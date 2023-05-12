@@ -27,7 +27,22 @@ class MyApp extends StatelessWidget {
         'info': (context) => const Info(),
       },
       theme: ThemeData(
-          fontFamily: 'Roboto', primaryColor: Color.fromARGB(255, 218, 0, 76)),
+          fontFamily: 'Roboto',
+          textTheme: const TextTheme(
+            displayLarge: TextStyle(fontSize: 14.0),
+            titleLarge: TextStyle(
+              fontSize: 16.0,
+              fontWeight: FontWeight.bold,
+            ),
+            bodyMedium: TextStyle(
+                fontSize: 14.0, color: Color.fromARGB(255, 57, 57, 57)),
+          ),
+          primaryColor: Color.fromARGB(255, 218, 0, 76),
+          highlightColor: Color.fromARGB(107, 218, 0, 76),
+          colorScheme: ColorScheme.fromSwatch(
+            backgroundColor: Color.fromARGB(255, 255, 197, 63),
+            accentColor: const Color.fromARGB(255, 49, 49, 49),
+          )),
       debugShowCheckedModeBanner: false,
       builder: EasyLoading.init(),
     );

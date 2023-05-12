@@ -17,13 +17,13 @@ class SharedPrefHelper {
   // retrieve user township
   static Future<String?> getUserTownship() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('userTsp');
+    return prefs.getString('userTownship');
   }
 
   // retrieve user village
   static Future<String?> getUserVillage() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('userVil');
+    return prefs.getString('userVillage');
   }
 
   // retrieve is other village
@@ -42,5 +42,11 @@ class SharedPrefHelper {
   static Future<bool?> getIsOtherWarehouse() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool('isOtherWarehouse');
+  }
+
+  // clear all values
+  static Future<void> clearSharedPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
   }
 }

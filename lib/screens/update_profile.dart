@@ -1,9 +1,12 @@
 import 'package:chdn_pharmacy/database/shared_pref_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uuid/uuid.dart';
 
 class UpdateProfile extends StatefulWidget {
-  const UpdateProfile({Key? key}) : super(key: key);
+  const UpdateProfile({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<UpdateProfile> createState() => _UpdateProfileState();
@@ -67,7 +70,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
   GlobalKey<FormState> _key = GlobalKey();
 
   // save data
-  Future<void> updateProfile() async {
+  Future<void> SaveProfile() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('userId', _userId);
     await prefs.setString('userName', _userNameController.text);
@@ -83,35 +86,47 @@ class _UpdateProfileState extends State<UpdateProfile> {
     super.initState();
 
     // load saved user name
-    SharedPrefHelper.getUserName().then(
-        (value) => _userNameController = TextEditingController(text: value));
+    SharedPrefHelper.getUserName().then((value) {
+      setState(() {
+        _userNameController = TextEditingController(text: value);
+      });
+    });
 
     // load saved user township
-    SharedPrefHelper.getUserTownship()
-        .then((value) => _selectedUserTownship = value);
+    SharedPrefHelper.getUserTownship().then((value) {
+      setState(() {
+        _selectedUserTownship = value;
+      });
+    });
 
     // load saved user village
-    SharedPrefHelper.getUserVillage()
-        .then((value) => _selectedUserVillage = value);
+    SharedPrefHelper.getUserVillage().then((value) {
+      setState(() {
+        _selectedUserVillage = value;
+      });
+    });
 
     // load is other village
-    SharedPrefHelper.getIsOtherVillage().then((value) => _isOtherVil);
+    SharedPrefHelper.getIsOtherVillage().then((value) {
+      setState(() {
+        _isOtherVil = value ?? false;
+      });
+    });
 
     // load saved user warehouse
-    SharedPrefHelper.getUserWarehouse()
-        .then((value) => _selectedUserWarehouse = value);
+    SharedPrefHelper.getUserWarehouse().then((value) {
+      setState(() {
+        _selectedUserWarehouse = value;
+      });
+    });
 
     // load is other warehouse
-    SharedPrefHelper.getIsOtherWarehouse().then((value) => _isOtherWarehouse);
+    SharedPrefHelper.getIsOtherWarehouse().then((value) {
+      setState(() {
+        _isOtherWarehouse = value ?? false;
+      });
+    });
   }
-
-  // // dispose text controller
-  // @override
-  // void dispose() {
-  //   _userNameController.dispose();
-  //   _otherVilController.dispose();
-  //   _otherWarehouseController.dispose();
-  // }
 
   // build widget tree
   @override
@@ -120,6 +135,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
       appBar: AppBar(
         title: const Text('Update Profile'),
         centerTitle: true,
+        backgroundColor: Theme.of(context).primaryColor,
       ),
       body: Form(
         key: _key,
@@ -145,18 +161,29 @@ class _UpdateProfileState extends State<UpdateProfile> {
                 onSaved: (value) {
                   _userNameController.text = value!;
                 },
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.person),
-                  hintText: 'Enter Incharge Name',
-                  border: OutlineInputBorder(),
-                ),
+                decoration: InputDecoration(
+                    contentPadding: EdgeInsets.all(10),
+                    prefixIcon: Icon(
+                      Icons.person,
+                      color: Colors.grey,
+                    ),
+                    hintText: 'Enter Incharge Name',
+                    border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: Theme.of(context).colorScheme.background,
+                            width: 2))),
+                maxLines: 1,
               ),
               const SizedBox(height: 10.0),
               // end of user name
               // Start of user township
               const Text('Township/ မြို့နယ်'),
               DropdownButtonFormField<String>(
-                  icon: Icon(Icons.arrow_drop_down_circle_outlined),
+                  icon: Icon(
+                    Icons.arrow_drop_down_circle_outlined,
+                    color: Colors.grey,
+                  ),
                   value: _selectedUserTownship,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -165,8 +192,15 @@ class _UpdateProfileState extends State<UpdateProfile> {
                     return null;
                   },
                   decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.map),
+                    prefixIcon: Icon(
+                      Icons.map,
+                      color: Colors.grey,
+                    ),
                     border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: Color.fromARGB(255, 255, 197, 63),
+                            width: 2)),
                     contentPadding:
                         EdgeInsets.only(top: 5, bottom: 5, right: 10),
                   ),
@@ -185,7 +219,10 @@ class _UpdateProfileState extends State<UpdateProfile> {
               const Text('Village/ ကျေးရွာ'),
               if (_showVilDropdown)
                 DropdownButtonFormField<String>(
-                    icon: Icon(Icons.arrow_drop_down_circle_outlined),
+                    icon: Icon(
+                      Icons.arrow_drop_down_circle_outlined,
+                      color: Colors.grey,
+                    ),
                     value: _selectedUserVillage,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -194,8 +231,15 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       return null;
                     },
                     decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.map),
+                      prefixIcon: Icon(
+                        Icons.map,
+                        color: Colors.grey,
+                      ),
                       border: OutlineInputBorder(),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Color.fromARGB(255, 255, 197, 63),
+                              width: 2)),
                       contentPadding:
                           EdgeInsets.only(top: 5, bottom: 5, right: 10),
                     ),
@@ -214,12 +258,14 @@ class _UpdateProfileState extends State<UpdateProfile> {
                           _selectedUserVillage = value;
                           _selectedUserWarehouse = null;
                         })),
-              const SizedBox(height: 10),
               // End of village
               // Start of village not found checkbox
               CheckboxListTile(
                 controlAffinity: ListTileControlAffinity.leading,
-                title: const Text('Village not found?/ ကျေးရွာရှာမတွေ့?'),
+                title: const Text(
+                  'Village not found?/ ကျေးရွာရှာမတွေ့?',
+                  style: TextStyle(fontSize: 12),
+                ),
                 value: _isOtherVil,
                 onChanged: (value) => setState(() {
                   _isOtherVil = value!;
@@ -246,9 +292,17 @@ class _UpdateProfileState extends State<UpdateProfile> {
                     _selectedUserVillage = value;
                   },
                   decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.map),
+                    prefixIcon: Icon(
+                      Icons.map,
+                      color: Colors.grey,
+                    ),
+                    contentPadding: EdgeInsets.all(10),
                     hintText: 'Please enter village name',
                     border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: Color.fromARGB(255, 255, 197, 63),
+                            width: 2)),
                   ),
                 ),
               const SizedBox(height: 10.0),
@@ -257,7 +311,10 @@ class _UpdateProfileState extends State<UpdateProfile> {
               const Text('Warehouse/Clinic/ ဆေးဂိုဒေါင်/ဆေးခန်း'),
               if (_showWarehouseDropdown)
                 DropdownButtonFormField<String>(
-                    icon: Icon(Icons.arrow_drop_down_circle_outlined),
+                    icon: Icon(
+                      Icons.arrow_drop_down_circle_outlined,
+                      color: Colors.grey,
+                    ),
                     value: _selectedUserWarehouse,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -266,8 +323,15 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       return null;
                     },
                     decoration: const InputDecoration(
-                      prefixIcon: Icon(Icons.location_city),
+                      prefixIcon: Icon(
+                        Icons.location_city,
+                        color: Colors.grey,
+                      ),
                       border: OutlineInputBorder(),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Color.fromARGB(255, 255, 197, 63),
+                              width: 2)),
                       contentPadding:
                           EdgeInsets.only(top: 5, bottom: 5, right: 10),
                     ),
@@ -291,7 +355,9 @@ class _UpdateProfileState extends State<UpdateProfile> {
               CheckboxListTile(
                 controlAffinity: ListTileControlAffinity.leading,
                 title: const Text(
-                    'Warehouse/Clinic not found? ဆေးဂိုဒေါင်/ဆေးခန်းရှာမတွေ့?'),
+                  'Warehouse/Clinic not found? ဆေးဂိုဒေါင်/ဆေးခန်းရှာမတွေ့?',
+                  style: TextStyle(fontSize: 12),
+                ),
                 value: _isOtherWarehouse,
                 onChanged: (value) => setState(() {
                   _isOtherWarehouse = value!;
@@ -317,9 +383,16 @@ class _UpdateProfileState extends State<UpdateProfile> {
                     _otherWarehouseController.text = value!;
                   },
                   decoration: const InputDecoration(
-                    prefixIcon: Icon(Icons.location_city),
+                    prefixIcon: Icon(
+                      Icons.location_city,
+                      color: Colors.grey,
+                    ),
                     hintText: 'Please enter Warehouse/Clinic',
                     border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: Color.fromARGB(255, 255, 197, 63),
+                            width: 2)),
                   ),
                 ),
               const SizedBox(height: 10.0), // end of other warehouse
@@ -335,7 +408,11 @@ class _UpdateProfileState extends State<UpdateProfile> {
                             _selectedUserVillage != '' ||
                             _selectedUserWarehouse != '')) {
                       _key.currentState?.save();
-                      await UpdateProfile();
+                      setState(() {
+                        const uuid = Uuid();
+                        _userId = uuid.v4();
+                      });
+                      await SaveProfile();
                       Navigator.pop(context, 'success');
                     } else {
                       showDialog(
@@ -361,6 +438,11 @@ class _UpdateProfileState extends State<UpdateProfile> {
                   },
                   icon: const Icon(Icons.save),
                   label: const Text('Save'),
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                          Theme.of(context).colorScheme.background),
+                      foregroundColor: MaterialStateProperty.all(
+                          Theme.of(context).colorScheme.secondary)),
                 ),
               ),
               const SizedBox(
