@@ -1,28 +1,45 @@
-import 'package:chdn_pharmacy/database/shared_pref_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uuid/uuid.dart';
 
 class EditProfile extends StatefulWidget {
-  const EditProfile({
-    Key? key,
-  }) : super(key: key);
+  const EditProfile(
+      {super.key,
+      required this.userName,
+      required this.userTownship,
+      required this.isOtherVillage,
+      required this.userVillage,
+      required this.isOtherWarehouse,
+      required this.userWarehouse});
+  final String userName;
+  final String userTownship;
+  final bool isOtherVillage;
+  final String userVillage;
+  final bool isOtherWarehouse;
+  final String userWarehouse;
 
   @override
   State<EditProfile> createState() => _EditProfileState();
 }
 
 class _EditProfileState extends State<EditProfile> {
-  // user name controller
+  // controllers
   TextEditingController _userNameController = TextEditingController();
+  TextEditingController _userVillageController = TextEditingController();
+  TextEditingController _userWarehouseController = TextEditingController();
 
-  // other village controller
-  TextEditingController _otherVilController = TextEditingController();
+  // dropdown selected values
+  String? _selectedUserTownship;
+  String? _selectedUserVillage;
+  bool _isOtherVillage = false;
+  bool _showVilDropdown = true;
+  String? _selectedUserWarehouse;
+  bool _isOtherWarehouse = false;
+  bool _showWarehouseDropdown = true;
 
-  // other warehouse controller
-  TextEditingController _otherWarehouseController = TextEditingController();
+  // form key
+  GlobalKey<FormState> _key = GlobalKey();
 
-  // dropdown lists
+  // dropdown options
   // township
   final townshipListItems = ['Demoso', 'Loikaw', 'Mese', 'Pruso'];
 
@@ -50,134 +67,102 @@ class _EditProfileState extends State<EditProfile> {
     'Pruso_vil3': ['vil3_wh1', 'vil3_wh2', 'vil3_wh3'],
   };
 
-  // default for other village
-  bool _isOtherVil = false;
-
-  // default to show village dropdown
-  bool _showVilDropdown = true;
-
-  // default for other warehouse
-  bool _isOtherWarehouse = false;
-
-  // default to show warehouse dropdown
-  bool _showWarehouseDropdown = true;
-
-  // for save and preload
-  String? _selectedUserTownship;
-  String? _selectedUserVillage;
-  String? _selectedUserWarehouse;
-  String _userId = '';
-  GlobalKey<FormState> _key = GlobalKey();
-
-  // save data
-  Future<void> SaveProfile() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('userId', _userId);
-    await prefs.setString('userName', _userNameController.text);
-    await prefs.setString('userTownship', _selectedUserTownship ?? '');
-    await prefs.setString('userVillage', _selectedUserVillage ?? '');
-    await prefs.setBool('isOtherVillage', _isOtherVil);
-    await prefs.setString('userWarehouse', _selectedUserWarehouse ?? '');
-    await prefs.setBool('isOtherWarehouse', _isOtherWarehouse);
-  }
-
+  // init state
   @override
   void initState() {
     super.initState();
-
-    // load saved user name
-    SharedPrefHelper.getUserName().then((value) {
-      setState(() {
-        _userNameController = TextEditingController(text: value);
-      });
+    // preload user name
+    setState(() {
+      _userNameController = TextEditingController(text: widget.userName);
     });
-
-    // load saved user township
-    SharedPrefHelper.getUserTownship().then((value) {
-      setState(() {
-        _selectedUserTownship = value;
-      });
+    // preload user township
+    setState(() {
+      _selectedUserTownship = widget.userTownship;
     });
-
-    // load saved user village
-    SharedPrefHelper.getUserVillage().then((value) {
+    // preload user village for other village
+    if (widget.isOtherVillage) {
       setState(() {
-        _selectedUserVillage = value;
+        _isOtherVillage = true;
+        _showVilDropdown = false;
+        _userVillageController =
+            TextEditingController(text: widget.userVillage);
       });
-    });
-
-    // load is other village
-    SharedPrefHelper.getIsOtherVillage().then((value) {
+    } else {
+      // preload user village for dropdown selcted village
       setState(() {
-        _isOtherVil = value ?? false;
+        _isOtherVillage = false;
+        _showVilDropdown = true;
+        _selectedUserVillage = widget.userVillage;
       });
-    });
-
-    // load saved user warehouse
-    SharedPrefHelper.getUserWarehouse().then((value) {
+    }
+    // preload user warehouse if other warehouse
+    if (widget.isOtherWarehouse) {
       setState(() {
-        _selectedUserWarehouse = value;
+        _isOtherWarehouse = true;
+        _showWarehouseDropdown = false;
+        _userWarehouseController =
+            TextEditingController(text: widget.userWarehouse);
       });
-    });
-
-    // load is other warehouse
-    SharedPrefHelper.getIsOtherWarehouse().then((value) {
+    } else {
+      // preload user warehouse for dropdown selected warehouse
       setState(() {
-        _isOtherWarehouse = value ?? false;
+        _isOtherWarehouse = false;
+        _showWarehouseDropdown = true;
+        _selectedUserWarehouse = widget.userWarehouse;
       });
-    });
+    }
   }
 
-  // build widget tree
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Theme.of(context).primaryColor,
         title: const Text('Edit Profile'),
         centerTitle: true,
-        backgroundColor: Theme.of(context).primaryColor,
+        // automaticallyImplyLeading: false,
       ),
       body: Form(
         key: _key,
         child: SingleChildScrollView(
-          padding: EdgeInsets.only(
-              left: MediaQuery.of(context).size.width * 0.05,
-              right: MediaQuery.of(context).size.width * 0.05),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+            padding: EdgeInsets.only(
+                left: MediaQuery.of(context).size.width * 0.05,
+                right: MediaQuery.of(context).size.width * 0.05),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               const SizedBox(height: 20),
-
               // start of user name
               const Text('Incharge/ တာဝန်ခံအမည်'),
-              TextFormField(
-                controller: _userNameController,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter incharge name';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _userNameController.text = value!;
-                },
-                decoration: InputDecoration(
-                    contentPadding: EdgeInsets.all(10),
-                    prefixIcon: Icon(
-                      Icons.person,
-                      color: Colors.grey,
-                    ),
-                    hintText: 'Enter Incharge Name',
-                    border: OutlineInputBorder(),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: Theme.of(context).colorScheme.background,
-                            width: 2))),
-                maxLines: 1,
-              ),
+              SizedBox(
+                height: 50,
+                child: TextFormField(
+                  controller: _userNameController,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter incharge name';
+                    }
+                    return null;
+                  },
+                  onSaved: (value) {
+                    _userNameController.text = value!;
+                  },
+                  decoration: InputDecoration(
+                      contentPadding: EdgeInsets.all(10),
+                      prefixIcon: Icon(
+                        Icons.person,
+                        color: Colors.grey,
+                      ),
+                      hintText: 'Enter Incharge Name',
+                      border: OutlineInputBorder(),
+                      focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.background,
+                              width: 2))),
+                  maxLines: 1,
+                ),
+              ), // end of user name
               const SizedBox(height: 10.0),
-              // end of user name
-              // Start of user township
+              // Start of township
               const Text('Township/ မြို့နယ်'),
               DropdownButtonFormField<String>(
                   icon: Icon(
@@ -209,15 +194,17 @@ class _EditProfileState extends State<EditProfile> {
                   onChanged: (value) => setState(() {
                         _selectedUserTownship = value;
                         _selectedUserVillage = null;
+                        _isOtherVillage = false;
+                        _showVilDropdown = true;
                         _selectedUserWarehouse = null;
-                        _isOtherVil = false;
                         _isOtherWarehouse = false;
+                        _showWarehouseDropdown = true;
                       })),
               const SizedBox(height: 10.0),
               // End of user township
               // Start of user village
               const Text('Village/ ကျေးရွာ'),
-              if (_showVilDropdown)
+              if (_showVilDropdown) // start of dropdown
                 DropdownButtonFormField<String>(
                     icon: Icon(
                       Icons.arrow_drop_down_circle_outlined,
@@ -257,85 +244,76 @@ class _EditProfileState extends State<EditProfile> {
                     onChanged: (value) => setState(() {
                           _selectedUserVillage = value;
                           _selectedUserWarehouse = null;
-                        })),
-              // End of village
-              // Start of village not found checkbox
+                        })), // End of village dropdown
+              // Start of other village check box
               CheckboxListTile(
                 controlAffinity: ListTileControlAffinity.leading,
                 title: const Text(
-                  'Village not found?/ ကျေးရွာရှာမတွေ့?',
+                  'Village not found? ကျေးရွာရှာမတွေ့?',
                   style: TextStyle(fontSize: 12),
                 ),
-                value: _isOtherVil,
+                value: _isOtherVillage,
                 onChanged: (value) => setState(() {
-                  _isOtherVil = value!;
-                  if (_isOtherVil) {
+                  _isOtherVillage = value!;
+                  if (_isOtherVillage) {
                     _showVilDropdown = false;
                     _selectedUserVillage = null;
+                    _userVillageController.text = '';
                   } else {
                     _showVilDropdown = true;
                   }
                 }),
-              ), // end of village not found checkbox
-              // Start of other village
-              if (_isOtherVil)
-                TextFormField(
-                  controller: _otherVilController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter village name';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    _otherVilController.text = value!;
-                    _selectedUserVillage = value;
-                  },
-                  decoration: const InputDecoration(
-                    prefixIcon: Icon(
-                      Icons.map,
-                      color: Colors.grey,
-                    ),
-                    contentPadding: EdgeInsets.all(10),
-                    hintText: 'Please enter village name',
-                    border: OutlineInputBorder(),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: Color.fromARGB(255, 255, 197, 63),
-                            width: 2)),
+              ), // end of other village checkbox
+              // start of other village text form field
+              if (_isOtherVillage)
+                SizedBox(
+                  height: 50,
+                  child: TextFormField(
+                    controller: _userVillageController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter village';
+                      }
+                      return null;
+                    },
+                    onSaved: (value) {
+                      _selectedUserVillage = value!;
+                    },
+                    decoration: InputDecoration(
+                        contentPadding: EdgeInsets.all(10),
+                        prefixIcon: Icon(
+                          Icons.map,
+                          color: Colors.grey,
+                        ),
+                        hintText: 'Please enter village',
+                        border: OutlineInputBorder(),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Theme.of(context).colorScheme.background,
+                                width: 2))),
+                    maxLines: 1,
                   ),
-                ),
-              const SizedBox(height: 10.0),
-              // end of other village
-              // Start of warehouse
-              const Text('Warehouse/Clinic/ ဆေးဂိုဒေါင်/ဆေးခန်း'),
+                ), // end of other village text form field
+              const SizedBox(height: 10),
+              // Start of warehouse dropdown
+              const Text('Warehouse/Clinic, ဆေးဂိုဒေါင်/ဆေးခန်း'),
               if (_showWarehouseDropdown)
                 DropdownButtonFormField<String>(
-                    icon: Icon(
-                      Icons.arrow_drop_down_circle_outlined,
-                      color: Colors.grey,
-                    ),
+                    icon: Icon(Icons.arrow_drop_down_circle_outlined),
                     value: _selectedUserWarehouse,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please select Warehouse/Clinic';
+                        return 'Please select warehouse/clinic';
                       }
                       return null;
                     },
                     decoration: const InputDecoration(
-                      prefixIcon: Icon(
-                        Icons.location_city,
-                        color: Colors.grey,
-                      ),
+                      prefixIcon: Icon(Icons.location_city),
                       border: OutlineInputBorder(),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: Color.fromARGB(255, 255, 197, 63),
-                              width: 2)),
                       contentPadding:
                           EdgeInsets.only(top: 5, bottom: 5, right: 10),
                     ),
-                    hint: const Text('Please select warehouse/clinic'),
+                    hint: const Text('Please select Warehouse/Clinic'),
                     items: _selectedUserVillage == null
                         ? []
                         : warehouseListItems[_selectedUserVillage!]!
@@ -350,12 +328,12 @@ class _EditProfileState extends State<EditProfile> {
                           _selectedUserWarehouse = value;
                         })),
               const SizedBox(height: 10),
-              // End of warehouse
-              // Start of warehouse not found checkbox
+// End of warehouse dropdown
+// start of other warehouse check box
               CheckboxListTile(
                 controlAffinity: ListTileControlAffinity.leading,
                 title: const Text(
-                  'Warehouse/Clinic not found? ဆေးဂိုဒေါင်/ဆေးခန်းရှာမတွေ့?',
+                  'Warehouse/Clinic not found?, ဆေးဂိုဒေါင်/ဆေးခန်းရှာမတွေ့?',
                   style: TextStyle(fontSize: 12),
                 ),
                 value: _isOtherWarehouse,
@@ -364,93 +342,129 @@ class _EditProfileState extends State<EditProfile> {
                   if (_isOtherWarehouse) {
                     _showWarehouseDropdown = false;
                     _selectedUserWarehouse = null;
+                    _userWarehouseController.text = '';
                   } else {
                     _showWarehouseDropdown = true;
                   }
                 }),
-              ), // end of warehouse not found checkbox
-              // Start of other warehouse
+              ), // end of other warehouse checkbox
+              // start of other warehouse text form field
               if (_isOtherWarehouse)
-                TextFormField(
-                  controller: _otherWarehouseController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter warehouse/clinic';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    _otherWarehouseController.text = value!;
-                  },
-                  decoration: const InputDecoration(
-                    prefixIcon: Icon(
-                      Icons.location_city,
-                      color: Colors.grey,
-                    ),
-                    hintText: 'Please enter Warehouse/Clinic',
-                    border: OutlineInputBorder(),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: Color.fromARGB(255, 255, 197, 63),
-                            width: 2)),
+                SizedBox(
+                  height: 50,
+                  child: TextFormField(
+                    controller: _userWarehouseController,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter warehouse/clinic';
+                      }
+                      return null;
+                    },
+                    onSaved: (value) {
+                      _selectedUserWarehouse = value!;
+                    },
+                    decoration: InputDecoration(
+                        contentPadding: EdgeInsets.all(10),
+                        prefixIcon: Icon(
+                          Icons.location_city,
+                          color: Colors.grey,
+                        ),
+                        hintText: 'Enter warehouse/clinic',
+                        border: OutlineInputBorder(),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Theme.of(context).colorScheme.background,
+                                width: 2))),
+                    maxLines: 1,
                   ),
-                ),
-              const SizedBox(height: 10.0), // end of other warehouse
-              // Start of Save Button
-              SizedBox(
-                width: 200,
-                height: 45,
-                child: ElevatedButton.icon(
-                  onPressed: () async {
-                    if (_key.currentState != null &&
-                        _key.currentState!.validate() &&
-                        (_selectedUserTownship != '' ||
-                            _selectedUserVillage != '' ||
-                            _selectedUserWarehouse != '')) {
-                      _key.currentState?.save();
-                      setState(() {
-                        const uuid = Uuid();
-                        _userId = uuid.v4();
-                      });
-                      await SaveProfile();
-                      Navigator.pop(context, 'success');
-                    } else {
-                      showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: const Text(
-                                  'Please enter the required values'),
-                              content: const Text(
-                                'အချက်အလက်များ ပြည့်စုံစွာရွေးခြယ်ဖြည့်သွင်းပါ',
-                                style: TextStyle(fontSize: 12),
-                              ),
-                              actions: <Widget>[
-                                TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text('OK')),
-                              ],
-                            );
-                          });
-                    }
-                  },
-                  icon: const Icon(Icons.save),
-                  label: const Text('Save'),
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
-                          Theme.of(context).colorScheme.background),
-                      foregroundColor: MaterialStateProperty.all(
-                          Theme.of(context).colorScheme.secondary)),
-                ),
+                ), // end of other warehouse text form field
+              const SizedBox(height: 20),
+              // start of button row
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: // start of save button
+                        SizedBox(
+                      width: 200,
+                      height: 45,
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          if (_key.currentState != null &&
+                              _key.currentState!.validate() &&
+                              (_selectedUserTownship != null ||
+                                  _selectedUserVillage != null ||
+                                  _selectedUserWarehouse != null)) {
+                            _key.currentState?.save();
+                            await SaveEditedProfile();
+                            Navigator.pop(context, 'success');
+                          } else {
+                            showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text(
+                                        'Please enter the required values'),
+                                    content: const Text(
+                                      'အချက်အလက်များ ပြည့်စုံစွာရွေးခြယ်ဖြည့်သွင်းပါ',
+                                      style: TextStyle(fontSize: 12),
+                                    ),
+                                    actions: <Widget>[
+                                      TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: const Text('OK')),
+                                    ],
+                                  );
+                                });
+                          }
+                        },
+                        icon: const Icon(Icons.save),
+                        label: const Text(
+                          'Save',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                                Theme.of(context).colorScheme.background),
+                            foregroundColor: MaterialStateProperty.all(
+                                Theme.of(context).colorScheme.secondary)),
+                      ),
+                    ),
+                  ), // end of save button
+                  Expanded(
+                    flex: 1,
+                    child: SizedBox(width: 10),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: // start of cancel button
+                        SizedBox(
+                      width: 200,
+                      height: 45,
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text(
+                          'Cancel',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                                Color.fromARGB(255, 255, 255, 255)),
+                            foregroundColor:
+                                MaterialStateProperty.all(Colors.red),
+                            side: MaterialStateProperty.all(
+                                BorderSide(width: 2.0, color: Colors.red))),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(
-                height: 20,
-              )
-            ],
-          ),
-        ),
+            ])),
       ),
     );
   }
@@ -463,4 +477,15 @@ class _EditProfileState extends State<EditProfile> {
             item,
             style: const TextStyle(fontSize: 15),
           ));
+
+  // save edited data
+  Future<void> SaveEditedProfile() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('userName', _userNameController.text);
+    await prefs.setString('userTownship', _selectedUserTownship!);
+    await prefs.setString('userVillage', _selectedUserVillage!);
+    await prefs.setString('userWarehouse', _selectedUserWarehouse!);
+    await prefs.setBool('isOtherVillage', _isOtherVillage);
+    await prefs.setBool('isOtherWarehouse', _isOtherWarehouse);
+  }
 }

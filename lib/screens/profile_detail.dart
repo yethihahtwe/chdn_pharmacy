@@ -17,7 +17,9 @@ class _ProfileDetailState extends State<ProfileDetail> {
   String? _userName;
   String? _userTownship;
   String? _userVillage;
+  bool? _isOtherVillage;
   String? _userWarehouse;
+  bool? _isOtherWarehouse;
 
   @override
   void initState() {
@@ -42,13 +44,21 @@ class _ProfileDetailState extends State<ProfileDetail> {
         _userVillage = value;
       });
     });
+    SharedPrefHelper.getIsOtherVillage().then((value) {
+      setState(() {
+        _isOtherVillage = value;
+      });
+    });
     SharedPrefHelper.getUserWarehouse().then((value) {
       _userWarehouse = value;
+    });
+    SharedPrefHelper.getIsOtherWarehouse().then((value) {
+      _isOtherWarehouse = value;
     });
   }
 
   // Index for bottom navigation bar
-  int _selectedIndex = 2;
+  int _selectedIndex = 3;
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -192,100 +202,77 @@ class _ProfileDetailState extends State<ProfileDetail> {
             ),
             // start of button row
             Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Expanded(
-                  flex: 2,
-                  child: // Start of edit profile Button
-                      SizedBox(
-                    width: 150,
-                    height: 45,
-                    child: ElevatedButton.icon(
-                      onPressed: () async {
-                        var result = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const EditProfile()));
-                        if (result == 'success') {
-                          SharedPrefHelper.getUserId().then((value) {
-                            setState(() {
-                              _userId = value ?? 'Not Set';
-                            });
+                SizedBox(
+                  width: 150,
+                  height: 45,
+                  child: ElevatedButton.icon(
+                    onPressed: () async {
+                      var result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => EditProfile(
+                                    userName: _userName ?? '',
+                                    userTownship: _userTownship ?? '',
+                                    isOtherVillage: _isOtherVillage ?? false,
+                                    userVillage: _userVillage ?? '',
+                                    isOtherWarehouse:
+                                        _isOtherWarehouse ?? false,
+                                    userWarehouse: _userWarehouse ?? '',
+                                  )));
+                      if (result == 'success') {
+                        SharedPrefHelper.getUserName().then((value) {
+                          setState(() {
+                            _userName = value ?? 'Not Set';
                           });
-                        }
-                      },
-                      icon: const Icon(
-                        Icons.edit,
-                        size: 16,
-                      ),
-                      label: const Text(
-                        'Edit Profile',
-                        style: TextStyle(fontSize: 12),
-                      ),
-                      style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
-                              Theme.of(context).colorScheme.background),
-                          foregroundColor: MaterialStateProperty.all(
-                              Theme.of(context).colorScheme.secondary)),
+                        });
+                        SharedPrefHelper.getUserTownship().then((value) {
+                          setState(() {
+                            _userTownship = value ?? 'Not Set';
+                          });
+                        });
+                        SharedPrefHelper.getIsOtherVillage().then((value) {
+                          setState(() {
+                            _isOtherVillage = value ?? false;
+                          });
+                        });
+                        SharedPrefHelper.getUserVillage().then((value) {
+                          setState(() {
+                            _userVillage = value ?? 'Not Set';
+                          });
+                        });
+                        SharedPrefHelper.getIsOtherWarehouse().then((value) {
+                          setState(() {
+                            _isOtherWarehouse = value ?? false;
+                          });
+                        });
+                        SharedPrefHelper.getUserWarehouse().then((value) {
+                          setState(() {
+                            _userWarehouse = value ?? 'Not Set';
+                          });
+                        });
+                      }
+                    },
+                    icon: const Icon(
+                      Icons.edit,
+                      size: 16,
                     ),
-                  ),
-                ),
-                Expanded(
-                    flex: 1,
-                    child: SizedBox(
-                      width: 10,
-                    )),
-                Expanded(
-                  flex: 2,
-                  child: // Start of delete profile Button
-                      Visibility(
-                    visible: _userId != null,
-                    child: SizedBox(
-                      width: 150,
-                      height: 45,
-                      child: ElevatedButton.icon(
-                        onPressed: () async {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: Text('Delete Profile'),
-                                content: Text(
-                                    'Are you sure you want to delete your profile?\nအချက်အလက်များဖျက်ပစ်ရန် သေချာပါသလား?',
-                                    style: TextStyle(fontSize: 12)),
-                                actions: <Widget>[
-                                  TextButton(
-                                    child: Text(
-                                      'Delete',
-                                      style: TextStyle(color: Colors.red),
-                                    ),
-                                    onPressed: () async {
-                                      SharedPrefHelper.clearSharedPreferences();
-                                      Navigator.pop(context);
-                                      setState(() {});
-                                    },
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        },
-                        icon: const Icon(
-                          Icons.delete,
-                          size: 16,
-                        ),
-                        label: const Text('Delete Profile',
-                            style: TextStyle(fontSize: 12)),
-                        style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.all(Colors.red),
-                            foregroundColor:
-                                MaterialStateProperty.all(Colors.white)),
-                      ),
+                    label: const Text(
+                      'Edit Profile',
+                      style: TextStyle(fontSize: 12),
                     ),
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                            Theme.of(context).colorScheme.background),
+                        foregroundColor: MaterialStateProperty.all(
+                            Theme.of(context).colorScheme.secondary)),
                   ),
                 ),
               ],
+            ),
+            SizedBox(
+              height: 10,
             ),
           ])),
       bottomNavigationBar: BottomNavigation(

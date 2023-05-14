@@ -17,9 +17,9 @@ class BottomNavigation extends StatelessWidget {
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
         BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'My Profile'),
         BottomNavigationBarItem(
-            icon: Icon(Icons.group), label: 'Other Profile'),
+            icon: Icon(Icons.manage_search), label: 'Manage'),
+        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'My Profile'),
         BottomNavigationBarItem(icon: Icon(Icons.info), label: 'Info'),
       ],
       currentIndex: selectedIndex,
@@ -31,10 +31,10 @@ class BottomNavigation extends StatelessWidget {
           Navigator.pushNamed(context, 'history');
         }
         if (value == 2) {
-          Navigator.pushNamed(context, 'profile');
+          Navigator.pushNamed(context, 'manage');
         }
         if (value == 3) {
-          Navigator.pushNamed(context, 'other_profile');
+          Navigator.pushNamed(context, 'profile');
         }
         if (value == 4) {
           Navigator.pushNamed(context, 'info');

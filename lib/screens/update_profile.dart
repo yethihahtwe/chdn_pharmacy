@@ -380,7 +380,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                     return null;
                   },
                   onSaved: (value) {
-                    _otherWarehouseController.text = value!;
+                    _selectedUserWarehouse = value!;
                   },
                   decoration: const InputDecoration(
                     prefixIcon: Icon(

@@ -1,4 +1,4 @@
-#Fri May 12 16:44:49 ICT 2023
-base.0=/Users/yethihahtwe/dev/chdn_pharmacy/build/app/intermediates/dex/debug/mergeDexDebug/classes.dex
+#Sun May 14 22:52:29 ICT 2023
+base.0=/Users/yethihahtwe/repos/chdn_pharmacy/build/app/intermediates/dex/debug/mergeDexDebug/classes.dex
 renamed.0=classes.dex
 path.0=classes.dex
