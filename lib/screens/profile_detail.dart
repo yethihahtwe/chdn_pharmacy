@@ -94,7 +94,7 @@ class _ProfileDetailState extends State<ProfileDetail> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Expanded(
+                const Expanded(
                     flex: 1,
                     child: Text(
                       'User ID',
@@ -104,7 +104,7 @@ class _ProfileDetailState extends State<ProfileDetail> {
                     flex: 2,
                     child: Text(
                       _userId ?? 'Not set',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     )),
               ],
             ), // end of user id row
@@ -116,7 +116,7 @@ class _ProfileDetailState extends State<ProfileDetail> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Expanded(
+                const Expanded(
                     flex: 1,
                     child: Text(
                       'Incharge Name\nတာဝန်ခံအမည်',
@@ -126,7 +126,7 @@ class _ProfileDetailState extends State<ProfileDetail> {
                     flex: 2,
                     child: Text(
                       _userName ?? 'Not Set',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     )),
               ],
             ), // end of user name row
@@ -138,7 +138,7 @@ class _ProfileDetailState extends State<ProfileDetail> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Expanded(
+                const Expanded(
                     flex: 1,
                     child: Text(
                       'Township\nမြို့နယ်',
@@ -148,7 +148,7 @@ class _ProfileDetailState extends State<ProfileDetail> {
                     flex: 2,
                     child: Text(
                       _userTownship ?? 'Not Set',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     )),
               ],
             ), // end of user township row
@@ -160,7 +160,7 @@ class _ProfileDetailState extends State<ProfileDetail> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Expanded(
+                const Expanded(
                     flex: 1,
                     child: Text(
                       'Village\nကျေးရွာ',
@@ -170,7 +170,7 @@ class _ProfileDetailState extends State<ProfileDetail> {
                     flex: 2,
                     child: Text(
                       _userVillage ?? 'Not Set',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     )),
               ],
             ), // end of user village row
@@ -182,7 +182,7 @@ class _ProfileDetailState extends State<ProfileDetail> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Expanded(
+                const Expanded(
                     flex: 1,
                     child: Text(
                       'Warehouse/Clinic\nဆေးဂိုဒေါင်၊ ဆေးခန်း',
@@ -192,11 +192,11 @@ class _ProfileDetailState extends State<ProfileDetail> {
                     flex: 2,
                     child: Text(
                       _userWarehouse ?? 'Not Set',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
                     )),
               ],
             ), // end of user warehouse row
-            SizedBox(
+            const SizedBox(
               height: 10,
               child: Divider(),
             ),
@@ -271,7 +271,7 @@ class _ProfileDetailState extends State<ProfileDetail> {
                 ),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
           ])),

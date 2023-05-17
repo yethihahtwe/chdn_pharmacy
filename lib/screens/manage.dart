@@ -63,7 +63,7 @@ class _ManageState extends State<Manage> {
                                       builder: (context) =>
                                           const ManageItemType()));
                             },
-                            child: ListTile(
+                            child: const ListTile(
                               leading: Icon(Icons.type_specimen_outlined),
                               title: Text('Manage Item Types'),
                               subtitle:
@@ -85,7 +85,7 @@ class _ManageState extends State<Manage> {
                                       builder: (context) =>
                                           const ManageItem()));
                             },
-                            child: ListTile(
+                            child: const ListTile(
                               leading: Icon(Icons.medication),
                               title: Text('Manage Items'),
                               subtitle: Text('ပစ္စည်းအမည်များ စီမံခန့်ခွဲရန်'),
@@ -108,7 +108,7 @@ class _ManageState extends State<Manage> {
                                       builder: (context) =>
                                           const ManagePackageForm()));
                             },
-                            child: ListTile(
+                            child: const ListTile(
                               leading: Icon(Icons.local_pharmacy_outlined),
                               title: Text('Manage Package Forms'),
                               subtitle:
@@ -119,7 +119,28 @@ class _ManageState extends State<Manage> {
                       ]));
             } else {
               return Container(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height * 0.6,
+                margin: EdgeInsets.only(
+                    top: 20,
+                    left: MediaQuery.of(context).size.width * 0.05,
+                    right: MediaQuery.of(context).size.width * 0.05),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(
+                        color: const Color.fromARGB(255, 218, 218, 218),
+                        width: 1),
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: const [
+                      BoxShadow(
+                          color: Color.fromARGB(94, 158, 158, 158),
+                          blurRadius: 10.0,
+                          offset: Offset(0.0, 1.0)),
+                    ]),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     SizedBox(
                       height: 150,
@@ -127,7 +148,7 @@ class _ManageState extends State<Manage> {
                         child: Image.asset('assets/images/CHDN_LOGO.png'),
                       ),
                     ),
-                    Text(
+                    const Text(
                         'You have not set your Warehouse/Clinic profile.\nPlease click `Update Profile` button.\nဆေးဂိုဒေါင်/ဆေးခန်းဆိုင်ရာ အချက်အလက်များ မဖြည့်သွင်းရသေးပါ။ `Update Profile` ခလုတ်ကိုနှိပ်၍ဖြည့်သွင်းပါ'),
                     // Start of update profile button
                     SizedBox(
@@ -138,7 +159,7 @@ class _ManageState extends State<Manage> {
                           var result = await Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => UpdateProfile()));
+                                  builder: (context) => const UpdateProfile()));
                           if (result == 'success') {
                             setState(() {});
                           }
@@ -153,28 +174,7 @@ class _ManageState extends State<Manage> {
                       ),
                     ),
                   ],
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  crossAxisAlignment: CrossAxisAlignment.end,
                 ),
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height * 0.6,
-                margin: EdgeInsets.only(
-                    top: 20,
-                    left: MediaQuery.of(context).size.width * 0.05,
-                    right: MediaQuery.of(context).size.width * 0.05),
-                padding: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(
-                        color: const Color.fromARGB(255, 218, 218, 218),
-                        width: 1),
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Color.fromARGB(94, 158, 158, 158),
-                          blurRadius: 10.0,
-                          offset: Offset(0.0, 1.0)),
-                    ]),
               );
             }
           }),

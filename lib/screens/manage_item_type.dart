@@ -30,11 +30,11 @@ class _ManageItemTypeState extends State<ManageItemType> {
               color: Color.fromARGB(255, 49, 49, 49),
               fontWeight: FontWeight.bold),
         ),
-        icon: Icon(
+        icon: const Icon(
           Icons.add,
           color: Color.fromARGB(255, 49, 49, 49),
         ),
-        backgroundColor: Color.fromARGB(255, 255, 197, 63),
+        backgroundColor: const Color.fromARGB(255, 255, 197, 63),
       ),
       // start of app bar
       appBar: AppBar(
@@ -74,17 +74,17 @@ class _ManageItemTypeState extends State<ManageItemType> {
                                     setState(() {});
                                   }
                                 },
-                                icon: Icon(
+                                icon: const Icon(
                                   Icons.edit,
                                   color: Color.fromARGB(255, 218, 0, 76),
                                 ))
-                            : Text('')),
+                            : const Text('')),
                       ]));
                     }
                     return Column(
                       children: [
                         DataTable(
-                            columns: [
+                            columns: const [
                               DataColumn(
                                   label: Text(
                                 'Item Type',
@@ -98,10 +98,10 @@ class _ManageItemTypeState extends State<ManageItemType> {
                                           fontWeight: FontWeight.bold))),
                             ],
                             headingRowColor: MaterialStateProperty.all(
-                              Color.fromARGB(255, 255, 227, 160),
+                              const Color.fromARGB(255, 255, 227, 160),
                             ),
                             rows: rows),
-                        SizedBox(
+                        const SizedBox(
                           height: 80,
                         )
                       ],
@@ -109,7 +109,7 @@ class _ManageItemTypeState extends State<ManageItemType> {
                   } else if (snapshot.hasError) {
                     return Text('${snapshot.error}');
                   } else {
-                    return CircularProgressIndicator();
+                    return const CircularProgressIndicator();
                   }
                 })
           ])),

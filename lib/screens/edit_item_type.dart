@@ -15,10 +15,13 @@ class EditItemType extends StatefulWidget {
 
 class _EditItemTypeState extends State<EditItemType> {
   // form key
-  GlobalKey<FormState> _key = GlobalKey();
+  final GlobalKey<FormState> _key = GlobalKey();
 
   // controllers
-  TextEditingController _itemTypeController = TextEditingController();
+  final TextEditingController _itemTypeController = TextEditingController();
+
+  // empty list to check duplicate
+  List<String> _itemTypeList = [];
 
   // load passed data
   @override
@@ -26,6 +29,14 @@ class _EditItemTypeState extends State<EditItemType> {
     super.initState();
     setState(() {
       _itemTypeController.text = widget.itemTypeName;
+    });
+
+    // load query to empty list
+    DatabaseHelper().getAllItemType().then((value) {
+      setState(() {
+        _itemTypeList = List<String>.from(value.map((e) =>
+            e['item_type_name'].toString().toLowerCase().replaceAll(' ', '')));
+      });
     });
   }
 
@@ -59,19 +70,24 @@ class _EditItemTypeState extends State<EditItemType> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter item type';
                     }
+                    if (widget.itemTypeName != value &&
+                        _itemTypeList.contains(
+                            value.toLowerCase().replaceAll(' ', ''))) {
+                      return '$value is already in Item Types';
+                    }
                     return null;
                   },
                   onSaved: (value) {
                     _itemTypeController.text = value!;
                   },
                   decoration: InputDecoration(
-                      contentPadding: EdgeInsets.all(10),
-                      prefixIcon: Icon(
+                      contentPadding: const EdgeInsets.all(10),
+                      prefixIcon: const Icon(
                         Icons.person,
                         color: Colors.grey,
                       ),
                       hintText: 'Enter Item Type',
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
                       focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide(
                               color: Theme.of(context).colorScheme.background,
@@ -101,22 +117,23 @@ class _EditItemTypeState extends State<EditItemType> {
                                 ItemType.updateItemType(
                                     itemTypeName: _itemTypeController.text),
                                 widget.itemTypeId);
+                            // ignore: use_build_context_synchronously
                             Navigator.pop(context, 'success');
                           }
                         },
-                        child: const Text(
-                          'Save',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
                         style: ButtonStyle(
                             backgroundColor: MaterialStateProperty.all(
                                 Theme.of(context).colorScheme.background),
                             foregroundColor: MaterialStateProperty.all(
                                 Theme.of(context).colorScheme.secondary)),
+                        child: const Text(
+                          'Save',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                   ),
-                  Expanded(flex: 1, child: SizedBox(width: 10)),
+                  const Expanded(flex: 1, child: SizedBox(width: 10)),
                   Expanded(
                     flex: 2,
                     child: // Start of delete Button
@@ -129,8 +146,9 @@ class _EditItemTypeState extends State<EditItemType> {
                                       context: context,
                                       builder: (BuildContext context) {
                                         return AlertDialog(
-                                          title: Text('Delete Item Type?'),
-                                          content: Text(
+                                          title:
+                                              const Text('Delete Item Type?'),
+                                          content: const Text(
                                               'Are you sure you want to delete item type?\nပစ္စည်းအမျိုးအစားကိုဖျက်ရန် သေချာပါသလား?',
                                               style: TextStyle(fontSize: 12)),
                                           actions: <Widget>[
@@ -139,11 +157,13 @@ class _EditItemTypeState extends State<EditItemType> {
                                                   await DatabaseHelper()
                                                       .deleteItemType(
                                                           widget.itemTypeId);
+                                                  // ignore: use_build_context_synchronously
                                                   Navigator.pop(context);
+                                                  // ignore: use_build_context_synchronously
                                                   Navigator.pop(
                                                       context, 'success');
                                                 },
-                                                child: Text(
+                                                child: const Text(
                                                   'Delete',
                                                   style: TextStyle(
                                                     color: Colors.red,
@@ -152,7 +172,7 @@ class _EditItemTypeState extends State<EditItemType> {
                                             TextButton(
                                               onPressed: () =>
                                                   Navigator.pop(context),
-                                              child: Text(
+                                              child: const Text(
                                                 'Cancel',
                                                 style: TextStyle(
                                                   color: Colors.red,
@@ -164,15 +184,16 @@ class _EditItemTypeState extends State<EditItemType> {
                                         );
                                       });
                                 },
+                                style: ButtonStyle(
+                                  side: MaterialStateProperty.all(
+                                      const BorderSide(
+                                          color: Colors.red, width: 2)),
+                                ),
                                 child: const Text(
                                   'Delete',
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: Colors.red),
-                                ),
-                                style: ButtonStyle(
-                                  side: MaterialStateProperty.all(
-                                      BorderSide(color: Colors.red, width: 2)),
                                 ))),
                   ),
                 ],

@@ -13,7 +13,7 @@ class AddItem extends StatefulWidget {
 
 class _AddItemState extends State<AddItem> {
   // form key
-  GlobalKey<FormState> _key = GlobalKey();
+  final GlobalKey<FormState> _key = GlobalKey();
 
   // user id
   String? _userId;
@@ -21,7 +21,7 @@ class _AddItemState extends State<AddItem> {
   String? _selectedItemType;
 
   // controllers
-  TextEditingController _itemNameController = TextEditingController();
+  final TextEditingController _itemNameController = TextEditingController();
 
   // dropdown options
   List<String> itemTypeList = [];
@@ -29,7 +29,7 @@ class _AddItemState extends State<AddItem> {
   @override
   void initState() {
     super.initState();
-    // Load volunteer list into volunteer dropdown
+    // Load item type list into item type dropdown
     DatabaseHelper().getAllItemType().then((value) {
       setState(() {
         itemTypeList =
@@ -51,7 +51,7 @@ class _AddItemState extends State<AddItem> {
       // start of app bar
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColor,
-        title: const Text('Add Item'),
+        title: const Text('Add New Item'),
         centerTitle: true,
       ), // end of app bar
       body: Form(
@@ -65,7 +65,8 @@ class _AddItemState extends State<AddItem> {
               const SizedBox(
                 height: 20,
               ),
-              const Text('Item and composition\nပစ္စည်းအမည်နှင့်ပါဝင်မှုပမာဏ'),
+              const Text(
+                  'New Item and Composition\nပစ္စည်းသစ်အမည်နှင့်ပါဝင်မှုပမာဏ'),
               SizedBox(
                 height: 50,
                 child: TextFormField(
@@ -74,19 +75,20 @@ class _AddItemState extends State<AddItem> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter item name';
                     }
+
                     return null;
                   },
                   onSaved: (value) {
                     _itemNameController.text = value!;
                   },
                   decoration: InputDecoration(
-                      contentPadding: EdgeInsets.all(10),
-                      prefixIcon: Icon(
+                      contentPadding: const EdgeInsets.all(10),
+                      prefixIcon: const Icon(
                         Icons.medication_outlined,
                         color: Colors.grey,
                       ),
                       hintText: 'Enter Item Name',
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
                       focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide(
                               color: Theme.of(context).colorScheme.background,
@@ -94,11 +96,11 @@ class _AddItemState extends State<AddItem> {
                   maxLines: 1,
                 ),
               ), // end of item name
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               // Start of item type dropdown
               const Text('Item Type, ပစ္စည်းအမျိုးအစား'),
               DropdownButtonFormField<String>(
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.arrow_drop_down_circle_outlined,
                     color: Colors.grey,
                   ),
@@ -150,6 +152,7 @@ class _AddItemState extends State<AddItem> {
                                 itemType: _selectedItemType!,
                                 itemEditable: 'true',
                                 itemCre: _userId!));
+                            // ignore: use_build_context_synchronously
                             Navigator.pop(context, 'success');
                           }
                         },
@@ -164,7 +167,7 @@ class _AddItemState extends State<AddItem> {
                       ),
                     ),
                   ),
-                  Expanded(
+                  const Expanded(
                     flex: 1,
                     child: SizedBox(width: 10),
                   ),
@@ -177,15 +180,15 @@ class _AddItemState extends State<AddItem> {
                             onPressed: () {
                               Navigator.pop(context);
                             },
+                            style: ButtonStyle(
+                              side: MaterialStateProperty.all(const BorderSide(
+                                  color: Colors.red, width: 2)),
+                            ),
                             child: const Text(
                               'Cancel',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.red),
-                            ),
-                            style: ButtonStyle(
-                              side: MaterialStateProperty.all(
-                                  BorderSide(color: Colors.red, width: 2)),
                             ))),
                   ),
                 ],

@@ -26,7 +26,7 @@ void main() async {
         .load(join('assets', 'databases', 'pharmacy_preload.db'));
     List<int> bytes =
         data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
-    await new File(path).writeAsBytes(bytes);
+    await File(path).writeAsBytes(bytes);
   }
 
   runApp(const MyApp());
@@ -58,10 +58,10 @@ class MyApp extends StatelessWidget {
             bodyMedium: TextStyle(
                 fontSize: 14.0, color: Color.fromARGB(255, 57, 57, 57)),
           ),
-          primaryColor: Color.fromARGB(255, 218, 0, 76),
-          highlightColor: Color.fromARGB(107, 218, 0, 76),
+          primaryColor: const Color.fromARGB(255, 218, 0, 76),
+          highlightColor: const Color.fromARGB(107, 218, 0, 76),
           colorScheme: ColorScheme.fromSwatch(
-            backgroundColor: Color.fromARGB(255, 255, 197, 63),
+            backgroundColor: const Color.fromARGB(255, 255, 197, 63),
             accentColor: const Color.fromARGB(255, 49, 49, 49),
           )),
       debugShowCheckedModeBanner: false,

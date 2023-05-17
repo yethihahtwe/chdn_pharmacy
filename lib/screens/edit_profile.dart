@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -37,7 +39,7 @@ class _EditProfileState extends State<EditProfile> {
   bool _showWarehouseDropdown = true;
 
   // form key
-  GlobalKey<FormState> _key = GlobalKey();
+  final GlobalKey<FormState> _key = GlobalKey();
 
   // dropdown options
   // township
@@ -147,13 +149,13 @@ class _EditProfileState extends State<EditProfile> {
                     _userNameController.text = value!;
                   },
                   decoration: InputDecoration(
-                      contentPadding: EdgeInsets.all(10),
-                      prefixIcon: Icon(
+                      contentPadding: const EdgeInsets.all(10),
+                      prefixIcon: const Icon(
                         Icons.person,
                         color: Colors.grey,
                       ),
                       hintText: 'Enter Incharge Name',
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
                       focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide(
                               color: Theme.of(context).colorScheme.background,
@@ -165,7 +167,7 @@ class _EditProfileState extends State<EditProfile> {
               // Start of township
               const Text('Township/ မြို့နယ်'),
               DropdownButtonFormField<String>(
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.arrow_drop_down_circle_outlined,
                     color: Colors.grey,
                   ),
@@ -206,7 +208,7 @@ class _EditProfileState extends State<EditProfile> {
               const Text('Village/ ကျေးရွာ'),
               if (_showVilDropdown) // start of dropdown
                 DropdownButtonFormField<String>(
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.arrow_drop_down_circle_outlined,
                       color: Colors.grey,
                     ),
@@ -280,13 +282,13 @@ class _EditProfileState extends State<EditProfile> {
                       _selectedUserVillage = value!;
                     },
                     decoration: InputDecoration(
-                        contentPadding: EdgeInsets.all(10),
-                        prefixIcon: Icon(
+                        contentPadding: const EdgeInsets.all(10),
+                        prefixIcon: const Icon(
                           Icons.map,
                           color: Colors.grey,
                         ),
                         hintText: 'Please enter village',
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
                         focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
                                 color: Theme.of(context).colorScheme.background,
@@ -299,7 +301,7 @@ class _EditProfileState extends State<EditProfile> {
               const Text('Warehouse/Clinic, ဆေးဂိုဒေါင်/ဆေးခန်း'),
               if (_showWarehouseDropdown)
                 DropdownButtonFormField<String>(
-                    icon: Icon(Icons.arrow_drop_down_circle_outlined),
+                    icon: const Icon(Icons.arrow_drop_down_circle_outlined),
                     value: _selectedUserWarehouse,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -364,13 +366,13 @@ class _EditProfileState extends State<EditProfile> {
                       _selectedUserWarehouse = value!;
                     },
                     decoration: InputDecoration(
-                        contentPadding: EdgeInsets.all(10),
-                        prefixIcon: Icon(
+                        contentPadding: const EdgeInsets.all(10),
+                        prefixIcon: const Icon(
                           Icons.location_city,
                           color: Colors.grey,
                         ),
                         hintText: 'Enter warehouse/clinic',
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
                         focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
                                 color: Theme.of(context).colorScheme.background,
@@ -397,7 +399,7 @@ class _EditProfileState extends State<EditProfile> {
                                   _selectedUserVillage != null ||
                                   _selectedUserWarehouse != null)) {
                             _key.currentState?.save();
-                            await SaveEditedProfile();
+                            await saveEditedProfile();
                             Navigator.pop(context, 'success');
                           } else {
                             showDialog(
@@ -434,7 +436,7 @@ class _EditProfileState extends State<EditProfile> {
                       ),
                     ),
                   ), // end of save button
-                  Expanded(
+                  const Expanded(
                     flex: 1,
                     child: SizedBox(width: 10),
                   ),
@@ -448,17 +450,17 @@ class _EditProfileState extends State<EditProfile> {
                         onPressed: () {
                           Navigator.pop(context);
                         },
+                        style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                                const Color.fromARGB(255, 255, 255, 255)),
+                            foregroundColor:
+                                MaterialStateProperty.all(Colors.red),
+                            side: MaterialStateProperty.all(const BorderSide(
+                                width: 2.0, color: Colors.red))),
                         child: const Text(
                           'Cancel',
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(
-                                Color.fromARGB(255, 255, 255, 255)),
-                            foregroundColor:
-                                MaterialStateProperty.all(Colors.red),
-                            side: MaterialStateProperty.all(
-                                BorderSide(width: 2.0, color: Colors.red))),
                       ),
                     ),
                   ),
@@ -479,7 +481,7 @@ class _EditProfileState extends State<EditProfile> {
           ));
 
   // save edited data
-  Future<void> SaveEditedProfile() async {
+  Future<void> saveEditedProfile() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('userName', _userNameController.text);
     await prefs.setString('userTownship', _selectedUserTownship!);

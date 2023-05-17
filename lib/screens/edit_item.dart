@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:chdn_pharmacy/model/data_model.dart';
 import 'package:flutter/material.dart';
 
@@ -19,10 +21,10 @@ class EditItem extends StatefulWidget {
 
 class _EditItemState extends State<EditItem> {
   // controllers
-  TextEditingController _itemNameController = TextEditingController();
+  final TextEditingController _itemNameController = TextEditingController();
 
   // form key
-  GlobalKey<FormState> _key = GlobalKey();
+  final GlobalKey<FormState> _key = GlobalKey();
 
   // selected value
   String? _selectedItemType;
@@ -91,13 +93,13 @@ class _EditItemState extends State<EditItem> {
                     _itemNameController.text = value!;
                   },
                   decoration: InputDecoration(
-                      contentPadding: EdgeInsets.all(10),
-                      prefixIcon: Icon(
+                      contentPadding: const EdgeInsets.all(10),
+                      prefixIcon: const Icon(
                         Icons.person,
                         color: Colors.grey,
                       ),
                       hintText: 'Enter Item and Composition',
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
                       focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide(
                               color: Theme.of(context).colorScheme.background,
@@ -105,13 +107,13 @@ class _EditItemState extends State<EditItem> {
                   maxLines: 1,
                 ), // end of item name
               ),
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
               // Start of item type dropdown
               const Text('Item Type, ပစ္စည်းအမျိုးအစား'),
               DropdownButtonFormField<String>(
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.arrow_drop_down_circle_outlined,
                     color: Colors.grey,
                   ),
@@ -142,7 +144,7 @@ class _EditItemState extends State<EditItem> {
                       })),
               const SizedBox(height: 10.0),
               // End of item type dropdown
-              SizedBox(
+              const SizedBox(
                 height: 20,
               ),
               // start of button row
@@ -179,7 +181,7 @@ class _EditItemState extends State<EditItem> {
                       ),
                     ),
                   ),
-                  Expanded(
+                  const Expanded(
                       child: SizedBox(
                     width: 10,
                   )),
@@ -194,8 +196,8 @@ class _EditItemState extends State<EditItem> {
                                   context: context,
                                   builder: (BuildContext context) {
                                     return AlertDialog(
-                                        title: Text('Delete Item?'),
-                                        content: Text(
+                                        title: const Text('Delete Item?'),
+                                        content: const Text(
                                           'ပစ္စည်းအမည်ကိုဖျက်ရန် သေချာပါသလား',
                                           style: TextStyle(fontSize: 12),
                                         ),
@@ -208,7 +210,7 @@ class _EditItemState extends State<EditItem> {
                                                 Navigator.pop(
                                                     context, 'success');
                                               },
-                                              child: Text(
+                                              child: const Text(
                                                 'Delete',
                                                 style: TextStyle(
                                                   color: Colors.red,
@@ -217,7 +219,7 @@ class _EditItemState extends State<EditItem> {
                                           TextButton(
                                             onPressed: () =>
                                                 Navigator.pop(context),
-                                            child: Text(
+                                            child: const Text(
                                               'Cancel',
                                               style: TextStyle(
                                                 color: Colors.red,
@@ -228,15 +230,15 @@ class _EditItemState extends State<EditItem> {
                                         ]);
                                   });
                             },
+                            style: ButtonStyle(
+                              side: MaterialStateProperty.all(const BorderSide(
+                                  color: Colors.red, width: 2)),
+                            ),
                             child: const Text(
                               'Delete',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.red),
-                            ),
-                            style: ButtonStyle(
-                              side: MaterialStateProperty.all(
-                                  BorderSide(color: Colors.red, width: 2)),
                             ))),
                   ),
                 ],

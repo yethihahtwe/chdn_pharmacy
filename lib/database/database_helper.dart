@@ -10,7 +10,6 @@ class DatabaseHelper {
   static const String tblItem = 'tbl_item';
   static const String tblPackageForm = 'tbl_package_form';
 
-  static var instance;
   DatabaseHelper() {
     _loadDatabase();
   }

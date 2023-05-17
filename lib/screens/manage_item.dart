@@ -15,7 +15,7 @@ class _ManageItemState extends State<ManageItem> {
   bool sortAscending = true;
 
   // controller
-  TextEditingController _searchController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void dispose() {
@@ -79,11 +79,11 @@ class _ManageItemState extends State<ManageItem> {
                                     setState(() {});
                                   }
                                 },
-                                icon: Icon(
+                                icon: const Icon(
                                   Icons.edit,
                                   color: Colors.red,
                                 ))
-                            : Text('')),
+                            : const Text('')),
                       ]));
                     }
                     // filter rows based in search input
@@ -112,8 +112,8 @@ class _ManageItemState extends State<ManageItem> {
                           child: TextField(
                             controller: _searchController,
                             decoration: InputDecoration(
-                                contentPadding: EdgeInsets.all(10),
-                                prefixIcon: Icon(
+                                contentPadding: const EdgeInsets.all(10),
+                                prefixIcon: const Icon(
                                   Icons.search,
                                   color: Colors.grey,
                                 ),
@@ -126,7 +126,7 @@ class _ManageItemState extends State<ManageItem> {
                                           color: Colors.grey,
                                         )),
                                 hintText: 'Search Item',
-                                border: OutlineInputBorder(),
+                                border: const OutlineInputBorder(),
                                 focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
                                         color: Theme.of(context)
@@ -139,13 +139,14 @@ class _ManageItemState extends State<ManageItem> {
                             },
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                         DataTable(
+                            columnSpacing: 20,
                             columns: [
                               DataColumn(
-                                  label: Text(
+                                  label: const Text(
                                     'Item\nName',
                                     style: TextStyle(
                                         fontSize: 16,
@@ -155,7 +156,7 @@ class _ManageItemState extends State<ManageItem> {
                                     _sortColumn(columnIndex, ascending);
                                   }),
                               DataColumn(
-                                  label: Text(
+                                  label: const Text(
                                     'Type',
                                     style: TextStyle(
                                         fontSize: 16,
@@ -165,7 +166,7 @@ class _ManageItemState extends State<ManageItem> {
                                     _sortColumn(columnIndex, ascending);
                                   }),
                               DataColumn(
-                                label: Text(
+                                label: const Text(
                                   'Edit',
                                   style: TextStyle(
                                       fontSize: 16,
@@ -177,12 +178,12 @@ class _ManageItemState extends State<ManageItem> {
                               ),
                             ],
                             headingRowColor: MaterialStateProperty.all(
-                              Color.fromARGB(255, 255, 227, 160),
+                              const Color.fromARGB(255, 255, 227, 160),
                             ),
                             sortAscending: sortAscending,
                             sortColumnIndex: sortColumnIndex,
                             rows: filteredRows),
-                        SizedBox(
+                        const SizedBox(
                           height: 80,
                         )
                       ],
@@ -190,7 +191,7 @@ class _ManageItemState extends State<ManageItem> {
                   } else if (snapshot.hasError) {
                     return Text('${snapshot.error}');
                   } else {
-                    return CircularProgressIndicator();
+                    return const CircularProgressIndicator();
                   }
                 })
           ])),
@@ -210,11 +211,11 @@ class _ManageItemState extends State<ManageItem> {
               color: Color.fromARGB(255, 49, 49, 49),
               fontWeight: FontWeight.bold),
         ),
-        icon: Icon(
+        icon: const Icon(
           Icons.add,
           color: Color.fromARGB(255, 49, 49, 49),
         ),
-        backgroundColor: Color.fromARGB(255, 255, 197, 63),
+        backgroundColor: const Color.fromARGB(255, 255, 197, 63),
       ),
     );
   }

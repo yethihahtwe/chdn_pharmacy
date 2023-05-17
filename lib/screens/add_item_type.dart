@@ -12,13 +12,16 @@ class AddItemType extends StatefulWidget {
 
 class _AddItemTypeState extends State<AddItemType> {
   // form key
-  GlobalKey<FormState> _key = GlobalKey();
+  final GlobalKey<FormState> _key = GlobalKey();
 
   // user id
   String? _userId;
 
   // controllers
-  TextEditingController _itemTypeController = TextEditingController();
+  final TextEditingController _itemTypeController = TextEditingController();
+
+  // to prevent duplicate
+  List<String> _itemTypeList = [];
 
   @override
   void initState() {
@@ -26,6 +29,14 @@ class _AddItemTypeState extends State<AddItemType> {
     SharedPrefHelper.getUserId().then((value) {
       setState(() {
         _userId = value;
+      });
+    });
+
+    // load query to list to prevent duplicate
+    DatabaseHelper().getAllItemType().then((value) {
+      setState(() {
+        _itemTypeList = List<String>.from(value.map((e) =>
+            e['item_type_name'].toString().toLowerCase().replaceAll(' ', '')));
       });
     });
   }
@@ -36,7 +47,7 @@ class _AddItemTypeState extends State<AddItemType> {
       // start of app bar
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColor,
-        title: const Text('Add Item Type'),
+        title: const Text('Add New Item Type'),
         centerTitle: true,
       ), // end of app bar
       body: Form(
@@ -60,19 +71,23 @@ class _AddItemTypeState extends State<AddItemType> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter new item type';
                     }
+                    if (_itemTypeList
+                        .contains(value.toLowerCase().replaceAll(' ', ''))) {
+                      return '$value is already in item types.';
+                    }
                     return null;
                   },
                   onSaved: (value) {
                     _itemTypeController.text = value!;
                   },
                   decoration: InputDecoration(
-                      contentPadding: EdgeInsets.all(10),
-                      prefixIcon: Icon(
+                      contentPadding: const EdgeInsets.all(10),
+                      prefixIcon: const Icon(
                         Icons.type_specimen,
                         color: Colors.grey,
                       ),
                       hintText: 'Enter New Item Type',
-                      border: OutlineInputBorder(),
+                      border: const OutlineInputBorder(),
                       focusedBorder: OutlineInputBorder(
                           borderSide: BorderSide(
                               color: Theme.of(context).colorScheme.background,
@@ -103,22 +118,23 @@ class _AddItemTypeState extends State<AddItemType> {
                                     itemTypeName: _itemTypeController.text,
                                     itemTypeEditable: 'true',
                                     itemTypeCre: _userId!));
+                            // ignore: use_build_context_synchronously
                             Navigator.pop(context, 'success');
                           }
                         },
-                        child: const Text(
-                          'Add Item Type',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
                         style: ButtonStyle(
                             backgroundColor: MaterialStateProperty.all(
                                 Theme.of(context).colorScheme.background),
                             foregroundColor: MaterialStateProperty.all(
                                 Theme.of(context).colorScheme.secondary)),
+                        child: const Text(
+                          'Add Item Type',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
                       ),
                     ),
                   ),
-                  Expanded(flex: 1, child: SizedBox(width: 10)),
+                  const Expanded(flex: 1, child: SizedBox(width: 10)),
                   Expanded(
                     flex: 2,
                     child: // Start of _specify_ Button
@@ -129,15 +145,16 @@ class _AddItemTypeState extends State<AddItemType> {
                                 onPressed: () {
                                   Navigator.pop(context);
                                 },
+                                style: ButtonStyle(
+                                  side: MaterialStateProperty.all(
+                                      const BorderSide(
+                                          color: Colors.red, width: 2)),
+                                ),
                                 child: const Text(
                                   'Cancel',
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       color: Colors.red),
-                                ),
-                                style: ButtonStyle(
-                                  side: MaterialStateProperty.all(
-                                      BorderSide(color: Colors.red, width: 2)),
                                 ))),
                   ),
                 ],

@@ -1,3 +1,4 @@
+import 'package:chdn_pharmacy/screens/add_package_form.dart';
 import 'package:flutter/material.dart';
 
 import '../database/database_helper.dart';
@@ -11,6 +12,20 @@ class ManagePackageForm extends StatefulWidget {
 }
 
 class _ManagePackageFormState extends State<ManagePackageForm> {
+  // current sorted column
+  int _sortColumnIndex = 0;
+
+  // default sort
+  bool _sortAscending = true;
+
+  // sort function
+  void _sortColumn(int columnIndex, bool ascending) {
+    setState(() {
+      _sortColumnIndex = columnIndex;
+      _sortAscending = ascending;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,36 +66,83 @@ class _ManagePackageFormState extends State<ManagePackageForm> {
                                     setState(() {});
                                   }
                                 },
-                                icon: Icon(Icons.edit))
-                            : Text('')),
+                                icon: const Icon(Icons.edit))
+                            : const Text('')),
                       ]));
                     }
-                    return DataTable(
-                        columns: [
-                          DataColumn(
-                              label: Text(
-                            'Package Form',
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
-                          )),
-                          DataColumn(
-                              label: Text(
-                            'Edit',
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
-                          )),
-                        ],
-                        headingRowColor: MaterialStateProperty.all(
-                          Color.fromARGB(255, 255, 227, 160),
+                    // sort the rows based on selected column
+                    rows.sort((a, b) {
+                      final aValue = a.cells[_sortColumnIndex].child.toString();
+                      final bValue = b.cells[_sortColumnIndex].child.toString();
+                      return _sortAscending
+                          ? aValue.compareTo(bValue)
+                          : bValue.compareTo(aValue);
+                    });
+                    return Column(
+                      children: [
+                        DataTable(
+                          columns: [
+                            DataColumn(
+                                label: const Text(
+                                  'Package Form',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                onSort: (columnIndex, ascending) {
+                                  _sortColumn(columnIndex, ascending);
+                                }),
+                            DataColumn(
+                                label: const Text(
+                                  'Edit',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                onSort: (columnIndex, ascending) {
+                                  _sortColumn(columnIndex, ascending);
+                                }),
+                          ],
+                          headingRowColor: MaterialStateProperty.all(
+                            const Color.fromARGB(255, 255, 227, 160),
+                          ),
+                          rows: rows,
+                          sortAscending: _sortAscending,
+                          sortColumnIndex: _sortColumnIndex,
                         ),
-                        rows: rows);
+                        const SizedBox(
+                          height: 80,
+                        )
+                      ],
+                    );
                   } else if (snapshot.hasError) {
                     return Text('${snapshot.error}');
                   } else {
-                    return CircularProgressIndicator();
+                    return const CircularProgressIndicator();
                   }
                 })
           ])),
+      // start of add package form fab
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () async {
+          var result = await Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const AddPackageForm()));
+          if (result == 'success') {
+            setState(() {});
+          }
+        },
+        label: const Text(
+          'Add Package Form',
+          style: TextStyle(
+              color: Color.fromARGB(255, 49, 49, 49),
+              fontWeight: FontWeight.bold),
+        ),
+        icon: const Icon(
+          Icons.add,
+          color: Color.fromARGB(255, 49, 49, 49),
+        ),
+        backgroundColor: const Color.fromARGB(255, 255, 197, 63),
+      ),
     );
   }
 }

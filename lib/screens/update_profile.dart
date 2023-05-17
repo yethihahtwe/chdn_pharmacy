@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:chdn_pharmacy/database/shared_pref_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,10 +19,11 @@ class _UpdateProfileState extends State<UpdateProfile> {
   TextEditingController _userNameController = TextEditingController();
 
   // other village controller
-  TextEditingController _otherVilController = TextEditingController();
+  final TextEditingController _otherVilController = TextEditingController();
 
   // other warehouse controller
-  TextEditingController _otherWarehouseController = TextEditingController();
+  final TextEditingController _otherWarehouseController =
+      TextEditingController();
 
   // dropdown lists
   // township
@@ -67,10 +70,10 @@ class _UpdateProfileState extends State<UpdateProfile> {
   String? _selectedUserVillage;
   String? _selectedUserWarehouse;
   String _userId = '';
-  GlobalKey<FormState> _key = GlobalKey();
+  final GlobalKey<FormState> _key = GlobalKey();
 
   // save data
-  Future<void> SaveProfile() async {
+  Future<void> saveProfile() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('userId', _userId);
     await prefs.setString('userName', _userNameController.text);
@@ -162,13 +165,13 @@ class _UpdateProfileState extends State<UpdateProfile> {
                   _userNameController.text = value!;
                 },
                 decoration: InputDecoration(
-                    contentPadding: EdgeInsets.all(10),
-                    prefixIcon: Icon(
+                    contentPadding: const EdgeInsets.all(10),
+                    prefixIcon: const Icon(
                       Icons.person,
                       color: Colors.grey,
                     ),
                     hintText: 'Enter Incharge Name',
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
                     focusedBorder: OutlineInputBorder(
                         borderSide: BorderSide(
                             color: Theme.of(context).colorScheme.background,
@@ -180,7 +183,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
               // Start of user township
               const Text('Township/ မြို့နယ်'),
               DropdownButtonFormField<String>(
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.arrow_drop_down_circle_outlined,
                     color: Colors.grey,
                   ),
@@ -219,7 +222,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
               const Text('Village/ ကျေးရွာ'),
               if (_showVilDropdown)
                 DropdownButtonFormField<String>(
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.arrow_drop_down_circle_outlined,
                       color: Colors.grey,
                     ),
@@ -311,7 +314,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
               const Text('Warehouse/Clinic/ ဆေးဂိုဒေါင်/ဆေးခန်း'),
               if (_showWarehouseDropdown)
                 DropdownButtonFormField<String>(
-                    icon: Icon(
+                    icon: const Icon(
                       Icons.arrow_drop_down_circle_outlined,
                       color: Colors.grey,
                     ),
@@ -412,7 +415,7 @@ class _UpdateProfileState extends State<UpdateProfile> {
                         const uuid = Uuid();
                         _userId = uuid.v4();
                       });
-                      await SaveProfile();
+                      await saveProfile();
                       Navigator.pop(context, 'success');
                     } else {
                       showDialog(
