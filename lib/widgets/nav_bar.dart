@@ -24,20 +24,22 @@ class BottomNavigation extends StatelessWidget {
       ],
       currentIndex: selectedIndex,
       onTap: (value) {
-        if (value == 0) {
-          Navigator.pushNamed(context, '/');
-        }
-        if (value == 1) {
-          Navigator.pushNamed(context, 'history');
-        }
-        if (value == 2) {
-          Navigator.pushNamed(context, 'manage');
-        }
-        if (value == 3) {
-          Navigator.pushNamed(context, 'profile');
-        }
-        if (value == 4) {
-          Navigator.pushNamed(context, 'info');
+        if (value != selectedIndex) {
+          if (value == 0) {
+            Navigator.pushNamed(context, '/');
+          }
+          if (value == 1) {
+            Navigator.pushNamed(context, 'history');
+          }
+          if (value == 2) {
+            Navigator.pushNamed(context, 'manage');
+          }
+          if (value == 3) {
+            Navigator.pushNamed(context, 'profile');
+          }
+          if (value == 4) {
+            Navigator.pushNamed(context, 'info');
+          }
         }
       },
     );

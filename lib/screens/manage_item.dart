@@ -114,6 +114,9 @@ class _ManageItemState extends State<ManageItem> {
                             },
                           ),
                         ),
+                        SizedBox(
+                          height: 10,
+                        ),
                         DataTable(
                             columns: [
                               DataColumn(
