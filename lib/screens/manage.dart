@@ -1,4 +1,5 @@
 import 'package:chdn_pharmacy/database/shared_pref_helper.dart';
+import 'package:chdn_pharmacy/screens/manage_item.dart';
 import 'package:chdn_pharmacy/screens/manage_item_type.dart';
 import 'package:chdn_pharmacy/screens/update_profile.dart';
 import 'package:flutter/material.dart';
@@ -69,6 +70,27 @@ class _ManageState extends State<Manage> {
                             ),
                           ),
                         ), // end of the edit type card
+                        const SizedBox(height: 20),
+                        // start of edit item card
+                        Card(
+                          clipBehavior: Clip.hardEdge,
+                          elevation: 5,
+                          child: InkWell(
+                            splashColor: Colors.red.withAlpha(30),
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const ManageItem()));
+                            },
+                            child: ListTile(
+                              leading: Icon(Icons.medication),
+                              title: Text('Manage Items'),
+                              subtitle: Text('ပစ္စည်းအမည်များ စီမံခန့်ခွဲရန်'),
+                            ),
+                          ),
+                        ), // end of _specify_ card
                       ]));
             } else {
               return Container(

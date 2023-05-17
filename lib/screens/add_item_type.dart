@@ -126,7 +126,9 @@ class _AddItemTypeState extends State<AddItemType> {
                             width: 200,
                             height: 45,
                             child: TextButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
                                 child: const Text(
                                   'Cancel',
                                   style: TextStyle(

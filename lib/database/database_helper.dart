@@ -7,56 +7,72 @@ import 'package:sqflite/sqflite.dart';
 class DatabaseHelper {
   late Database _db;
   static const String tblItemType = 'tbl_item_type';
+  static const String tblItem = 'tbl_item';
 
   static var instance;
   DatabaseHelper() {
     _loadDatabase();
   }
 
-  // // create database
-  // Future<Database> _createDatabase() async {
-  //   var dataPath = await getDatabasesPath();
-  //   String path = join(dataPath, "pharmacy.db");
-  //   _db = await openDatabase(path);
-
 // open database
   Future<Database> _loadDatabase() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, "pharmacy.db");
     _db = await openDatabase(path);
-
-    // // create tables
-    // // create item type table
-    // await _db.execute(
-    //     'CREATE TABLE IF NOT EXISTS $tblItemType(item_type_id INTEGER PRIMARY KEY, item_type_name TEXT, item_type_editable TEXT);');
     return _db;
   }
 
   // database actions
-  // insert into item type table
+  // item type table
+  // insert
   Future<int> insertItemType(Map<String, dynamic> itemType) async {
     _db = await _loadDatabase();
     return await _db.insert(tblItemType, itemType);
   }
 
-  // select * from item type table
+  // select *
   Future<List<Map<String, dynamic>>> getAllItemType() async {
     _db = await _loadDatabase();
     return await _db
         .rawQuery('SELECT * FROM $tblItemType ORDER BY item_type_id asc');
   }
 
-  // update item type table
+  // update
   Future<int> updateItemType(Map<String, dynamic> itemType, int id) async {
     _db = await _loadDatabase();
     return await _db.update(tblItemType, itemType,
         where: "item_type_id=?", whereArgs: [id]);
   }
 
-  // delete item type row
+  // delete
   Future<int> deleteItemType(int id) async {
     _db = await _loadDatabase();
     return await _db
         .delete(tblItemType, where: "item_type_id=?", whereArgs: [id]);
+  }
+
+  // item table
+  // insert
+  Future<int> insertItem(Map<String, dynamic> item) async {
+    _db = await _loadDatabase();
+    return await _db.insert(tblItem, item);
+  }
+
+  // select *
+  Future<List<Map<String, dynamic>>> getAllItem() async {
+    _db = await _loadDatabase();
+    return await _db.rawQuery('SELECT * FROM $tblItem ORDER BY item_id asc');
+  }
+
+  // update
+  Future<int> updateItem(Map<String, dynamic> item, int id) async {
+    _db = await _loadDatabase();
+    return await _db.update(tblItem, item, where: "item_id=?", whereArgs: [id]);
+  }
+
+  // delete
+  Future<int> deleteItem(int id) async {
+    _db = await _loadDatabase();
+    return await _db.delete(tblItem, where: "item_id=?", whereArgs: [id]);
   }
 }

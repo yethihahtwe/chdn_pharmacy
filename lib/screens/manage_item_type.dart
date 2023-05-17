@@ -1,4 +1,5 @@
 import 'package:chdn_pharmacy/database/database_helper.dart';
+import 'package:chdn_pharmacy/screens/edit_item_type.dart';
 import 'package:flutter/material.dart';
 
 import 'add_item_type.dart';
@@ -60,22 +61,44 @@ class _ManageItemTypeState extends State<ManageItemType> {
                         DataCell(Text('${item['item_type_name']}')),
                         DataCell(item['item_type_editable'] == 'true'
                             ? IconButton(
-                                onPressed: () {}, icon: Icon(Icons.edit))
+                                onPressed: () async {
+                                  var result = await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => EditItemType(
+                                              itemTypeName:
+                                                  '${item['item_type_name']}',
+                                              itemTypeId:
+                                                  item['item_type_id'])));
+                                  if (result == 'success') {
+                                    setState(() {});
+                                  }
+                                },
+                                icon: Icon(
+                                  Icons.edit,
+                                  color: Color.fromARGB(255, 218, 0, 76),
+                                ))
                             : Text('')),
                       ]));
                     }
-                    return DataTable(columns: [
-                      DataColumn(
-                          label: Text(
-                        'Item Type',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      )),
-                      DataColumn(
-                          label: Text('Edit',
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold))),
-                    ], rows: rows);
+                    return DataTable(
+                        columns: [
+                          DataColumn(
+                              label: Text(
+                            'Item Type',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
+                          )),
+                          DataColumn(
+                              label: Text('',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold))),
+                        ],
+                        headingRowColor: MaterialStateProperty.all(
+                          Color.fromARGB(255, 255, 227, 160),
+                        ),
+                        rows: rows);
                   } else if (snapshot.hasError) {
                     return Text('${snapshot.error}');
                   } else {
