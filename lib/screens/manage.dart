@@ -5,6 +5,7 @@ import 'package:chdn_pharmacy/screens/update_profile.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/nav_bar.dart';
+import 'manage_package_form.dart';
 
 class Manage extends StatefulWidget {
   const Manage({super.key});
@@ -55,8 +56,8 @@ class _ManageState extends State<Manage> {
                           elevation: 5,
                           child: InkWell(
                             splashColor: Colors.red.withAlpha(30),
-                            onTap: () async {
-                              await Navigator.push(
+                            onTap: () {
+                              Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) =>
@@ -70,7 +71,7 @@ class _ManageState extends State<Manage> {
                             ),
                           ),
                         ), // end of the edit type card
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 10),
                         // start of edit item card
                         Card(
                           clipBehavior: Clip.hardEdge,
@@ -88,6 +89,30 @@ class _ManageState extends State<Manage> {
                               leading: Icon(Icons.medication),
                               title: Text('Manage Items'),
                               subtitle: Text('ပစ္စည်းအမည်များ စီမံခန့်ခွဲရန်'),
+                            ),
+                          ),
+                        ), // end of edit type card
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        // start of edit package form card
+                        Card(
+                          clipBehavior: Clip.hardEdge,
+                          elevation: 5,
+                          child: InkWell(
+                            splashColor: Colors.red.withAlpha(30),
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const ManagePackageForm()));
+                            },
+                            child: ListTile(
+                              leading: Icon(Icons.local_pharmacy_outlined),
+                              title: Text('Manage Package Forms'),
+                              subtitle:
+                                  Text('ထုပ်ပိုးပုံစံများ စီမံခန့်ခွဲရန်'),
                             ),
                           ),
                         ), // end of _specify_ card

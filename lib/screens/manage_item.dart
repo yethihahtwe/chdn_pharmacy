@@ -31,6 +31,12 @@ class _ManageItemState extends State<ManageItem> {
     });
   }
 
+  // clear search text field function
+  void _clearSearch() {
+    _searchController.clear();
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,8 +86,19 @@ class _ManageItemState extends State<ManageItem> {
                             : Text('')),
                       ]));
                     }
+                    // filter rows based in search input
+                    final List<DataRow> filteredRows = rows.where(
+                      (row) {
+                        final itemName = row.cells[0].child.toString();
+                        final itemType = row.cells[1].child.toString();
+                        final searchQuery =
+                            _searchController.text.toLowerCase();
+                        return itemName.toLowerCase().contains(searchQuery) ||
+                            itemType.toLowerCase().contains(searchQuery);
+                      },
+                    ).toList();
                     // sort the rows based on selected column
-                    rows.sort((a, b) {
+                    filteredRows.sort((a, b) {
                       final aValue = a.cells[sortColumnIndex].child.toString();
                       final bValue = b.cells[sortColumnIndex].child.toString();
                       return sortAscending
@@ -100,7 +117,15 @@ class _ManageItemState extends State<ManageItem> {
                                   Icons.search,
                                   color: Colors.grey,
                                 ),
-                                hintText: 'Search Item, ရှာရန်',
+                                suffixIcon: _searchController.text.isEmpty
+                                    ? null // not shown if search is empty
+                                    : IconButton(
+                                        onPressed: _clearSearch,
+                                        icon: const Icon(
+                                          Icons.cancel,
+                                          color: Colors.grey,
+                                        )),
+                                hintText: 'Search Item',
                                 border: OutlineInputBorder(),
                                 focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
@@ -141,7 +166,7 @@ class _ManageItemState extends State<ManageItem> {
                                   }),
                               DataColumn(
                                 label: Text(
-                                  '',
+                                  'Edit',
                                   style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold),
@@ -156,7 +181,10 @@ class _ManageItemState extends State<ManageItem> {
                             ),
                             sortAscending: sortAscending,
                             sortColumnIndex: sortColumnIndex,
-                            rows: rows),
+                            rows: filteredRows),
+                        SizedBox(
+                          height: 80,
+                        )
                       ],
                     );
                   } else if (snapshot.hasError) {

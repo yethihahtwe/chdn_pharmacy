@@ -8,6 +8,7 @@ class DatabaseHelper {
   late Database _db;
   static const String tblItemType = 'tbl_item_type';
   static const String tblItem = 'tbl_item';
+  static const String tblPackageForm = 'tbl_package_form';
 
   static var instance;
   DatabaseHelper() {
@@ -74,5 +75,34 @@ class DatabaseHelper {
   Future<int> deleteItem(int id) async {
     _db = await _loadDatabase();
     return await _db.delete(tblItem, where: "item_id=?", whereArgs: [id]);
+  }
+
+  // package form table
+  // insert
+  Future<int> insertPackageForm(Map<String, dynamic> packageForm) async {
+    _db = await _loadDatabase();
+    return await _db.insert(tblPackageForm, packageForm);
+  }
+
+  // select *
+  Future<List<Map<String, dynamic>>> getAllPackageForm() async {
+    _db = await _loadDatabase();
+    return await _db
+        .rawQuery('SELECT * FROM $tblPackageForm ORDER BY package_form_id asc');
+  }
+
+  // update
+  Future<int> updatePackageForm(
+      Map<String, dynamic> packageForm, int id) async {
+    _db = await _loadDatabase();
+    return await _db.update(tblPackageForm, packageForm,
+        where: "package_form_id", whereArgs: [id]);
+  }
+
+  // delete
+  Future<int> deletePackageForm(int id) async {
+    _db = await _loadDatabase();
+    return await _db
+        .delete(tblPackageForm, where: "package_form_id", whereArgs: [id]);
   }
 }

@@ -81,24 +81,31 @@ class _ManageItemTypeState extends State<ManageItemType> {
                             : Text('')),
                       ]));
                     }
-                    return DataTable(
-                        columns: [
-                          DataColumn(
-                              label: Text(
-                            'Item Type',
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
-                          )),
-                          DataColumn(
-                              label: Text('',
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold))),
-                        ],
-                        headingRowColor: MaterialStateProperty.all(
-                          Color.fromARGB(255, 255, 227, 160),
-                        ),
-                        rows: rows);
+                    return Column(
+                      children: [
+                        DataTable(
+                            columns: [
+                              DataColumn(
+                                  label: Text(
+                                'Item Type',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
+                              )),
+                              DataColumn(
+                                  label: Text('Edit',
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold))),
+                            ],
+                            headingRowColor: MaterialStateProperty.all(
+                              Color.fromARGB(255, 255, 227, 160),
+                            ),
+                            rows: rows),
+                        SizedBox(
+                          height: 80,
+                        )
+                      ],
+                    );
                   } else if (snapshot.hasError) {
                     return Text('${snapshot.error}');
                   } else {

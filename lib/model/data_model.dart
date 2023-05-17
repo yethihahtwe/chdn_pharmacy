@@ -38,3 +38,23 @@ class Item {
     return {'item_name': itemName, 'item_type': itemType};
   }
 }
+
+class PackageForm {
+  // insert new package form model
+  static Map<String, dynamic> insertPackageForm(
+      {required String packageFormName,
+      required String packageFormEditable,
+      required String packageFormCre}) {
+    return {
+      'package_form_name': packageFormName,
+      'package_form_editable': packageFormEditable,
+      'package_form_cre': packageFormCre
+    };
+  }
+
+  // update package form model
+  static Map<String, dynamic> updatePackageForm(
+      {required String packageFormName}) {
+    return {'package_form_name': packageFormName};
+  }
+}
