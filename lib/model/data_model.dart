@@ -58,3 +58,42 @@ class PackageForm {
     return {'package_form_name': packageFormName};
   }
 }
+
+class SourcePlace {
+  // insert new source place model
+  static Map<String, dynamic> insertSourcePlace(
+      {required String sourcePlaceName,
+      required String sourcePlaceEditable,
+      required String sourcePlaceCre}) {
+    return {
+      'source_place_name': sourcePlaceName,
+      'source_place_editable': sourcePlaceEditable,
+      'source_place_cre': sourcePlaceCre
+    };
+  }
+
+  // update source place model
+  static Map<String, dynamic> updateSourcePlace(
+      {required String sourcePlaceName}) {
+    return {'source_place_name': sourcePlaceName};
+  }
+}
+
+class Donor {
+  // insert new donor model
+  static Map<String, dynamic> insertDonor(
+      {required String donorName,
+      required String donorEditable,
+      required String donorCre}) {
+    return {
+      'donor_name': donorName,
+      'donor_editable': donorEditable,
+      'donor_cre': donorCre
+    };
+  }
+
+  // update donor model
+  static Map<String, dynamic> updateDonor({required String donorName}) {
+    return {'donor_name': donorName};
+  }
+}

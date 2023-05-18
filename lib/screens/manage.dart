@@ -1,10 +1,12 @@
 import 'package:chdn_pharmacy/database/shared_pref_helper.dart';
 import 'package:chdn_pharmacy/screens/manage_item.dart';
 import 'package:chdn_pharmacy/screens/manage_item_type.dart';
+import 'package:chdn_pharmacy/screens/manage_source_place.dart';
 import 'package:chdn_pharmacy/screens/update_profile.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/nav_bar.dart';
+import 'manage_donor.dart';
 import 'manage_package_form.dart';
 
 class Manage extends StatefulWidget {
@@ -115,7 +117,53 @@ class _ManageState extends State<Manage> {
                                   Text('ထုပ်ပိုးပုံစံများ စီမံခန့်ခွဲရန်'),
                             ),
                           ),
-                        ), // end of _specify_ card
+                        ), // end of package form card
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        // start of source place card
+                        Card(
+                          clipBehavior: Clip.hardEdge,
+                          elevation: 5,
+                          child: InkWell(
+                            splashColor: Colors.red.withAlpha(30),
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const ManageSourcePlace()));
+                            },
+                            child: const ListTile(
+                              leading: Icon(Icons.system_update_alt),
+                              title: Text('Manage Source Places'),
+                              subtitle: Text('ရရှိရာနေရာများစီမံခန့်ခွဲရန်'),
+                            ),
+                          ),
+                        ), // end of source place card
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        // start of donor card
+                        Card(
+                          clipBehavior: Clip.hardEdge,
+                          elevation: 5,
+                          child: InkWell(
+                            splashColor: Colors.red.withAlpha(30),
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const ManageDonor()));
+                            },
+                            child: const ListTile(
+                              leading: Icon(Icons.contact_mail),
+                              title: Text('Manage Donors'),
+                              subtitle: Text('အလှူရှင်အမည်များစီမံခန့်ခွဲရန်'),
+                            ),
+                          ),
+                        ), // end of donor card
                       ]));
             } else {
               return Container(

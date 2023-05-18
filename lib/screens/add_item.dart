@@ -26,6 +26,49 @@ class _AddItemState extends State<AddItem> {
   // dropdown options
   List<String> itemTypeList = [];
 
+  Future checkForDuplicates() async {
+    const column1 = 'item_name';
+    const column2 = 'item_type';
+    final value1 = _itemNameController.text.toLowerCase().replaceAll(' ', '');
+    final value2 = _selectedItemType!.toLowerCase().replaceAll(' ', '');
+    final duplicateCount = await DatabaseHelper()
+        .itemDuplicateCount(column1, column2, value1, value2);
+    if (duplicateCount > 0) {
+      // ignore: use_build_context_synchronously
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              title: const Text('Duplicate!'),
+              content: Text(
+                '$value1, $value2 already present!',
+                style: const TextStyle(fontSize: 12),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text(
+                    'OK',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                )
+              ]);
+        },
+      );
+    } else {
+      await DatabaseHelper().insertItem(Item.insertItem(
+          itemName: _itemNameController.text,
+          itemType: _selectedItemType!,
+          itemEditable: 'true',
+          itemCre: _userId!));
+      // ignore: use_build_context_synchronously
+      Navigator.pop(context, 'success');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -138,7 +181,7 @@ class _AddItemState extends State<AddItem> {
                 children: [
                   Expanded(
                     flex: 2,
-                    child: // Start of _specify_ Button
+                    child: // Start of update Button
                         SizedBox(
                       width: 200,
                       height: 45,
@@ -146,14 +189,8 @@ class _AddItemState extends State<AddItem> {
                         onPressed: () async {
                           if (_key.currentState != null &&
                               _key.currentState!.validate()) {
+                            checkForDuplicates();
                             _key.currentState?.save();
-                            await DatabaseHelper().insertItem(Item.insertItem(
-                                itemName: _itemNameController.text,
-                                itemType: _selectedItemType!,
-                                itemEditable: 'true',
-                                itemCre: _userId!));
-                            // ignore: use_build_context_synchronously
-                            Navigator.pop(context, 'success');
                           }
                         },
                         icon: const Icon(Icons.add),

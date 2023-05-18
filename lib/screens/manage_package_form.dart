@@ -66,7 +66,10 @@ class _ManagePackageFormState extends State<ManagePackageForm> {
                                     setState(() {});
                                   }
                                 },
-                                icon: const Icon(Icons.edit))
+                                icon: const Icon(
+                                  Icons.edit,
+                                  color: Colors.red,
+                                ))
                             : const Text('')),
                       ]));
                     }
@@ -120,7 +123,10 @@ class _ManagePackageFormState extends State<ManagePackageForm> {
                   } else {
                     return const CircularProgressIndicator();
                   }
-                })
+                }),
+            const SizedBox(
+              height: 80,
+            )
           ])),
       // start of add package form fab
       floatingActionButton: FloatingActionButton.extended(

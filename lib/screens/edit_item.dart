@@ -32,6 +32,49 @@ class _EditItemState extends State<EditItem> {
   // dropdown options
   List<String> itemTypeList = [];
 
+  // check for duplicate edits
+  Future checkForDuplicates() async {
+    const column1 = 'item_name';
+    const column2 = 'item_type';
+    final value1 = _itemNameController.text.toLowerCase().replaceAll(' ', '');
+    final value2 = _selectedItemType!.toLowerCase().replaceAll(' ', '');
+    final duplicateCount = await DatabaseHelper()
+        .itemDuplicateCount(column1, column2, value1, value2);
+    if ((widget.itemName != _itemNameController.text ||
+            widget.itemType != _selectedItemType) &&
+        duplicateCount > 0) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+              title: const Text('Duplicate!'),
+              content: Text(
+                '$value1, $value2 already present!',
+                style: const TextStyle(fontSize: 12),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text(
+                    'OK',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                )
+              ]);
+        },
+      );
+    } else {
+      await DatabaseHelper().updateItem(
+          Item.updateItem(
+              itemName: _itemNameController.text, itemType: _selectedItemType!),
+          widget.itemId);
+      Navigator.pop(context, 'success');
+    }
+  }
+
   // init State
   @override
   void initState() {
@@ -161,13 +204,8 @@ class _EditItemState extends State<EditItem> {
                         onPressed: () async {
                           if (_key.currentState != null &&
                               _key.currentState!.validate()) {
+                            checkForDuplicates();
                             _key.currentState?.save();
-                            await DatabaseHelper().updateItem(
-                                Item.updateItem(
-                                    itemName: _itemNameController.text,
-                                    itemType: _selectedItemType!),
-                                widget.itemId);
-                            Navigator.pop(context, 'success');
                           }
                         },
                         icon: const Icon(Icons.system_update_alt),

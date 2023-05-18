@@ -9,6 +9,8 @@ class DatabaseHelper {
   static const String tblItemType = 'tbl_item_type';
   static const String tblItem = 'tbl_item';
   static const String tblPackageForm = 'tbl_package_form';
+  static const String tblSourcePlace = 'tbl_source_place';
+  static const String tblDonor = 'tbl_donor';
 
   DatabaseHelper() {
     _loadDatabase();
@@ -76,6 +78,17 @@ class DatabaseHelper {
     return await _db.delete(tblItem, where: "item_id=?", whereArgs: [id]);
   }
 
+  // check duplicate
+  Future<int> itemDuplicateCount(
+      String column1, String column2, String value1, String value2) async {
+    _db = await _loadDatabase();
+    final result = await _db.rawQuery(
+        "SELECT COUNT(*) FROM $tblItem WHERE LOWER(REPLACE($column1, ' ', ''))=? AND LOWER(REPLACE($column2, ' ', ''))=?",
+        [value1, value2]);
+    await _db.close();
+    return Sqflite.firstIntValue(result) ?? 0;
+  }
+
   // package form table
   // insert
   Future<int> insertPackageForm(Map<String, dynamic> packageForm) async {
@@ -95,13 +108,67 @@ class DatabaseHelper {
       Map<String, dynamic> packageForm, int id) async {
     _db = await _loadDatabase();
     return await _db.update(tblPackageForm, packageForm,
-        where: "package_form_id", whereArgs: [id]);
+        where: "package_form_id=?", whereArgs: [id]);
   }
 
   // delete
   Future<int> deletePackageForm(int id) async {
     _db = await _loadDatabase();
     return await _db
-        .delete(tblPackageForm, where: "package_form_id", whereArgs: [id]);
+        .delete(tblPackageForm, where: "package_form_id=?", whereArgs: [id]);
+  }
+
+  // source place table
+  // insert
+  Future<int> insertSourcePlace(Map<String, dynamic> sourcePlace) async {
+    _db = await _loadDatabase();
+    return await _db.insert(tblSourcePlace, sourcePlace);
+  }
+
+  // select *
+  Future<List<Map<String, dynamic>>> getAllSourcePlace() async {
+    _db = await _loadDatabase();
+    return await _db.rawQuery('SELECT * FROM $tblSourcePlace');
+  }
+
+  // update
+  Future<int> updateSourcePlace(
+      Map<String, dynamic> sourcePlace, int id) async {
+    _db = await _loadDatabase();
+    return await _db.update(tblSourcePlace, sourcePlace,
+        where: "source_place_id=?", whereArgs: [id]);
+  }
+
+  // delete
+  Future<int> deleteSourcePlace(int id) async {
+    _db = await _loadDatabase();
+    return await _db
+        .delete(tblSourcePlace, where: "source_place_id=?", whereArgs: [id]);
+  }
+
+  // donor table
+  // insert
+  Future<int> insertDonor(Map<String, dynamic> donor) async {
+    _db = await _loadDatabase();
+    return await _db.insert(tblDonor, donor);
+  }
+
+  // select *
+  Future<List<Map<String, dynamic>>> getAllDonor() async {
+    _db = await _loadDatabase();
+    return await _db.rawQuery('SELECT * FROM $tblDonor');
+  }
+
+  // update
+  Future<int> updateDonor(Map<String, dynamic> donor, int id) async {
+    _db = await _loadDatabase();
+    return await _db
+        .update(tblDonor, donor, where: "donor_id=?", whereArgs: [id]);
+  }
+
+  // delete
+  Future<int> deleteDonor(int id) async {
+    _db = await _loadDatabase();
+    return await _db.delete(tblDonor, where: "donor_id=?", whereArgs: [id]);
   }
 }
