@@ -67,73 +67,82 @@ class _ManageSourcePlaceState extends State<ManageSourcePlace> {
             FutureBuilder<List<Map<String, dynamic>>>(
                 future: DatabaseHelper().getAllSourcePlace(),
                 builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done &&
-                      snapshot.hasData &&
-                      snapshot.data != null) {
-                    final List<DataRow> rows = [];
-                    for (final item in snapshot.data!) {
-                      rows.add(DataRow(cells: [
-                        DataCell(Text('${item['source_place_name']}')),
-                        DataCell(item['source_place_editable'] == 'true'
-                            ? IconButton(
-                                onPressed: () async {
-                                  var result = await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => EditSourcePlace(
-                                              sourcePlaceName:
-                                                  '${item['source_place_name']}',
-                                              sourcePlaceId:
-                                                  item['source_place_id'])));
-                                  if (result == 'success') {
-                                    setState(() {});
-                                  }
-                                },
-                                icon: const Icon(
-                                  Icons.edit,
-                                  color: Colors.red,
-                                ))
-                            : const Text('')),
-                      ]));
-                    } // sort the rows based on selected column
-                    rows.sort((a, b) {
-                      final aValue = a.cells[sortColumnIndex].child.toString();
-                      final bValue = b.cells[sortColumnIndex].child.toString();
-                      return sortAscending
-                          ? aValue.compareTo(bValue)
-                          : bValue.compareTo(aValue);
-                    });
-                    return DataTable(
-                        columns: [
-                          DataColumn(
-                              label: const Text(
-                                'Source Place',
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                              onSort: (columnIndex, ascending) {
-                                _sortColumn(columnIndex, ascending);
-                              }),
-                          DataColumn(
-                              label: const Text(
-                                'Edit',
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
-                              ),
-                              onSort: (columnIndex, ascending) {
-                                _sortColumn(columnIndex, ascending);
-                              }),
-                        ],
-                        headingRowColor: MaterialStateProperty.all(
-                          const Color.fromARGB(255, 255, 227, 160),
-                        ),
-                        sortAscending: sortAscending,
-                        sortColumnIndex: sortColumnIndex,
-                        rows: rows);
-                  } else if (snapshot.hasError) {
-                    return Text('${snapshot.error}');
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.hasData &&
+                        snapshot.data != null &&
+                        snapshot.data!.isNotEmpty) {
+                      final List<DataRow> rows = [];
+                      for (final item in snapshot.data!) {
+                        rows.add(DataRow(cells: [
+                          DataCell(Text('${item['source_place_name']}')),
+                          DataCell(item['source_place_editable'] == 'true'
+                              ? IconButton(
+                                  onPressed: () async {
+                                    var result = await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => EditSourcePlace(
+                                                sourcePlaceName:
+                                                    '${item['source_place_name']}',
+                                                sourcePlaceId:
+                                                    item['source_place_id'])));
+                                    if (result == 'success') {
+                                      setState(() {});
+                                    }
+                                  },
+                                  icon: const Icon(
+                                    Icons.edit,
+                                    color: Colors.red,
+                                  ))
+                              : const Text('')),
+                        ]));
+                      } // sort the rows based on selected column
+                      rows.sort((a, b) {
+                        final aValue =
+                            a.cells[sortColumnIndex].child.toString();
+                        final bValue =
+                            b.cells[sortColumnIndex].child.toString();
+                        return sortAscending
+                            ? aValue.compareTo(bValue)
+                            : bValue.compareTo(aValue);
+                      });
+                      return DataTable(
+                          columns: [
+                            DataColumn(
+                                label: const Text(
+                                  'Source Place',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                onSort: (columnIndex, ascending) {
+                                  _sortColumn(columnIndex, ascending);
+                                }),
+                            DataColumn(
+                                label: const Text(
+                                  'Edit',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                onSort: (columnIndex, ascending) {
+                                  _sortColumn(columnIndex, ascending);
+                                }),
+                          ],
+                          headingRowColor: MaterialStateProperty.all(
+                            const Color.fromARGB(255, 255, 227, 160),
+                          ),
+                          sortAscending: sortAscending,
+                          sortColumnIndex: sortColumnIndex,
+                          rows: rows);
+                    } else if (snapshot.hasError) {
+                      return Text('${snapshot.error}');
+                    } else {
+                      return const Text(
+                          'There is no data with the Source Places. Please add by pressing `Add Source Place` button.\nရရှိရာနေရာများအတွက် အချက်အလက်များမရှိသေးပါ။ `Add Source Place` ခလုတ်ကိုနှိပ်၍ဖြည့်သွင်းပါ');
+                    }
                   } else {
-                    return const Text('No Source places');
+                    return const CircularProgressIndicator();
                   }
                 }),
             const SizedBox(
