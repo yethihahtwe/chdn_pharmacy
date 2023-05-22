@@ -1,4 +1,5 @@
 import 'package:chdn_pharmacy/database/shared_pref_helper.dart';
+import 'package:chdn_pharmacy/screens/update_profile.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/nav_bar.dart';
@@ -20,6 +21,8 @@ class _ProfileDetailState extends State<ProfileDetail> {
   bool? _isOtherVillage;
   String? _userWarehouse;
   bool? _isOtherWarehouse;
+  bool? _isComplete; // to check profile is complete
+  bool? _isIncomplete;
 
   @override
   void initState() {
@@ -28,6 +31,17 @@ class _ProfileDetailState extends State<ProfileDetail> {
       setState(() {
         _userId = value;
       });
+      if (value != null) {
+        setState(() {
+          _isComplete = true;
+          _isIncomplete = false;
+        });
+      } else {
+        setState(() {
+          _isComplete = false;
+          _isIncomplete = true;
+        });
+      }
     });
     SharedPrefHelper.getUserName().then((value) {
       setState(() {
@@ -204,69 +218,134 @@ class _ProfileDetailState extends State<ProfileDetail> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                SizedBox(
-                  width: 150,
-                  height: 45,
-                  child: ElevatedButton.icon(
-                    onPressed: () async {
-                      var result = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => EditProfile(
-                                    userName: _userName ?? '',
-                                    userTownship: _userTownship ?? '',
-                                    isOtherVillage: _isOtherVillage ?? false,
-                                    userVillage: _userVillage ?? '',
-                                    isOtherWarehouse:
-                                        _isOtherWarehouse ?? false,
-                                    userWarehouse: _userWarehouse ?? '',
-                                  )));
-                      if (result == 'success') {
-                        SharedPrefHelper.getUserName().then((value) {
-                          setState(() {
-                            _userName = value ?? 'Not Set';
+                // start of edit profile button
+                Visibility(
+                  visible: _isComplete ?? false,
+                  child: SizedBox(
+                    width: 150,
+                    height: 45,
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        var result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => EditProfile(
+                                      userName: _userName ?? '',
+                                      userTownship: _userTownship ?? '',
+                                      isOtherVillage: _isOtherVillage ?? false,
+                                      userVillage: _userVillage ?? '',
+                                      isOtherWarehouse:
+                                          _isOtherWarehouse ?? false,
+                                      userWarehouse: _userWarehouse ?? '',
+                                    )));
+                        if (result == 'success') {
+                          SharedPrefHelper.getUserId().then((value) {
+                            setState(() {
+                              _userId = value ?? 'Not Set';
+                            });
                           });
-                        });
-                        SharedPrefHelper.getUserTownship().then((value) {
-                          setState(() {
-                            _userTownship = value ?? 'Not Set';
+                          SharedPrefHelper.getUserName().then((value) {
+                            setState(() {
+                              _userName = value ?? 'Not Set';
+                            });
                           });
-                        });
-                        SharedPrefHelper.getIsOtherVillage().then((value) {
-                          setState(() {
-                            _isOtherVillage = value ?? false;
+                          SharedPrefHelper.getUserTownship().then((value) {
+                            setState(() {
+                              _userTownship = value ?? 'Not Set';
+                            });
                           });
-                        });
-                        SharedPrefHelper.getUserVillage().then((value) {
-                          setState(() {
-                            _userVillage = value ?? 'Not Set';
+                          SharedPrefHelper.getIsOtherVillage().then((value) {
+                            setState(() {
+                              _isOtherVillage = value ?? false;
+                            });
                           });
-                        });
-                        SharedPrefHelper.getIsOtherWarehouse().then((value) {
-                          setState(() {
-                            _isOtherWarehouse = value ?? false;
+                          SharedPrefHelper.getUserVillage().then((value) {
+                            setState(() {
+                              _userVillage = value ?? 'Not Set';
+                            });
                           });
-                        });
-                        SharedPrefHelper.getUserWarehouse().then((value) {
-                          setState(() {
-                            _userWarehouse = value ?? 'Not Set';
+                          SharedPrefHelper.getIsOtherWarehouse().then((value) {
+                            setState(() {
+                              _isOtherWarehouse = value ?? false;
+                            });
                           });
-                        });
-                      }
-                    },
-                    icon: const Icon(
-                      Icons.edit,
-                      size: 16,
+                          SharedPrefHelper.getUserWarehouse().then((value) {
+                            setState(() {
+                              _userWarehouse = value ?? 'Not Set';
+                            });
+                          });
+                        }
+                      },
+                      icon: const Icon(
+                        Icons.edit,
+                        size: 16,
+                      ),
+                      label: const Text(
+                        'Edit Profile',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                      style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                              Theme.of(context).colorScheme.background),
+                          foregroundColor: MaterialStateProperty.all(
+                              Theme.of(context).colorScheme.secondary)),
                     ),
-                    label: const Text(
-                      'Edit Profile',
-                      style: TextStyle(fontSize: 12),
+                  ),
+                ), // end of edit profile button
+                // Start of update profile Button
+                Visibility(
+                  visible: _isIncomplete ?? false,
+                  child: SizedBox(
+                    width: 200,
+                    height: 45,
+                    child: ElevatedButton.icon(
+                      style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all(
+                              Theme.of(context).colorScheme.background),
+                          foregroundColor: MaterialStateProperty.all(
+                              Theme.of(context).colorScheme.secondary)),
+                      onPressed: () async {
+                        var result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const UpdateProfile()));
+                        if (result == 'success') {
+                          SharedPrefHelper.getUserName().then((value) {
+                            setState(() {
+                              _userName = value ?? 'Not Set';
+                            });
+                          });
+                          SharedPrefHelper.getUserTownship().then((value) {
+                            setState(() {
+                              _userTownship = value ?? 'Not Set';
+                            });
+                          });
+                          SharedPrefHelper.getIsOtherVillage().then((value) {
+                            setState(() {
+                              _isOtherVillage = value ?? false;
+                            });
+                          });
+                          SharedPrefHelper.getUserVillage().then((value) {
+                            setState(() {
+                              _userVillage = value ?? 'Not Set';
+                            });
+                          });
+                          SharedPrefHelper.getIsOtherWarehouse().then((value) {
+                            setState(() {
+                              _isOtherWarehouse = value ?? false;
+                            });
+                          });
+                          SharedPrefHelper.getUserWarehouse().then((value) {
+                            setState(() {
+                              _userWarehouse = value ?? 'Not Set';
+                            });
+                          });
+                        }
+                      },
+                      icon: const Icon(Icons.edit),
+                      label: const Text('Update Profile',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
-                    style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                            Theme.of(context).colorScheme.background),
-                        foregroundColor: MaterialStateProperty.all(
-                            Theme.of(context).colorScheme.secondary)),
                   ),
                 ),
               ],

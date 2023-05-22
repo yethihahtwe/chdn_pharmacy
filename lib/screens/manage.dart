@@ -186,6 +186,7 @@ class _ManageState extends State<Manage> {
                             ),
                           ),
                         ), // end of destination card
+                        const SizedBox(height: 20)
                       ]));
             } else {
               return Container(
