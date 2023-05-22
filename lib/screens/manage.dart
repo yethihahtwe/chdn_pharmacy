@@ -6,6 +6,7 @@ import 'package:chdn_pharmacy/screens/update_profile.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/nav_bar.dart';
+import 'manage_destination.dart';
 import 'manage_donor.dart';
 import 'manage_package_form.dart';
 
@@ -164,6 +165,27 @@ class _ManageState extends State<Manage> {
                             ),
                           ),
                         ), // end of donor card
+                        const SizedBox(height: 10),
+                        // start of destination card
+                        Card(
+                          clipBehavior: Clip.hardEdge,
+                          elevation: 5,
+                          child: InkWell(
+                            splashColor: Colors.red.withAlpha(30),
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const ManageDestination()));
+                            },
+                            child: const ListTile(
+                              leading: Icon(Icons.airport_shuttle),
+                              title: Text('Manage Destinations'),
+                              subtitle: Text('ပေးပို့ရာနေရာများစီမံခန့်ခွဲရန်'),
+                            ),
+                          ),
+                        ), // end of destination card
                       ]));
             } else {
               return Container(

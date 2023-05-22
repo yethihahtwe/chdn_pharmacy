@@ -17,14 +17,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
-  change_notifier:
-    dependency: "direct main"
-    description:
-      name: change_notifier
-      sha256: "9a50ab5290b93a2f164d20a12998ef10571d57947b47f144296dc53cc24f4f5b"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.24.0"
   characters:
     dependency: transitive
     description:
@@ -65,14 +57,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
-  dart_internal:
-    dependency: transitive
-    description:
-      name: dart_internal
-      sha256: b4710e6d55e97cd1c6e13adf68c3f18114d2b666bb8c0450b9719852915ad04d
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.7"
   fake_async:
     dependency: transitive
     description:
@@ -136,14 +120,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  go_router:
+  intl:
     dependency: "direct main"
     description:
-      name: go_router
-      sha256: "73a50070c125c90f9960aad4da9e4a95d94558230727f145ac634528da1e75e3"
+      name: intl
+      sha256: "3bc132a9dbce73a7e4a21a17d06e1878839ffbf975568bc875c60537824b0c4d"
       url: "https://pub.dev"
     source: hosted
-    version: "7.0.0"
+    version: "0.18.1"
   js:
     dependency: transitive
     description:
@@ -160,14 +144,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
-  logging:
-    dependency: transitive
-    description:
-      name: logging
-      sha256: "04094f2eb032cbb06c6f6e8d3607edcfcb0455e2bb6cbc010cb01171dcb64e6d"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.1.1"
   matcher:
     dependency: transitive
     description:
@@ -192,14 +168,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.9.1"
-  nested:
-    dependency: transitive
-    description:
-      name: nested
-      sha256: "03bac4c528c64c95c722ec99280375a6f2fc708eec17c7b3f07253b626cd2a20"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
   path:
     dependency: "direct main"
     description:
@@ -280,22 +248,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.2.4"
-  provider:
-    dependency: "direct main"
-    description:
-      name: provider
-      sha256: cdbe7530b12ecd9eb455bdaa2fcb8d4dad22e80b8afb4798b41479d5ce26847f
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.0.5"
-  quiver:
-    dependency: transitive
-    description:
-      name: quiver
-      sha256: b1c1ac5ce6688d77f65f3375a9abb9319b3cb32486bdc7a1e0fdf004d7ba4e47
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.2.1"
   shared_preferences:
     dependency: "direct main"
     description:
@@ -470,5 +422,5 @@ packages:
     source: hosted
     version: "1.0.0"
 sdks:
-  dart: ">=3.0.0 <3.1.0"
+  dart: ">=3.0.0 <4.0.0"
   flutter: ">=3.3.0"

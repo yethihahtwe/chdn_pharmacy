@@ -44,6 +44,24 @@ class SharedPrefHelper {
     return prefs.getBool('isOtherWarehouse');
   }
 
+  // retrieve last date
+  static Future<String?> getLastDate() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('lastDate');
+  }
+
+  // retrieve last source place
+  static Future<int?> getLastSourcePlace() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('lastSourcePlace');
+  }
+
+  // retrieve last donor
+  static Future<int?> getLastDonor() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt('lastDonor');
+  }
+
   // clear all values
   static Future<void> clearSharedPreferences() async {
     final prefs = await SharedPreferences.getInstance();

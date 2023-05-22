@@ -11,6 +11,8 @@ class DatabaseHelper {
   static const String tblPackageForm = 'tbl_package_form';
   static const String tblSourcePlace = 'tbl_source_place';
   static const String tblDonor = 'tbl_donor';
+  static const String tblDestination = 'tbl_destination';
+  static const String tblStock = 'tbl_stock';
 
   DatabaseHelper() {
     _loadDatabase();
@@ -64,6 +66,14 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> getAllItem() async {
     _db = await _loadDatabase();
     return await _db.rawQuery('SELECT * FROM $tblItem ORDER BY item_id asc');
+  }
+
+  // select item filtered by item type
+  Future<List<Map<String, dynamic>>> getAllItemByItemType(
+      String itemType) async {
+    _db = await _loadDatabase();
+    return await _db
+        .query(tblItem, where: "item_type=?", whereArgs: [itemType]);
   }
 
   // update
@@ -170,5 +180,53 @@ class DatabaseHelper {
   Future<int> deleteDonor(int id) async {
     _db = await _loadDatabase();
     return await _db.delete(tblDonor, where: "donor_id=?", whereArgs: [id]);
+  }
+
+  // destination table
+  // insert
+  Future<int> insertDestination(Map<String, dynamic> destination) async {
+    _db = await _loadDatabase();
+    return await _db.insert(tblDestination, destination);
+  }
+
+  // select *
+  Future<List<Map<String, dynamic>>> getAllDestination() async {
+    _db = await _loadDatabase();
+    return await _db.rawQuery('SELECT * FROM $tblDestination');
+  }
+
+  // update
+  Future<int> updateDestination(
+      Map<String, dynamic> destination, int id) async {
+    _db = await _loadDatabase();
+    return await _db.update(tblDestination, destination,
+        where: "destination_id=?", whereArgs: [id]);
+  }
+
+  // delete
+  Future<int> deleteDestination(int id) async {
+    _db = await _loadDatabase();
+    return await _db
+        .delete(tblDestination, where: "destination_id=?", whereArgs: [id]);
+  }
+
+  // stock table
+  // insert
+  Future<int> insertStock(Map<String, dynamic> stock) async {
+    _db = await _loadDatabase();
+    return await _db.insert(tblStock, stock);
+  }
+
+  // select *
+  Future<List<Map<String, dynamic>>> getAllStock() async {
+    _db = await _loadDatabase();
+    return await _db.rawQuery('SELECT * FROM $tblStock');
+  }
+
+  // select group by for home screen
+  Future<List<Map<String, dynamic>>> getAllBalance() async {
+    _db = await _loadDatabase();
+    return await _db.rawQuery(
+        'SELECT stock_item_id, (SELECT item_name FROM $tblItem WHERE item_id=stock_item_id) AS item_name, (SELECT item_type FROM $tblItem WHERE item_id=stock_item_id) AS item_type, SUM(stock_amount) AS stock_amount FROM tbl_stock GROUP BY stock_item_id, item_name, item_type HAVING SUM(stock_amount) >0;');
   }
 }

@@ -97,3 +97,86 @@ class Donor {
     return {'donor_name': donorName};
   }
 }
+
+class Destination {
+  // insert new destination model
+  static Map<String, dynamic> insertDestination(
+      {required String destinationName,
+      required String destinationEditable,
+      required String destinationCre}) {
+    return {
+      'destination_name': destinationName,
+      'destination_editable': destinationEditable,
+      'destination_cre': destinationCre
+    };
+  }
+
+  // update destination model
+  static Map<String, dynamic> updateDestination(
+      {required String destinationName}) {
+    return {'destination_name': destinationName};
+  }
+}
+
+/* The following are the menu classes */
+// source place
+class SourcePlaceMenu {
+  final int id;
+  final String name;
+  SourcePlaceMenu(this.id, this.name);
+}
+
+// donor
+class DonorMenu {
+  final int id;
+  final String name;
+  DonorMenu(this.id, this.name);
+}
+
+// item
+class ItemMenu {
+  final int id;
+  final String name;
+  ItemMenu(this.id, this.name);
+}
+
+// package form
+class PackageFormMenu {
+  final int id;
+  final String name;
+  PackageFormMenu(this.id, this.name);
+}
+
+// stock
+class Stock {
+  static Map<String, dynamic> insertStock(
+      {required String stockDate,
+      required String stockType,
+      required int stockItemId,
+      required int stockPackageFormId,
+      required String stockExpDate,
+      required String stockBatch,
+      required int stockAmount,
+      required int stockSourcePlaceId,
+      required int stockDonorId,
+      required String stockRemark,
+      required int stockTo,
+      required String stockSync,
+      required String stockCre}) {
+    return {
+      'stock_date': stockDate,
+      'stock_type': stockType,
+      'stock_item_id': stockItemId,
+      'stock_package_form_id': stockPackageFormId,
+      'stock_exp_date': stockExpDate,
+      'stock_batch': stockBatch,
+      'stock_amount': stockAmount,
+      'stock_source_place_id': stockSourcePlaceId,
+      'stock_donor_id': stockDonorId,
+      'stock_remark': stockRemark,
+      'stock_to': stockTo,
+      'stock_sync': stockSync,
+      'stock_cre': stockCre
+    };
+  }
+}
