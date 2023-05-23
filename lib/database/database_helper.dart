@@ -217,10 +217,11 @@ class DatabaseHelper {
     return await _db.insert(tblStock, stock);
   }
 
-  // select *
+  // select for history screen
   Future<List<Map<String, dynamic>>> getAllStock() async {
     _db = await _loadDatabase();
-    return await _db.rawQuery('SELECT * FROM $tblStock');
+    return await _db.rawQuery(
+        'SELECT stock_item_id, stock_date, stock_type, (SELECT item_name FROM $tblItem WHERE item_id=stock_item_id) AS item_name, (SELECT item_type FROM $tblItem WHERE item_id=stock_item_id) AS item_type, (SELECT package_form_name from $tblPackageForm WHERE package_form_id=stock_package_form_id) AS stock_package_form, stock_amount, stock_sync FROM tbl_stock');
   }
 
   // select group by for home screen

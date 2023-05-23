@@ -1,788 +1,339 @@
 import 'package:chdn_pharmacy/database/shared_pref_helper.dart';
-import 'package:chdn_pharmacy/model/data_model.dart';
+import 'package:chdn_pharmacy/screens/item_inventory.dart';
+import 'package:chdn_pharmacy/screens/update_profile.dart';
 import 'package:flutter/material.dart';
-import '../database/database_helper.dart';
 
-class AddStock extends StatefulWidget {
-  const AddStock({super.key});
+import '../database/database_helper.dart';
+import '../widgets/nav_bar.dart';
+import 'add_stock.dart';
+
+class Home extends StatefulWidget {
+  const Home({super.key});
 
   @override
-  State<AddStock> createState() => _AddStockState();
+  State<Home> createState() => _HomeState();
 }
 
-class _AddStockState extends State<AddStock> {
-  // form key
-  final GlobalKey<FormState> _key = GlobalKey();
-// user id
-  String? _userId;
-
-  // date
-  DateTime? date;
-  // validate if date is picked
-  bool _isDatePicked = false;
-  // display date in date picker button
-  String getDateText() {
-    if (date == null) {
-      _isDatePicked = false;
-      return 'Select Date';
-    } else {
-      _isDatePicked = true;
-      return '${date!.day}-${date!.month}-${date!.year}';
-    }
+class _HomeState extends State<Home> {
+  // Index for bottom navigation bar
+  int _selectedIndex = 0;
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
-  // date value to save
-  String saveDateText() {
-    if (date == null) {
-      return '';
-    } else {
-      return '${date!.day}-${date!.month}-${date!.year}';
-    }
+  // sort column
+  int sortColumnIndex = 0;
+  bool sortAscending = true;
+  void _sortColumn(int columnIndex, bool ascending) {
+    setState(() {
+      sortColumnIndex = columnIndex;
+      sortAscending = ascending;
+    });
   }
 
-  // source place
-  // save source place
-  int? _selectedSourcePlace;
-  // source place dropdown options
-  List<SourcePlaceMenu> _sourcePlaceList = [];
-
-  // donor
-  // save donor
-  int? _selectedDonor;
-  // donor dropdown options
-  List<DonorMenu> _donorList = [];
-
-  // item type
-  String? _selectedItemType;
-  // dropdown options
-  List<String> _itemTypeList = [];
-
-  // item
-  bool _searchEnabled = false;
-  int? _selectedItem;
-  List<ItemMenu> _itemList = [];
-  final TextEditingController itemNameController = TextEditingController();
-// clear text field when clear button pressed
-  void _clearSearch() {
-    itemNameController.clear();
-    setState(() {});
-  }
-
+  // search
+  TextEditingController _searchController = TextEditingController();
   @override
   void dispose() {
     super.dispose();
-    itemNameController.dispose();
+    _searchController.dispose();
   }
 
-  // exp date
-  DateTime? _expDate;
-  // to validate
-  bool _isExpDatePicked = false;
-  // display exp date
-  String getExpDateText() {
-    if (_expDate == null) {
-      _isExpDatePicked = false;
-      return 'Select Expiry Date';
-    } else {
-      _isExpDatePicked = true;
-      return '${_expDate!.day}-${_expDate!.month}-${_expDate!.year}';
-    }
-  }
-
-  // save exp date
-  String saveExpDateText() {
-    if (_expDate == null) {
-      return '';
-    } else {
-      return '${_expDate!.day}-${_expDate!.month}-${_expDate!.year}';
-    }
-  }
-
-  // show exp date picker
-  bool _showExpDatePicker = true;
-  // no exp date
-  bool _hasNoExpDate = false;
-
-  // batch no
-  final TextEditingController _batchNameController = TextEditingController();
-  // show batch text form field
-  bool _showBatchNumber = true;
-  // no batch number
-  bool _hasNoBatchNumber = false;
-
-  // package form
-  int? _selectedPackageForm;
-  List<PackageFormMenu> _packageFormList = [];
-
-  // amount
-  final TextEditingController _amountController = TextEditingController();
-
-  // remark
-  final TextEditingController _remarkController = TextEditingController();
-
-  // validate error text
-  bool _itemNotValid = false;
-  bool _dateNotValid = false;
-  bool _expDateNotValid = false;
-
-  @override
-  void initState() {
-    super.initState();
-    // load user id
-    SharedPrefHelper.getUserId().then((value) {
-      setState(() {
-        _userId = value;
-      });
-    });
-    // Load source place query to List
-    DatabaseHelper().getAllSourcePlace().then((value) {
-      setState(() {
-        _sourcePlaceList = value
-            .map((e) => SourcePlaceMenu(
-                  e['source_place_id'] as int,
-                  e['source_place_name'].toString(),
-                ))
-            .toList();
-      });
-    });
-    // load donor query to list
-    DatabaseHelper().getAllDonor().then((value) {
-      setState(() {
-        _donorList = value
-            .map((e) => DonorMenu(
-                  e['donor_id'] as int,
-                  e['donor_name'].toString(),
-                ))
-            .toList();
-      });
-    });
-
-    // Load list of item type string value
-    DatabaseHelper().getAllItemType().then((value) {
-      setState(() {
-        _itemTypeList =
-            List<String>.from(value.map((e) => e['item_type_name'].toString()));
-      });
-    });
-
-    // load query to item list
-    DatabaseHelper()
-        .getAllItemByItemType(_selectedItemType ?? '')
-        .then((value) {
-      setState(() {
-        _itemList = value
-            .map(
-                (e) => ItemMenu(e['item_id'] as int, e['item_name'].toString()))
-            .toList();
-      });
-    });
-
-    // load query to package form
-    DatabaseHelper().getAllPackageForm().then((value) {
-      setState(() {
-        _packageFormList = value
-            .map((e) => PackageFormMenu(
-                e['package_form_id'] as int, e['package_form_name'].toString()))
-            .toList();
-      });
-    });
+  // clear search text field function
+  void _clearSearch() {
+    _searchController.clear();
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // start of app bar
+      /* the build tree of the scaffold body is app bar > body > fab > bottom navigataion bar*/
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColor,
-        title: const Text('Add Stock'),
+        title: const Text('CHDNventory'),
         centerTitle: true,
+        automaticallyImplyLeading: false,
       ), // end of app bar
-      body: Form(
-        key: _key,
-        child: SingleChildScrollView(
-            padding: EdgeInsets.only(
-                left: MediaQuery.of(context).size.width * 0.05,
-                right: MediaQuery.of(context).size.width * 0.05),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const SizedBox(
-                height: 20,
-              ),
-              // start of date picker
-              const Text('Stock-in Date | ပစ္စည်းအဝင်ရက်စွဲ'),
-              SizedBox(
-                width: 200,
-                height: 45,
-                child: ElevatedButton.icon(
-                    style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                          const Color.fromARGB(255, 255, 227, 160),
-                        ),
-                        foregroundColor: MaterialStateProperty.all(
-                            Theme.of(context).colorScheme.secondary)),
-                    onPressed: () {
-                      pickDate(context);
-                    },
-                    icon: const Icon(Icons.calendar_today, size: 19),
-                    label: Text(getDateText(),
-                        style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold))),
-              ), // end of date picker
-              if (_dateNotValid)
-                const Text('Please select date',
-                    style: TextStyle(color: Colors.red, fontSize: 12)),
-              const SizedBox(height: 10),
-              // start of source place
-              const Text('Source | လက်ခံရရှိရာနေရာ'),
-              DropdownButtonFormField<int>(
-                  icon: const Icon(
-                    Icons.arrow_drop_down_circle_outlined,
-                    color: Colors.grey,
-                  ),
-                  value: _selectedSourcePlace,
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please select source place';
-                    }
-                    return null;
-                  },
-                  decoration: const InputDecoration(
-                    prefixIcon: Icon(
-                      Icons.system_update_alt,
-                      color: Colors.grey,
-                    ),
-                    border: OutlineInputBorder(),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: Color.fromARGB(255, 255, 197, 63),
-                            width: 2)),
-                    contentPadding:
-                        EdgeInsets.only(top: 5, bottom: 5, right: 10),
-                  ),
-                  hint: const Text('Select Source'),
-                  items: _sourcePlaceList
-                      .map(buildSourcePlaceListMenuItem)
-                      .toList(),
-                  onChanged: (value) => setState(() {
-                        _selectedSourcePlace = value;
-                      })),
-              // End of source place
-              const SizedBox(height: 10.0),
-              // start of donor
-              const Text('Donor | အလှူရှင်အဖွဲ့အစည်း'),
-              DropdownButtonFormField<int>(
-                  icon: const Icon(
-                    Icons.arrow_drop_down_circle_outlined,
-                    color: Colors.grey,
-                  ),
-                  value: _selectedDonor,
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please select donor';
-                    }
-                    return null;
-                  },
-                  decoration: const InputDecoration(
-                    prefixIcon: Icon(
-                      Icons.contact_mail,
-                      color: Colors.grey,
-                    ),
-                    border: OutlineInputBorder(),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: Color.fromARGB(255, 255, 197, 63),
-                            width: 2)),
-                    contentPadding:
-                        EdgeInsets.only(top: 5, bottom: 5, right: 10),
-                  ),
-                  hint: const Text('Select Donor'),
-                  items: _donorList.map(buildDonorListMenuItem).toList(),
-                  onChanged: (value) => setState(() {
-                        _selectedDonor = value;
-                      })), // end of donor
-              const SizedBox(height: 10),
-              // Start of item type dropdown
-              const Text('Item Type | ပစ္စည်းအမျိုးအစား'),
-              DropdownButtonFormField<String>(
-                  icon: const Icon(
-                    Icons.arrow_drop_down_circle_outlined,
-                    color: Colors.grey,
-                  ),
-                  value: _selectedItemType,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please select item type';
-                    }
-                    return null;
-                  },
-                  decoration: const InputDecoration(
-                    prefixIcon: Icon(
-                      Icons.type_specimen_outlined,
-                      color: Colors.grey,
-                    ),
-                    border: OutlineInputBorder(),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: Color.fromARGB(255, 255, 197, 63),
-                            width: 2)),
-                    contentPadding:
-                        EdgeInsets.only(top: 5, bottom: 5, right: 10),
-                  ),
-                  hint: const Text('Select Item Type'),
-                  items: _itemTypeList.map(buildItemTypeListMenuItem).toList(),
-                  onChanged: (value) {
-                    if (value != null) {
-                      setState(() {
-                        _searchEnabled = true;
-                      });
-                    }
-                    setState(() {
-                      _selectedItemType = value;
-                      _clearSearch();
-                      DatabaseHelper()
-                          .getAllItemByItemType(_selectedItemType ?? '')
-                          .then((value) {
-                        setState(() {
-                          _itemList = value
-                              .map((e) => ItemMenu(e['item_id'] as int,
-                                  e['item_name'].toString()))
-                              .toList();
-                        });
-                      });
-                    });
-                  }),
-              // End of item type
-              const SizedBox(height: 10.0),
-              // start of item
-              const Text('Item and Composition | ပစ္စည်းအမည်နှင့်ပါဝင်မှုပမာဏ'),
-              DropdownMenu<int>(
-                  width: 300,
-                  enabled: _searchEnabled,
-                  controller: itemNameController,
-                  enableFilter: true,
-                  enableSearch: true,
-                  requestFocusOnTap: true,
-                  leadingIcon: const Icon(
-                    Icons.search,
-                    color: Colors.grey,
-                  ),
-                  trailingIcon: itemNameController.text.isEmpty
-                      ? null
-                      : IconButton(
-                          onPressed: _clearSearch,
-                          icon: const Icon(
-                            Icons.cancel,
-                            color: Colors.grey,
-                            size: 18,
-                          )),
-                  hintText: 'Item name and composition',
-                  inputDecorationTheme: const InputDecorationTheme(
-                    border: OutlineInputBorder(),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: Color.fromARGB(255, 255, 197, 63),
-                            width: 2)),
-                    contentPadding: EdgeInsets.symmetric(horizontal: 5),
-                    suffixIconColor: Colors.grey,
-                  ),
-                  initialSelection: _selectedItem,
-                  onSelected: (value) {
-                    setState(() {
-                      _selectedItem = value;
-                    });
-                  },
-                  dropdownMenuEntries:
-                      _itemList.map(buildItemListMenuEntry).toList()),
-              // end of item menu
-              if (_itemNotValid)
-                const Text('Please select item',
-                    style: TextStyle(color: Colors.red, fontSize: 12)),
-              const SizedBox(height: 10),
-              // start of package form
-              const Text('Package Form | ထုပ်ပိုးပုံစံ'),
-              DropdownButtonFormField<int>(
-                  icon: const Icon(
-                    Icons.arrow_drop_down_circle_outlined,
-                    color: Colors.grey,
-                  ),
-                  value: _selectedPackageForm,
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please select package form';
-                    }
-                    return null;
-                  },
-                  decoration: const InputDecoration(
-                    prefixIcon: Icon(
-                      Icons.local_pharmacy_outlined,
-                      color: Colors.grey,
-                    ),
-                    border: OutlineInputBorder(),
-                    focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                            color: Color.fromARGB(255, 255, 197, 63),
-                            width: 2)),
-                    contentPadding:
-                        EdgeInsets.only(top: 5, bottom: 5, right: 10),
-                  ),
-                  hint: const Text('Select Package Form'),
-                  items: _packageFormList
-                      .map(buildPackageFormListMenuItem)
-                      .toList(),
-                  onChanged: (value) => setState(() {
-                        _selectedPackageForm = value;
-                      })), // end of package form
-              const SizedBox(height: 10),
-              // start of exp date
-              if (_showExpDatePicker)
-                const Text('Expiry Date | သက်တမ်းလွန်ရက်စွဲ'),
-              if (_showExpDatePicker)
-                SizedBox(
-                  width: 200,
-                  height: 45,
-                  child: ElevatedButton.icon(
-                      style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all(
-                            const Color.fromARGB(255, 255, 227, 160),
-                          ),
-                          foregroundColor: MaterialStateProperty.all(
-                              Theme.of(context).colorScheme.secondary)),
-                      onPressed: () {
-                        pickExpDate(context);
+      body: FutureBuilder<String?>(
+        // check profile set up
+        future: SharedPrefHelper.getUserId(), //check user id
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done &&
+              snapshot.hasData &&
+              snapshot.data != null) {
+            // return check inventory if user id present
+            return buildInventoryContent();
+          } else {
+            // return this if user id absent
+            return buildProfileSetup();
+          }
+        },
+      ),
+      // start of add stock fab
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () async {
+          var result = await Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const AddStock()));
+          if (result == 'success') {
+            setState(() {});
+          }
+        },
+        label: const Text(
+          'Add Stock',
+          style: TextStyle(
+              color: Color.fromARGB(255, 49, 49, 49),
+              fontWeight: FontWeight.bold),
+        ),
+        icon: const Icon(
+          Icons.add,
+          color: Color.fromARGB(255, 49, 49, 49),
+        ),
+        backgroundColor: const Color.fromARGB(255, 255, 197, 63),
+      ), // end of add stock fab
+      bottomNavigationBar: BottomNavigation(
+          selectedIndex: _selectedIndex, onItemTapped: _onItemTapped),
+    );
+  }
+
+  Widget buildInventoryContent() {
+    return FutureBuilder<List<Map<String, dynamic>>>(
+        future: DatabaseHelper().getAllBalance(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasData &&
+                snapshot.data != null &&
+                snapshot.data!.isNotEmpty) {
+              final List<DataRow> rows = [];
+              for (final item in snapshot.data!) {
+                rows.add(DataRow(cells: [
+                  DataCell(Text('${item['item_name']}')),
+                  DataCell(Text('${item['item_type']}')),
+                  DataCell(Text('${item['stock_amount']}')),
+                  DataCell(IconButton(
+                      onPressed: () async {
+                        var result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ItemInventory(
+                                      itemId: '${item['stock_item_id']}',
+                                    )));
+                        if (result == 'success') {
+                          setState(() {});
+                        }
                       },
-                      icon: const Icon(Icons.calendar_today, size: 19),
-                      label: Text(getExpDateText(),
-                          style: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold))),
-                ), // end of exp date
-              if (_expDateNotValid)
-                const Text('Please select expiry date',
-                    style: TextStyle(color: Colors.red, fontSize: 12)),
-              // start of no exp date checkbox
-              CheckboxListTile(
-                controlAffinity: ListTileControlAffinity.leading,
-                title: const Text(
-                  'No Expiry Date | သက်တမ်းလွန်ရက်စွဲမရှိ',
-                  style: TextStyle(fontSize: 12),
-                ),
-                value: _hasNoExpDate,
-                onChanged: (value) => setState(() {
-                  _hasNoExpDate = value!;
-                  if (_hasNoExpDate) {
-                    _showExpDatePicker = false;
-                    _expDate = null;
-                  } else {
-                    _showExpDatePicker = true;
-                  }
-                }),
-              ), // end of no exp date checkbox
-              const Divider(),
-              // const SizedBox(height: 10),
-              // start of batch
-              if (_showBatchNumber) const Text('Batch Number'),
-              if (_showBatchNumber)
-                SizedBox(
-                  height: 50,
-                  child: TextFormField(
-                    controller: _batchNameController,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'please enter batch number';
-                      }
-                      return null;
-                    },
-                    onSaved: (value) {
-                      _batchNameController.text = value!;
-                    },
-                    decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.all(10),
-                        prefixIcon: const Icon(
-                          Icons.more_outlined,
-                          color: Colors.grey,
-                        ),
-                        hintText: 'Enter Batch Number',
-                        border: const OutlineInputBorder(),
-                        focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.background,
-                                width: 2))),
-                    maxLines: 1,
+                      icon: const Icon(Icons.play_circle_filled,
+                          color: Colors.red))),
+                ]));
+              } // filter rows based in search input
+              final List<DataRow> filteredRows = rows.where(
+                (row) {
+                  final itemName = row.cells[0].child.toString();
+                  final itemType = row.cells[1].child.toString();
+                  final searchQuery = _searchController.text.toLowerCase();
+                  return itemName.toLowerCase().contains(searchQuery) ||
+                      itemType.toLowerCase().contains(searchQuery);
+                },
+              ).toList();
+              // sort the rows based on selected column
+              filteredRows.sort((a, b) {
+                final aValue = a.cells[sortColumnIndex].child.toString();
+                final bValue = b.cells[sortColumnIndex].child.toString();
+                return sortAscending
+                    ? aValue.compareTo(bValue)
+                    : bValue.compareTo(aValue);
+              });
+              return LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints constraints) {
+                return SingleChildScrollView(
+                  padding: EdgeInsets.only(
+                    left: MediaQuery.of(context).size.width * 0.05,
+                    right: MediaQuery.of(context).size.width * 0.05,
+                    bottom: MediaQuery.of(context).viewInsets.bottom,
                   ),
-                ), // end of batch
-              // start of no batch checkbox
-              CheckboxListTile(
-                controlAffinity: ListTileControlAffinity.leading,
-                title: const Text(
-                  'No Batch Number | Batch Number မရှိ',
-                  style: TextStyle(fontSize: 12),
-                ),
-                value: _hasNoBatchNumber,
-                onChanged: (value) => setState(() {
-                  _hasNoBatchNumber = value!;
-                  if (_hasNoBatchNumber) {
-                    _showBatchNumber = false;
-                    _batchNameController.text = '';
-                  } else {
-                    _showBatchNumber = true;
-                  }
-                }),
-              ), // end of no batch checkbox
-              const Divider(),
-              // const SizedBox(
-              //   height: 10,
-              // ),
-              // start of amount
-              const Text('Stock Amount | အရေအတွက်'),
-              SizedBox(
-                height: 50,
-                width: 200,
-                child: TextFormField(
-                  controller: _amountController,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter stock amount';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    _amountController.text = value!;
-                  },
-                  decoration: InputDecoration(
-                      contentPadding: const EdgeInsets.all(10),
-                      prefixIcon: const Icon(
-                        Icons.format_list_numbered_rounded,
-                        color: Colors.grey,
-                      ),
-                      hintText: 'Enter Amount',
-                      border: const OutlineInputBorder(),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: Theme.of(context).colorScheme.background,
-                              width: 2))),
-                  keyboardType: TextInputType.number,
-                  maxLines: 1,
-                ),
-              ), // end of stock amount
-              const SizedBox(
-                height: 10,
-              ),
-              // start of remark
-              const Text('Remark | မှတ်ချက်'),
-              SizedBox(
-                height: 50,
-                child: TextFormField(
-                  controller: _remarkController,
-                  onSaved: (value) {
-                    _remarkController.text = value!;
-                  },
-                  decoration: InputDecoration(
-                      contentPadding: const EdgeInsets.all(10),
-                      prefixIcon: const Icon(
-                        Icons.note,
-                        color: Colors.grey,
-                      ),
-                      hintText: 'Enter Remark',
-                      border: const OutlineInputBorder(),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: Theme.of(context).colorScheme.background,
-                              width: 2))),
-                  expands: true,
-                  minLines: null,
-                  maxLines: null,
-                ),
-              ), // end of remark
-              const SizedBox(
-                height: 20,
-              ),
-              // start of button row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: // Start of save Button
-                        SizedBox(
-                      width: 200,
-                      height: 45,
-                      child: ElevatedButton.icon(
-                        onPressed: () async {
-                          if (_key.currentState != null &&
-                              _key.currentState!.validate() &&
-                              _isDatePicked &&
-                              (_isExpDatePicked || _hasNoExpDate) &&
-                              (_batchNameController.text.isNotEmpty ||
-                                  _hasNoBatchNumber) &&
-                              _selectedItem != null) {
-                            _key.currentState?.save();
-                            await saveStock();
-                            Navigator.pop(context, 'success');
-                          } else {
-                            await validateForm();
-                          }
-                        },
-                        icon: const Icon(Icons.add),
-                        label: const Text('Add',
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(
-                                Theme.of(context).colorScheme.background),
-                            foregroundColor: MaterialStateProperty.all(
-                                Theme.of(context).colorScheme.secondary)),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: IntrinsicHeight(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          const SizedBox(
+                            height: 20,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              FocusScope.of(context).requestFocus(FocusNode());
+                            },
+                            child: SizedBox(
+                              height: 50,
+                              child: TextField(
+                                controller: _searchController,
+                                decoration: InputDecoration(
+                                    contentPadding: const EdgeInsets.all(10),
+                                    prefixIcon: const Icon(
+                                      Icons.search,
+                                      color: Colors.grey,
+                                    ),
+                                    suffixIcon: _searchController.text.isEmpty
+                                        ? null // not shown if search is empty
+                                        : IconButton(
+                                            onPressed: _clearSearch,
+                                            icon: const Icon(
+                                              Icons.cancel,
+                                              color: Colors.grey,
+                                            )),
+                                    hintText: 'Search Item',
+                                    border: const OutlineInputBorder(),
+                                    focusedBorder: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .background,
+                                            width: 2))),
+                                onChanged: (value) {
+                                  setState(() {});
+                                },
+                              ),
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          DataTable(
+                              columnSpacing: 20,
+                              columns: [
+                                DataColumn(
+                                    label: const Text(
+                                      'Item',
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    onSort: (columnIndex, ascending) {
+                                      _sortColumn(columnIndex, ascending);
+                                    }),
+                                DataColumn(
+                                    label: const Text(
+                                      'Type',
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    onSort: (columnIndex, ascending) {
+                                      _sortColumn(columnIndex, ascending);
+                                    }),
+                                DataColumn(
+                                    numeric: true,
+                                    label: const Text(
+                                      'Balance',
+                                      style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    onSort: (columnIndex, ascending) {
+                                      _sortColumn(columnIndex, ascending);
+                                    }),
+                                const DataColumn(
+                                    label: Text(
+                                  '',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                )),
+                              ],
+                              sortAscending: sortAscending,
+                              sortColumnIndex: sortColumnIndex,
+                              headingRowColor: MaterialStateProperty.all(
+                                const Color.fromARGB(255, 255, 227, 160),
+                              ),
+                              rows: filteredRows),
+                          const SizedBox(
+                            height: 20,
+                          )
+                        ],
                       ),
                     ),
                   ),
-                  const Expanded(flex: 1, child: SizedBox(width: 10)),
-                  Expanded(
-                    flex: 2,
-                    child: SizedBox(
-                        width: 200,
-                        height: 45,
-                        child: TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            style: ButtonStyle(
-                              side: MaterialStateProperty.all(const BorderSide(
-                                  color: Colors.red, width: 2)),
-                            ),
-                            child: const Text(
-                              'Cancel',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.red),
-                            ))),
-                  ),
-                ],
-              ), // end of button row
-              const SizedBox(
-                height: 50,
-              )
-            ])),
+                );
+              });
+            } else if (snapshot.hasError) {
+              return Text('${snapshot.error}');
+            } else if (snapshot.data == null || snapshot.data!.isEmpty) {
+              return const Padding(
+                padding: EdgeInsets.all(10.0),
+                child: Text(
+                    'There is no inventory data. Please add by pressing `Add Stock` button.\nပစ္စည်းစာရင်းအချက်အလက်များမရှိသေးပါ။ `Add Stock` ခလုတ်ကိုနှိပ်၍ဖြည့်သွင်းပါ'),
+              );
+            } else {
+              return const CircularProgressIndicator();
+            }
+          } else {
+            return const CircularProgressIndicator();
+          }
+        });
+  }
+
+  Widget buildProfileSetup() {
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height * 0.6,
+      margin: EdgeInsets.only(
+          top: 20,
+          left: MediaQuery.of(context).size.width * 0.05,
+          right: MediaQuery.of(context).size.width * 0.05),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(
+              color: const Color.fromARGB(255, 218, 218, 218), width: 1),
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: const [
+            BoxShadow(
+                color: Color.fromARGB(94, 158, 158, 158),
+                blurRadius: 10.0,
+                offset: Offset(0.0, 1.0)),
+          ]),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          SizedBox(
+            height: 150,
+            child: Center(
+              child: Image.asset('assets/images/CHDN_LOGO.png'),
+            ),
+          ),
+          const Text(
+              'You have not set your Warehouse/Clinic profile.\nPlease click `Update Profile` button.\nဆေးဂိုဒေါင်/ဆေးခန်းဆိုင်ရာ အချက်အလက်များ မဖြည့်သွင်းရသေးပါ။ `Update Profile` ခလုတ်ကိုနှိပ်၍ဖြည့်သွင်းပါ'),
+          // Start of update profile button
+          SizedBox(
+            width: 200,
+            height: 45,
+            child: ElevatedButton.icon(
+              onPressed: () async {
+                var result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const UpdateProfile()));
+                if (result == 'success') {
+                  setState(() {});
+                }
+              },
+              icon: const Icon(Icons.person),
+              label: const Text('Update Profile'),
+              style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(
+                      Theme.of(context).colorScheme.background),
+                  foregroundColor: MaterialStateProperty.all(
+                      Theme.of(context).colorScheme.secondary)),
+            ),
+          ),
+        ],
       ),
     );
-  }
-
-  // pick date function
-  Future pickDate(BuildContext context) async {
-    final initialDate = DateTime.now();
-    final newDate = await showDatePicker(
-      context: context,
-      initialDate: initialDate,
-      firstDate: DateTime(DateTime.now().year - 5),
-      lastDate: DateTime(DateTime.now().year + 5),
-      builder: (context, child) {
-        return Theme(
-            data: Theme.of(context).copyWith(
-                colorScheme: const ColorScheme.light(
-              primary: Color.fromARGB(255, 218, 0, 76),
-            )),
-            child: child!);
-      },
-    );
-    if (newDate == null) return;
-    setState(() {
-      date = newDate;
-      _isDatePicked = true;
-    });
-  }
-
-  // build source place menu items
-  DropdownMenuItem<int> buildSourcePlaceListMenuItem(SourcePlaceMenu item) =>
-      DropdownMenuItem(
-          value: item.id,
-          child: Text(
-            item.name,
-            style: const TextStyle(fontSize: 15),
-          ));
-
-// build donor menu items
-  DropdownMenuItem<int> buildDonorListMenuItem(DonorMenu item) =>
-      DropdownMenuItem(
-          value: item.id,
-          child: Text(
-            item.name,
-            style: const TextStyle(fontSize: 15),
-          ));
-  // build item type menu items
-  DropdownMenuItem<String> buildItemTypeListMenuItem(String item) =>
-      DropdownMenuItem(
-          value: item,
-          child: Text(
-            item,
-            style: const TextStyle(fontSize: 15),
-          ));
-  // build item menu items
-  DropdownMenuEntry<int> buildItemListMenuEntry(ItemMenu item) =>
-      DropdownMenuEntry(value: item.id, label: item.name);
-
-  // build package form menu items
-  DropdownMenuItem<int> buildPackageFormListMenuItem(PackageFormMenu item) =>
-      DropdownMenuItem(
-          value: item.id,
-          child: Text(
-            item.name,
-            style: const TextStyle(fontSize: 15),
-          ));
-
-// exp date pick function
-  Future pickExpDate(BuildContext context) async {
-    final initialExpDate = DateTime.now();
-    final newExpDate = await showDatePicker(
-      context: context,
-      initialDate: initialExpDate,
-      firstDate: DateTime(DateTime.now().year - 5),
-      lastDate: DateTime(DateTime.now().year + 5),
-      builder: (context, child) {
-        return Theme(
-            data: Theme.of(context).copyWith(
-                colorScheme: const ColorScheme.light(
-              primary: Color.fromARGB(255, 218, 0, 76),
-            )),
-            child: child!);
-      },
-    );
-    if (newExpDate == null) return;
-    setState(() {
-      _expDate = newExpDate;
-      _isExpDatePicked = true;
-    });
-  }
-
-  // save function
-  Future saveStock() async {
-    await DatabaseHelper().insertStock(Stock.insertStock(
-        stockDate: saveDateText(),
-        stockType: 'IN',
-        stockItemId: _selectedItem!,
-        stockPackageFormId: _selectedPackageForm!,
-        stockExpDate: saveExpDateText(),
-        stockBatch: _batchNameController.text,
-        stockAmount: int.tryParse(_amountController.text) ?? 0,
-        stockSourcePlaceId: _selectedSourcePlace!,
-        stockDonorId: _selectedDonor!,
-        stockRemark: _remarkController.text,
-        stockTo: 0,
-        stockSync: '',
-        stockCre: _userId!));
-  }
-
-  // validate function
-  Future validateForm() async {
-    if (date == null) {
-      setState(() {
-        _dateNotValid = true;
-      });
-    }
-    if (_expDate == null && !_hasNoExpDate) {
-      setState(() {
-        _expDateNotValid = true;
-      });
-    }
-    if (_selectedItem == null) {
-      setState(() {
-        _itemNotValid = true;
-      });
-    }
   }
 }
