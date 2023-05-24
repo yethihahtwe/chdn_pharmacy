@@ -390,7 +390,20 @@ class _StockDetailState extends State<StockDetail> {
                       Text(
                         dateValue,
                         style: const TextStyle(fontWeight: FontWeight.bold),
-                      )
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      TextButton(
+                          style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(
+                            const Color.fromARGB(255, 218, 0, 76),
+                          )),
+                          onPressed: () {},
+                          child: const Text('Select Date',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold)))
                     ],
                   ),
                   const SizedBox(height: 10),
@@ -399,12 +412,25 @@ class _StockDetailState extends State<StockDetail> {
                       TextButton(
                           style: ButtonStyle(
                               backgroundColor: MaterialStateProperty.all(
-                            Color.fromARGB(255, 255, 197, 63),
+                            const Color.fromARGB(255, 255, 197, 63),
                           )),
                           onPressed: () {},
                           child: const Text(
                             'Update',
-                          ))
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold),
+                          )),
+                      const SizedBox(width: 10),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text('Cancel',
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold)),
+                      )
                     ],
                   )
                 ],
