@@ -124,14 +124,14 @@ class _HomeState extends State<Home> {
                           context,
                           MaterialPageRoute(
                               builder: (context) => ItemInventory(
-                                    itemId: '${item['stock_item_id']}',
+                                    itemId: item['stock_item_id'],
                                   )));
                       if (result == 'success') {
                         setState(() {});
                       }
                     },
                     icon: const Icon(Icons.play_circle_filled,
-                        color: Colors.red))),
+                        color: Color.fromARGB(255, 218, 0, 76), size: 16))),
               ]));
             } // filter rows based in search input
             final List<DataRow> filteredRows = rows.where(

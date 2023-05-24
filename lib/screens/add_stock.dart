@@ -659,6 +659,7 @@ class _AddStockState extends State<AddStock> {
                             await saveStock();
                             EasyLoading.showSuccess(
                                 'ပစ္စည်းအဝင်မှတ်တမ်း သိမ်းဆည်းပြီးပါပြီ');
+                            // ignore: use_build_context_synchronously
                             Navigator.pop(context, 'success');
                           } else {
                             await validateForm();

@@ -217,11 +217,25 @@ class DatabaseHelper {
     return await _db.insert(tblStock, stock);
   }
 
+  // delete
+  Future<int> deleteStock(int id) async {
+    _db = await _loadDatabase();
+    return await _db.delete(tblStock, where: "stock_id=?", whereArgs: [id]);
+  }
+
   // select for history screen
   Future<List<Map<String, dynamic>>> getAllStock() async {
     _db = await _loadDatabase();
     return await _db.rawQuery(
-        'SELECT stock_item_id, stock_date, stock_type, (SELECT item_name FROM $tblItem WHERE item_id=stock_item_id) AS item_name, (SELECT item_type FROM $tblItem WHERE item_id=stock_item_id) AS item_type, (SELECT package_form_name from $tblPackageForm WHERE package_form_id=stock_package_form_id) AS stock_package_form, stock_amount, stock_sync FROM tbl_stock');
+        'SELECT stock_id, stock_item_id, stock_date, stock_type, (SELECT item_name FROM $tblItem WHERE item_id=stock_item_id) AS item_name, (SELECT item_type FROM $tblItem WHERE item_id=stock_item_id) AS item_type, (SELECT package_form_name from $tblPackageForm WHERE package_form_id=stock_package_form_id) AS stock_package_form, stock_amount, stock_sync FROM tbl_stock');
+  }
+
+  // select single stock row for stock detail screen
+  Future<Map<String, dynamic>?> getStockById(int id) async {
+    _db = await _loadDatabase();
+    List<Map<String, dynamic>> result = await _db.rawQuery(
+        'SELECT stock_date, stock_type, stock_exp_date, stock_batch, stock_amount, (SELECT source_place_name FROM $tblSourcePlace WHERE source_place_id=stock_source_place_id) AS source_place, (SELECT donor_name FROM $tblDonor WHERE donor_id=stock_donor_id) AS donor, stock_remark, (SELECT destination_name FROM $tblDestination WHERE destination_id=stock_to) AS destination, stock_sync FROM $tblStock WHERE stock_id=$id');
+    return result.isNotEmpty ? result.first : null;
   }
 
   // select group by for home screen

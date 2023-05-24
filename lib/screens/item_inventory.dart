@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ItemInventory extends StatefulWidget {
-  final String itemId;
+  final int itemId;
   const ItemInventory({super.key, required this.itemId});
 
   @override

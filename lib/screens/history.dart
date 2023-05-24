@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../database/database_helper.dart';
 import '../database/shared_pref_helper.dart';
+import '../widgets/nav_bar.dart';
 import 'add_stock.dart';
 import 'update_profile.dart';
 
@@ -98,6 +99,8 @@ class _HistoryState extends State<History> {
         ),
         backgroundColor: const Color.fromARGB(255, 255, 197, 63),
       ), // end of add stock fab
+      bottomNavigationBar: BottomNavigation(
+          selectedIndex: _selectedIndex, onItemTapped: _onItemTapped),
     );
   }
 
@@ -116,14 +119,21 @@ class _HistoryState extends State<History> {
                   style: const TextStyle(fontSize: 10),
                 )),
                 DataCell(item['stock_type'] == 'IN'
-                    ? IconButton(
-                        icon: const Icon(
-                          Icons.play_arrow,
-                          size: 16,
-                        ),
-                        onPressed: () {},
+                    ? const Icon(
+                        Icons.keyboard_arrow_right,
+                        size: 16,
+                        color: Colors.blueAccent,
                       )
-                    : const Text('')),
+                    : item['stock_type'] == 'OUT'
+                        ? const Icon(Icons.keyboard_arrow_left,
+                            size: 16, color: Colors.red)
+                        : item['stock_type'] == 'EXP'
+                            ? const Icon(Icons.warning,
+                                size: 16, color: Colors.red)
+                            : item['item_type'] == 'DMG'
+                                ? const Icon(Icons.flash_on,
+                                    size: 16, color: Colors.red)
+                                : const Text('')),
                 DataCell(Text('${item['item_name']}',
                     style: const TextStyle(fontSize: 10))),
                 DataCell(Text('${item['item_type']}',
@@ -134,10 +144,21 @@ class _HistoryState extends State<History> {
                     style: const TextStyle(fontSize: 10))),
                 DataCell(IconButton(
                     onPressed: () async {
-                      _goToStockDetail();
+                      var result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => StockDetail(
+                                    stockId: item['stock_id'],
+                                    itemName: item['item_name'],
+                                    itemType: item['item_type'],
+                                    packageForm: item['stock_package_form'],
+                                  )));
+                      if (result == 'success') {
+                        setState(() {});
+                      }
                     },
                     icon: const Icon(Icons.play_circle_filled,
-                        color: Colors.red)))
+                        color: Color.fromARGB(255, 218, 0, 76), size: 16)))
               ]));
             } // filter rows based in search input
             final List<DataRow> filteredRows = rows.where((row) {
@@ -161,6 +182,7 @@ class _HistoryState extends State<History> {
                 child: TextField(
                   controller: _searchController,
                   decoration: InputDecoration(
+                      isDense: true,
                       contentPadding: const EdgeInsets.all(10),
                       prefixIcon: const Icon(
                         Icons.search,
@@ -192,57 +214,36 @@ class _HistoryState extends State<History> {
                   columnSpacing: 0.1,
                   columns: [
                     DataColumn(
-                        label: const Text(
-                          'Date',
-                          style: TextStyle(
-                              fontSize: 10, fontWeight: FontWeight.bold),
+                        label: const Icon(
+                          Icons.calendar_month,
+                          size: 16,
                         ),
                         onSort: (columnIndex, ascending) {
                           _sortColumn(columnIndex, ascending);
                         }),
                     DataColumn(
-                        label: const Text(
-                          'Type',
-                          style: TextStyle(
-                              fontSize: 10, fontWeight: FontWeight.bold),
-                        ),
+                        label: const Icon(Icons.sync_alt, size: 16),
                         onSort: (columnIndex, ascending) {
                           _sortColumn(columnIndex, ascending);
                         }),
                     DataColumn(
-                        label: const Text(
-                          'Item',
-                          style: TextStyle(
-                              fontSize: 10, fontWeight: FontWeight.bold),
-                        ),
+                        label: const Icon(Icons.vaccines, size: 16),
                         onSort: (columnIndex, ascending) {
                           _sortColumn(columnIndex, ascending);
                         }),
                     DataColumn(
-                        label: const Text(
-                          'Item\nType',
-                          style: TextStyle(
-                              fontSize: 10, fontWeight: FontWeight.bold),
-                        ),
+                        label: const Icon(Icons.category, size: 16),
                         onSort: (columnIndex, ascending) {
                           _sortColumn(columnIndex, ascending);
                         }),
                     DataColumn(
                         numeric: true,
-                        label: const Text(
-                          'Amount',
-                          style: TextStyle(
-                              fontSize: 10, fontWeight: FontWeight.bold),
-                        ),
+                        label: const Icon(Icons.tag, size: 16),
                         onSort: (columnIndex, ascending) {
                           _sortColumn(columnIndex, ascending);
                         }),
                     DataColumn(
-                        label: const Text(
-                          'pack',
-                          style: TextStyle(
-                              fontSize: 10, fontWeight: FontWeight.bold),
-                        ),
+                        label: const Icon(Icons.inventory_2, size: 14),
                         onSort: (columnIndex, ascending) {
                           _sortColumn(columnIndex, ascending);
                         }),
@@ -275,14 +276,6 @@ class _HistoryState extends State<History> {
             return const CircularProgressIndicator();
           }
         });
-  }
-
-  void _goToStockDetail() async {
-    var result = await Navigator.push(
-        context, MaterialPageRoute(builder: (context) => StockDetail()));
-    if (result == 'success') {
-      setState(() {});
-    }
   }
 
   Widget buildProfileSetup() {
