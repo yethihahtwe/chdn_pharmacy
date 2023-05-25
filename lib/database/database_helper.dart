@@ -241,7 +241,7 @@ class DatabaseHelper {
   Future<Map<String, dynamic>?> getStockById(int id) async {
     _db = await _loadDatabase();
     List<Map<String, dynamic>> result = await _db.rawQuery(
-        'SELECT stock_date, stock_type, stock_exp_date, stock_batch, stock_amount, (SELECT source_place_name FROM $tblSourcePlace WHERE source_place_id=stock_source_place_id) AS source_place, (SELECT donor_name FROM $tblDonor WHERE donor_id=stock_donor_id) AS donor, stock_remark, (SELECT destination_name FROM $tblDestination WHERE destination_id=stock_to) AS destination, stock_sync FROM $tblStock WHERE stock_id=$id');
+        'SELECT stock_date, stock_type, stock_exp_date, stock_batch, stock_amount, stock_package_form_id, (SELECT source_place_name FROM $tblSourcePlace WHERE source_place_id=stock_source_place_id) AS source_place, stock_source_place_id, (SELECT donor_name FROM $tblDonor WHERE donor_id=stock_donor_id) AS donor, stock_donor_id, stock_remark, (SELECT destination_name FROM $tblDestination WHERE destination_id=stock_to) AS destination, stock_to, stock_sync FROM $tblStock WHERE stock_id=$id');
     return result.isNotEmpty ? result.first : null;
   }
 
@@ -258,5 +258,11 @@ class DatabaseHelper {
     _db = await _loadDatabase();
     return await _db.rawUpdate(
         'UPDATE $tableName SET $columnName=? WHERE $idColumn=?', [value, id]);
+  }
+
+  // reusable get all
+  Future<List<Map<String, dynamic>>> getAllReusable(String tableName) async {
+    _db = await _loadDatabase();
+    return await _db.query(tableName);
   }
 }

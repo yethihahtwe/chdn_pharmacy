@@ -180,3 +180,9 @@ class Stock {
     };
   }
 }
+
+class ReusableMenuModel {
+  final int id;
+  final String name;
+  ReusableMenuModel(this.id, this.name);
+}

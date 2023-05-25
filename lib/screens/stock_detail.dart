@@ -2,6 +2,8 @@ import 'package:chdn_pharmacy/database/database_helper.dart';
 import 'package:chdn_pharmacy/screens/reusable_widget.dart';
 import 'package:flutter/material.dart';
 
+import 'reusable_function.dart';
+
 class StockDetail extends StatefulWidget {
   final int stockId;
   final String itemName;
@@ -228,7 +230,23 @@ class _StockDetailState extends State<StockDetail> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => EditStockNonDate(
-                                        fieldNameToEdit: 'Batch Number')));
+                                          fieldNameToEdit: 'Batch Number',
+                                          iconName: Icons.more_outlined,
+                                          queryValue:
+                                              _stockDetail['stock_batch'],
+                                          columnName: 'stock_batch',
+                                          id: widget.stockId,
+                                          isNumberKeyboard: false,
+                                        )));
+                            if (result == 'success') {
+                              DatabaseHelper()
+                                  .getStockById(widget.stockId)
+                                  .then((value) {
+                                setState(() {
+                                  _stockDetail = value ?? {};
+                                });
+                              });
+                            }
                           },
                           icon: const Icon(Icons.edit),
                         )
@@ -252,7 +270,27 @@ class _StockDetailState extends State<StockDetail> {
                 child: _stockDetail['stock_type'] == 'IN'
                     ? IconButton(
                         iconSize: 16,
-                        onPressed: () {},
+                        onPressed: () async {
+                          var result = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => EditStockNonDate(
+                                        fieldNameToEdit: 'Stock Amount',
+                                        iconName: Icons.format_list_numbered,
+                                        queryValue:
+                                            _stockDetail['stock_amount'],
+                                        columnName: 'stock_amount',
+                                        id: widget.stockId,
+                                        isNumberKeyboard: true,
+                                      )));
+                          if (result == 'success') {
+                            DatabaseHelper()
+                                .getStockById(widget.stockId)
+                                .then((value) {
+                              _stockDetail = value ?? {};
+                            });
+                          }
+                        },
                         icon: const Icon(Icons.edit),
                       )
                     : null,
@@ -273,7 +311,30 @@ class _StockDetailState extends State<StockDetail> {
                   child: _stockDetail['stock_type'] == 'IN'
                       ? IconButton(
                           iconSize: 16,
-                          onPressed: () {},
+                          onPressed: () async {
+                            var result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => EditStockDropdown(
+                                          dropdownTableName: 'tbl_package_form',
+                                          dropdownIdColumn: 'package_form_id',
+                                          dropdownNameColumn:
+                                              'package_form_name',
+                                          fieldNameToEdit: 'Package Form',
+                                          queryValue: _stockDetail[
+                                              'stock_package_form_id'],
+                                          iconName: Icons.inventory_2,
+                                          columnName: 'stock_package_form_id',
+                                          stockId: widget.stockId,
+                                        )));
+                            if (result == 'success') {
+                              DatabaseHelper()
+                                  .getStockById(widget.stockId)
+                                  .then((value) {
+                                _stockDetail = value ?? {};
+                              });
+                            }
+                          },
                           icon: const Icon(Icons.edit),
                         )
                       : null,
