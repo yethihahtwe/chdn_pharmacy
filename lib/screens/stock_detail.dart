@@ -1,4 +1,5 @@
 import 'package:chdn_pharmacy/database/database_helper.dart';
+import 'package:chdn_pharmacy/screens/reusable_widget.dart';
 import 'package:flutter/material.dart';
 
 class StockDetail extends StatefulWidget {
@@ -67,9 +68,27 @@ class _StockDetailState extends State<StockDetail> {
                   child: _stockDetail['stock_type'] == 'IN'
                       ? IconButton(
                           iconSize: 16,
-                          onPressed: () {
-                            _showEditDateDialog(
-                                'Date', _stockDetail['stock_date']);
+                          onPressed: () async {
+                            var result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => EditStockDate(
+                                          dateType: 'Date',
+                                          dateValue: _stockDetail['stock_date'],
+                                          stockId: widget.stockId,
+                                          columnName: 'stock_date',
+                                          idColumn: 'stock_id',
+                                          tableName: 'tbl_stock',
+                                        )));
+                            if (result == 'success') {
+                              DatabaseHelper()
+                                  .getStockById(widget.stockId)
+                                  .then((value) {
+                                setState(() {
+                                  _stockDetail = value ?? {};
+                                });
+                              });
+                            }
                           },
                           icon: const Icon(Icons.edit),
                         )
@@ -156,7 +175,28 @@ class _StockDetailState extends State<StockDetail> {
                   child: _stockDetail['stock_type'] == 'IN'
                       ? IconButton(
                           iconSize: 16,
-                          onPressed: () {},
+                          onPressed: () async {
+                            var result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => EditStockDate(
+                                        dateType: 'Expiray Date',
+                                        dateValue:
+                                            _stockDetail['stock_exp_date'],
+                                        stockId: widget.stockId,
+                                        tableName: 'tbl_stock',
+                                        columnName: 'stock_exp_date',
+                                        idColumn: 'stock_id')));
+                            if (result == 'success') {
+                              DatabaseHelper()
+                                  .getStockById(widget.stockId)
+                                  .then((value) {
+                                setState(() {
+                                  _stockDetail = value ?? {};
+                                });
+                              });
+                            }
+                          },
                           icon: const Icon(Icons.edit),
                         )
                       : null,
@@ -183,7 +223,13 @@ class _StockDetailState extends State<StockDetail> {
                   child: _stockDetail['stock_type'] == 'IN'
                       ? IconButton(
                           iconSize: 16,
-                          onPressed: () {},
+                          onPressed: () async {
+                            var result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => EditStockNonDate(
+                                        fieldNameToEdit: 'Batch Number')));
+                          },
                           icon: const Icon(Icons.edit),
                         )
                       : null,
@@ -371,73 +417,6 @@ class _StockDetailState extends State<StockDetail> {
             )
           ])),
     );
-  }
-
-  void _showEditDateDialog(String dateType, String dateValue) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return Dialog(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
-                    children: [
-                      Text('$dateType: '),
-                      Text(
-                        dateValue,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      TextButton(
-                          style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
-                            const Color.fromARGB(255, 218, 0, 76),
-                          )),
-                          onPressed: () {},
-                          child: const Text('Select Date',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold)))
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      TextButton(
-                          style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
-                            const Color.fromARGB(255, 255, 197, 63),
-                          )),
-                          onPressed: () {},
-                          child: const Text(
-                            'Update',
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold),
-                          )),
-                      const SizedBox(width: 10),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Text('Cancel',
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold)),
-                      )
-                    ],
-                  )
-                ],
-              ),
-            ),
-          );
-        });
   }
 
   void _deleteStock() {

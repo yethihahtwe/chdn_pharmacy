@@ -155,6 +155,8 @@ class _HistoryState extends State<History> {
                                   )));
                       if (result == 'success') {
                         setState(() {});
+                      } else {
+                        setState(() {});
                       }
                     },
                     icon: const Icon(Icons.play_circle_filled,

@@ -203,6 +203,13 @@ class DatabaseHelper {
         where: "destination_id=?", whereArgs: [id]);
   }
 
+  // update stock date
+  Future<int> updateStockDate(String value, int id) async {
+    _db = await _loadDatabase();
+    return await _db.rawUpdate(
+        'UPDATE $tblStock SET stock_date=? WHERE stock_id=?', [value, id]);
+  }
+
   // delete
   Future<int> deleteDestination(int id) async {
     _db = await _loadDatabase();
@@ -243,5 +250,13 @@ class DatabaseHelper {
     _db = await _loadDatabase();
     return await _db.rawQuery(
         'SELECT stock_item_id, (SELECT item_name FROM $tblItem WHERE item_id=stock_item_id) AS item_name, (SELECT item_type FROM $tblItem WHERE item_id=stock_item_id) AS item_type, SUM(stock_amount) AS stock_amount FROM tbl_stock GROUP BY stock_item_id, item_name, item_type HAVING SUM(stock_amount) >0;');
+  }
+
+  // update single value
+  Future<int> updateSingleValue(String tableName, String columnName,
+      String idColumn, var value, int id) async {
+    _db = await _loadDatabase();
+    return await _db.rawUpdate(
+        'UPDATE $tableName SET $columnName=? WHERE $idColumn=?', [value, id]);
   }
 }
