@@ -276,4 +276,41 @@ class DatabaseHelper {
         whereArgs: [itemId]);
     return result.isNotEmpty ? result.first : null;
   }
+
+  // get balance by batch for item inventory screen
+  Future<List<Map<String, dynamic>>> getBalanceByBatch(itemId) async {
+    _db = await _loadDatabase();
+    return await _db.query(tblStock,
+        columns: [
+          '(SELECT package_form_name FROM $tblPackageForm WHERE package_form_id=stock_package_form_id) AS package_form',
+          'stock_exp_date',
+          'stock_batch',
+          'SUM(stock_amount)AS balance_by_batch',
+          '(SELECT source_place_name from $tblSourcePlace WHERE source_place_id=stock_source_place_id) AS source_place',
+          '(SELECT donor_name FROM $tblDonor WHERE donor_id=stock_donor_id) AS donor'
+        ],
+        where: "stock_item_id=?",
+        whereArgs: [itemId],
+        groupBy:
+            'stock_package_form_id, stock_exp_date, stock_batch, stock_source_place_id, stock_donor_id',
+        having: 'SUM(stock_amount)>0');
+  }
+
+  // get all stock for item inventory screen
+  Future<List<Map<String, dynamic>>> getAllStockByItem(itemId) async {
+    _db = await _loadDatabase();
+    return await _db.query(tblStock,
+        columns: [
+          'stock_id',
+          'stock_date',
+          'stock_type',
+          '(SELECT source_place_name from $tblSourcePlace WHERE source_place_id=stock_source_place_id) AS source_place',
+          '(SELECT donor_name FROM $tblDonor WHERE donor_id=stock_donor_id) AS donor',
+          '(SELECT package_form_name FROM $tblPackageForm WHERE package_form_id=stock_package_form_id) AS package_form',
+          'stock_amount',
+          'stock_exp_date'
+        ],
+        where: "stock_item_id=?",
+        whereArgs: [itemId]);
+  }
 }
