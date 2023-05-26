@@ -124,8 +124,9 @@ class _HomeState extends State<Home> {
                           context,
                           MaterialPageRoute(
                               builder: (context) => ItemInventory(
-                                    itemId: item['stock_item_id'],
-                                  )));
+                                  itemId: item['stock_item_id'],
+                                  itemName: item['item_name'],
+                                  itemType: item['item_type'])));
                       if (result == 'success') {
                         setState(() {});
                       }

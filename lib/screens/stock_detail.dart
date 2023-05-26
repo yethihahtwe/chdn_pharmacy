@@ -287,7 +287,9 @@ class _StockDetailState extends State<StockDetail> {
                             DatabaseHelper()
                                 .getStockById(widget.stockId)
                                 .then((value) {
-                              _stockDetail = value ?? {};
+                              setState(() {
+                                _stockDetail = value ?? {};
+                              });
                             });
                           }
                         },
@@ -303,7 +305,8 @@ class _StockDetailState extends State<StockDetail> {
                 const Expanded(flex: 1, child: Text('Package Form:')),
                 Expanded(
                     flex: 1,
-                    child: Text(widget.packageForm,
+                    child: Text(
+                        _stockDetail['package_form'] ?? 'No package form',
                         style: const TextStyle(fontWeight: FontWeight.bold))),
                 SizedBox(
                   width: 30,
@@ -312,28 +315,28 @@ class _StockDetailState extends State<StockDetail> {
                       ? IconButton(
                           iconSize: 16,
                           onPressed: () async {
-                            var result = await Navigator.push(
+                            await Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => EditStockDropdown(
-                                          dropdownTableName: 'tbl_package_form',
-                                          dropdownIdColumn: 'package_form_id',
-                                          dropdownNameColumn:
-                                              'package_form_name',
-                                          fieldNameToEdit: 'Package Form',
-                                          queryValue: _stockDetail[
-                                              'stock_package_form_id'],
-                                          iconName: Icons.inventory_2,
-                                          columnName: 'stock_package_form_id',
-                                          stockId: widget.stockId,
-                                        )));
-                            if (result == 'success') {
-                              DatabaseHelper()
-                                  .getStockById(widget.stockId)
-                                  .then((value) {
-                                _stockDetail = value ?? {};
-                              });
-                            }
+                                        dropdownTableName: 'tbl_package_form',
+                                        dropdownIdColumn: 'package_form_id',
+                                        dropdownNameColumn: 'package_form_name',
+                                        fieldNameToEdit: 'Package Form',
+                                        queryValue: _stockDetail[
+                                            'stock_package_form_id'],
+                                        iconName: Icons.inventory_2,
+                                        columnName: 'stock_package_form_id',
+                                        stockId: widget.stockId,
+                                        onStockUpdated: () {
+                                          DatabaseHelper()
+                                              .getStockById(widget.stockId)
+                                              .then((value) {
+                                            setState(() {
+                                              _stockDetail = value!;
+                                            });
+                                          });
+                                        })));
                           },
                           icon: const Icon(Icons.edit),
                         )
@@ -360,7 +363,32 @@ class _StockDetailState extends State<StockDetail> {
                   child: _stockDetail['stock_type'] == 'IN'
                       ? IconButton(
                           iconSize: 16,
-                          onPressed: () {},
+                          onPressed: () async {
+                            await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => EditStockDropdown(
+                                          dropdownTableName: 'tbl_source_place',
+                                          dropdownIdColumn: 'source_place_id',
+                                          dropdownNameColumn:
+                                              'source_place_name',
+                                          fieldNameToEdit: 'Source Place',
+                                          queryValue: _stockDetail[
+                                              'stock_source_place_id'],
+                                          iconName: Icons.system_update_alt,
+                                          stockId: widget.stockId,
+                                          columnName: 'stock_source_place_id',
+                                          onStockUpdated: () {
+                                            DatabaseHelper()
+                                                .getStockById(widget.stockId)
+                                                .then((value) {
+                                              setState(() {
+                                                _stockDetail = value!;
+                                              });
+                                            });
+                                          },
+                                        )));
+                          },
                           icon: const Icon(Icons.edit),
                         )
                       : null,
@@ -382,7 +410,31 @@ class _StockDetailState extends State<StockDetail> {
                   child: _stockDetail['stock_type'] == 'IN'
                       ? IconButton(
                           iconSize: 16,
-                          onPressed: () {},
+                          onPressed: () async {
+                            await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => EditStockDropdown(
+                                          dropdownTableName: 'tbl_donor',
+                                          dropdownIdColumn: 'donor_id',
+                                          dropdownNameColumn: 'donor_name',
+                                          fieldNameToEdit: 'Donor',
+                                          queryValue:
+                                              _stockDetail['stock_donor_id'],
+                                          iconName: Icons.contact_mail,
+                                          stockId: widget.stockId,
+                                          columnName: 'stock_donor_id',
+                                          onStockUpdated: () {
+                                            DatabaseHelper()
+                                                .getStockById(widget.stockId)
+                                                .then((value) {
+                                              setState(() {
+                                                _stockDetail = value!;
+                                              });
+                                            });
+                                          },
+                                        )));
+                          },
                           icon: const Icon(Icons.edit),
                         )
                       : null,
@@ -405,7 +457,28 @@ class _StockDetailState extends State<StockDetail> {
                   child: _stockDetail['stock_type'] == 'IN'
                       ? IconButton(
                           iconSize: 16,
-                          onPressed: () {},
+                          onPressed: () async {
+                            var result = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => EditStockNonDate(
+                                        fieldNameToEdit: 'Remark',
+                                        iconName: Icons.drafts,
+                                        queryValue:
+                                            _stockDetail['stock_remark'],
+                                        columnName: 'stock_remark',
+                                        id: widget.stockId,
+                                        isNumberKeyboard: false)));
+                            if (result == 'success') {
+                              DatabaseHelper()
+                                  .getStockById(widget.stockId)
+                                  .then((value) {
+                                setState(() {
+                                  _stockDetail = value!;
+                                });
+                              });
+                            }
+                          },
                           icon: const Icon(Icons.edit),
                         )
                       : null,

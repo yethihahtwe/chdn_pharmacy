@@ -222,7 +222,7 @@ class _EditStockNonDateState extends State<EditStockNonDate> {
                   const Expanded(flex: 1, child: SizedBox(width: 10)),
                   Expanded(
                       flex: 2,
-                      child: reusableColdButton('Cancle', () {
+                      child: reusableColdButton('Cancel', () {
                         Navigator.pop(context);
                       }))
                 ],
@@ -288,6 +288,7 @@ class EditStockDropdown extends StatefulWidget {
   final String dropdownIdColumn;
   final String dropdownNameColumn;
   final String columnName;
+  final VoidCallback? onStockUpdated;
   const EditStockDropdown(
       {super.key,
       required this.dropdownTableName,
@@ -297,7 +298,8 @@ class EditStockDropdown extends StatefulWidget {
       required this.queryValue,
       required this.iconName,
       required this.stockId,
-      required this.columnName});
+      required this.columnName,
+      this.onStockUpdated});
 
   @override
   State<EditStockDropdown> createState() => _EditStockDropdownState();
@@ -359,13 +361,16 @@ class _EditStockDropdownState extends State<EditStockDropdown> {
                       () async {
                     EditStock.saveStockData('tbl_stock', widget.columnName,
                         'stock_id', selectedReusableValue, widget.stockId);
-                    Navigator.pop(context, 'success');
+                    if (widget.onStockUpdated != null) {
+                      widget.onStockUpdated!();
+                    }
+                    Navigator.pop(context);
                   }),
                 ),
                 const Expanded(flex: 1, child: SizedBox(width: 10)),
                 Expanded(
                     flex: 2,
-                    child: reusableColdButton('Cancle', () {
+                    child: reusableColdButton('Cancel', () {
                       Navigator.pop(context);
                     }))
               ],

@@ -241,7 +241,7 @@ class DatabaseHelper {
   Future<Map<String, dynamic>?> getStockById(int id) async {
     _db = await _loadDatabase();
     List<Map<String, dynamic>> result = await _db.rawQuery(
-        'SELECT stock_date, stock_type, stock_exp_date, stock_batch, stock_amount, stock_package_form_id, (SELECT source_place_name FROM $tblSourcePlace WHERE source_place_id=stock_source_place_id) AS source_place, stock_source_place_id, (SELECT donor_name FROM $tblDonor WHERE donor_id=stock_donor_id) AS donor, stock_donor_id, stock_remark, (SELECT destination_name FROM $tblDestination WHERE destination_id=stock_to) AS destination, stock_to, stock_sync FROM $tblStock WHERE stock_id=$id');
+        'SELECT stock_date, stock_type, stock_exp_date, stock_batch, stock_amount, stock_package_form_id, (SELECT package_form_name FROM tbl_package_form WHERE package_form_id=stock_package_form_id) AS package_form, (SELECT source_place_name FROM $tblSourcePlace WHERE source_place_id=stock_source_place_id) AS source_place, stock_source_place_id, (SELECT donor_name FROM $tblDonor WHERE donor_id=stock_donor_id) AS donor, stock_donor_id, stock_remark, (SELECT destination_name FROM $tblDestination WHERE destination_id=stock_to) AS destination, stock_to, stock_sync FROM $tblStock WHERE stock_id=$id');
     return result.isNotEmpty ? result.first : null;
   }
 
@@ -264,5 +264,16 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> getAllReusable(String tableName) async {
     _db = await _loadDatabase();
     return await _db.query(tableName);
+  }
+
+  // item inventory screen
+  // get total balance
+  Future<Map<String, dynamic>?> getTotalBalance(itemId) async {
+    _db = await _loadDatabase();
+    List<Map<String, dynamic>> result = await _db.query(tblStock,
+        columns: ['SUM(stock_amount) AS total_balance'],
+        where: "stock_item_id=?",
+        whereArgs: [itemId]);
+    return result.isNotEmpty ? result.first : null;
   }
 }
