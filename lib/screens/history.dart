@@ -130,8 +130,8 @@ class _HistoryState extends State<History> {
                         : item['stock_type'] == 'EXP'
                             ? const Icon(Icons.warning,
                                 size: 16, color: Colors.red)
-                            : item['item_type'] == 'DMG'
-                                ? const Icon(Icons.flash_on,
+                            : item['stock_type'] == 'DMG'
+                                ? const Icon(Icons.bolt,
                                     size: 16, color: Colors.red)
                                 : const Text('')),
                 DataCell(Text('${item['item_name']}',

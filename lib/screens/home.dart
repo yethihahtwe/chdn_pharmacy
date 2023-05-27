@@ -120,16 +120,15 @@ class _HomeState extends State<Home> {
                 DataCell(Text('${item['stock_amount']}')),
                 DataCell(IconButton(
                     onPressed: () async {
-                      var result = await Navigator.push(
+                      await Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => ItemInventory(
                                   itemId: item['stock_item_id'],
                                   itemName: item['item_name'],
                                   itemType: item['item_type'])));
-                      if (result == 'success') {
-                        setState(() {});
-                      }
+
+                      setState(() {});
                     },
                     icon: const Icon(Icons.play_circle_filled,
                         color: Color.fromARGB(255, 218, 0, 76), size: 16))),

@@ -1,4 +1,5 @@
 import 'package:chdn_pharmacy/database/database_helper.dart';
+import 'package:chdn_pharmacy/screens/batch_inventory.dart';
 import 'package:chdn_pharmacy/screens/reusable_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -33,12 +34,12 @@ class _ItemInventoryState extends State<ItemInventory> {
 
   @override
   void initState() {
+    super.initState();
     DatabaseHelper().getTotalBalance(widget.itemId).then((value) {
       setState(() {
         totalBalance = value!['total_balance'];
       });
     });
-    super.initState();
   }
 
   @override
@@ -133,7 +134,37 @@ class _ItemInventoryState extends State<ItemInventory> {
                   DataCell(Text('${item['package_form']}' '(s)',
                       style: const TextStyle(fontSize: 10))),
                   DataCell(IconButton(
-                      onPressed: () async {},
+                      onPressed: () async {
+                        var result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => BatchInventory(
+                                    itemName: widget.itemName,
+                                    itemType: widget.itemType,
+                                    itemId: widget.itemId,
+                                    batchAmount: item['balance_by_batch'],
+                                    packageForm: item['package_form'],
+                                    packageFormId:
+                                        item['stock_package_form_id'],
+                                    expDate: item['stock_exp_date'],
+                                    batchNumber: item['stock_batch'],
+                                    sourcePlace: item['source_place'],
+                                    sourcePlaceId:
+                                        item['stock_source_place_id'],
+                                    donor: item['donor'],
+                                    donorId: item['stock_donor_id'])));
+                        if (result == 'success') {
+                          setState(() {
+                            DatabaseHelper()
+                                .getTotalBalance(widget.itemId)
+                                .then((value) {
+                              setState(() {
+                                totalBalance = value!['total_balance'];
+                              });
+                            });
+                          });
+                        }
+                      },
                       icon: const Icon(
                         Icons.outbound_outlined,
                         color: Colors.red,
@@ -243,8 +274,8 @@ class _ItemInventoryState extends State<ItemInventory> {
                         : item['stock_type'] == 'EXP'
                             ? const Icon(Icons.warning,
                                 size: 16, color: Colors.red)
-                            : item['item_type'] == 'DMG'
-                                ? const Icon(Icons.flash_on,
+                            : item['stock_type'] == 'DMG'
+                                ? const Icon(Icons.bolt,
                                     size: 16, color: Colors.red)
                                 : const Text('')),
                 DataCell(Text(

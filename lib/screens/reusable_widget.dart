@@ -2,7 +2,6 @@ import 'package:chdn_pharmacy/database/database_helper.dart';
 import 'package:chdn_pharmacy/screens/reusable_dropdown.dart';
 import 'package:chdn_pharmacy/screens/reusable_function.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart';
 
 import '../model/data_model.dart';
 
@@ -233,6 +232,14 @@ class _EditStockNonDateState extends State<EditStockNonDate> {
   }
 }
 
+Widget sizedBoxH20() {
+  return const SizedBox(height: 20);
+}
+
+Widget sizedBoxH10() {
+  return const SizedBox(height: 10);
+}
+
 Widget reusableTextFormField(String label, TextEditingController controller,
     IconData iconName, bool isNumberKeyboard) {
   return Column(
@@ -382,7 +389,7 @@ class _EditStockDropdownState extends State<EditStockDropdown> {
 // end of edit stock with dropdown
 
 Widget reusableHotButton(
-    IconData iconName, String label, VoidCallback onPressed) {
+    IconData? iconName, String label, VoidCallback onPressed) {
   return SizedBox(
     width: 200,
     height: 45,
@@ -416,4 +423,14 @@ Widget reusableColdButton(String label, VoidCallback onPressed) {
             style:
                 const TextStyle(fontWeight: FontWeight.bold, color: Colors.red),
           )));
+}
+
+Widget reusableTwoButtonRow(Widget hotButton, Widget coldButton) {
+  return Row(
+    children: [
+      Expanded(flex: 2, child: hotButton),
+      const Expanded(flex: 1, child: SizedBox(width: 10)),
+      Expanded(flex: 2, child: coldButton)
+    ],
+  );
 }

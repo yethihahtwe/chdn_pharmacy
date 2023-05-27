@@ -6,7 +6,7 @@ import '../model/data_model.dart';
 class ReusableDropdown extends StatefulWidget {
   final List<ReusableMenuModel> reusableList;
   final String label;
-  final int queryValue;
+  final int? queryValue;
   final IconData iconName;
   final ValueChanged<int?>? onChanged;
   const ReusableDropdown(
@@ -27,7 +27,10 @@ class _ReusableDropdownState extends State<ReusableDropdown> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(widget.label),
+        Text(
+          widget.label,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 10),
         DropdownButtonFormField<int>(
           icon: const Icon(

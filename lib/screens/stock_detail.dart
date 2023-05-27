@@ -2,8 +2,6 @@ import 'package:chdn_pharmacy/database/database_helper.dart';
 import 'package:chdn_pharmacy/screens/reusable_widget.dart';
 import 'package:flutter/material.dart';
 
-import 'reusable_function.dart';
-
 class StockDetail extends StatefulWidget {
   final int stockId;
   final String itemName;
@@ -67,34 +65,32 @@ class _StockDetailState extends State<StockDetail> {
                 SizedBox(
                   width: 30,
                   height: 30,
-                  child: _stockDetail['stock_type'] == 'IN'
-                      ? IconButton(
-                          iconSize: 16,
-                          onPressed: () async {
-                            var result = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => EditStockDate(
-                                          dateType: 'Date',
-                                          dateValue: _stockDetail['stock_date'],
-                                          stockId: widget.stockId,
-                                          columnName: 'stock_date',
-                                          idColumn: 'stock_id',
-                                          tableName: 'tbl_stock',
-                                        )));
-                            if (result == 'success') {
-                              DatabaseHelper()
-                                  .getStockById(widget.stockId)
-                                  .then((value) {
-                                setState(() {
-                                  _stockDetail = value ?? {};
-                                });
-                              });
-                            }
-                          },
-                          icon: const Icon(Icons.edit),
-                        )
-                      : null,
+                  child: IconButton(
+                    iconSize: 16,
+                    onPressed: () async {
+                      var result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => EditStockDate(
+                                    dateType: 'Date',
+                                    dateValue: _stockDetail['stock_date'],
+                                    stockId: widget.stockId,
+                                    columnName: 'stock_date',
+                                    idColumn: 'stock_id',
+                                    tableName: 'tbl_stock',
+                                  )));
+                      if (result == 'success') {
+                        DatabaseHelper()
+                            .getStockById(widget.stockId)
+                            .then((value) {
+                          setState(() {
+                            _stockDetail = value ?? {};
+                          });
+                        });
+                      }
+                    },
+                    icon: const Icon(Icons.edit),
+                  ),
                 )
               ],
             ), // end of date row

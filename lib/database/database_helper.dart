@@ -283,11 +283,14 @@ class DatabaseHelper {
     return await _db.query(tblStock,
         columns: [
           '(SELECT package_form_name FROM $tblPackageForm WHERE package_form_id=stock_package_form_id) AS package_form',
+          'stock_package_form_id',
           'stock_exp_date',
           'stock_batch',
           'SUM(stock_amount)AS balance_by_batch',
           '(SELECT source_place_name from $tblSourcePlace WHERE source_place_id=stock_source_place_id) AS source_place',
-          '(SELECT donor_name FROM $tblDonor WHERE donor_id=stock_donor_id) AS donor'
+          'stock_source_place_id',
+          '(SELECT donor_name FROM $tblDonor WHERE donor_id=stock_donor_id) AS donor',
+          'stock_donor_id'
         ],
         where: "stock_item_id=?",
         whereArgs: [itemId],
