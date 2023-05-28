@@ -1,3 +1,6 @@
+import 'package:chdn_pharmacy/database/database_helper.dart';
+import 'package:chdn_pharmacy/screens/batch_inventory.dart';
+import 'package:chdn_pharmacy/screens/reusable_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../widgets/nav_bar.dart';
@@ -36,6 +39,12 @@ class _InfoState extends State<Info> {
             const SizedBox(
               height: 20,
             ),
+            const Text(
+                'Top 10 nearest expiry\nသက်တမ်းလွန်ရက်အနီးဆုံး ပစ္စည်း (၁၀) မျိုး',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            nearestExpiryTable(),
+            const Divider(),
+            sizedBoxH20(),
             // start of logo row
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -95,11 +104,11 @@ class _InfoState extends State<Info> {
               'CHDNventory',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             )),
-            const Center(child: Text('v 1.0')),
+            const Center(child: Text('alpha')),
             const Text('Release history',
                 style: TextStyle(fontWeight: FontWeight.bold)),
             const Text(
-              'v1.0 - released on 30-MAY-2023',
+              'alpha - released on 30-MAY-2023',
               style: TextStyle(fontSize: 12),
             ),
             const SizedBox(height: 10),
@@ -128,10 +137,101 @@ class _InfoState extends State<Info> {
             const SizedBox(height: 10),
             const Text(
                 style: TextStyle(fontSize: 12),
-                'အင်တာနက်ဆက်သွယ်မှုမရရှိသည့်နေရာများတွင် အချက်အလက်များမှတ်တမ်းတင်သိမ်းဆည်းနိုင်ရန် ရည်ရွယ်ပါသည်။ အသုံးပြုသည့်ဖုန်း/တက်ဘလက်အတွင်း၌သာ အချက်အလက်များသိမ်းဆည်းထားသောကြောင့် အပလီကေးရှင်းကိုမဖျက်ခင် (သို့) စက်ပစ္စည်းပျက်စီးခြင်းမဖြစ်ပေါ်ခင် မိခင်အဖွဲ့အစည်းထံသို့ အင်တာနက်ရချိန်၌ အချက်အလက်များပေးပို့ထားရန်လိုပါသည်။')
+                'အင်တာနက်ဆက်သွယ်မှုမရရှိသည့်နေရာများတွင် အချက်အလက်များမှတ်တမ်းတင်သိမ်းဆည်းနိုင်ရန် ရည်ရွယ်ပါသည်။ အသုံးပြုသည့်ဖုန်း/တက်ဘလက်အတွင်း၌သာ အချက်အလက်များသိမ်းဆည်းထားသောကြောင့် အပလီကေးရှင်းကိုမဖျက်ခင် (သို့) စက်ပစ္စည်းပျက်စီးခြင်းမဖြစ်ပေါ်ခင် မိခင်အဖွဲ့အစည်းထံသို့ အင်တာနက်ရချိန်၌ အချက်အလက်များပေးပို့ထားရန်လိုပါသည်။'),
+            sizedBoxH20()
           ])),
       bottomNavigationBar: BottomNavigation(
           selectedIndex: _selectedIndex, onItemTapped: _onItemTapped),
     );
+  }
+
+  Widget nearestExpiryTable() {
+    return FutureBuilder<List<Map<String, dynamic>>>(
+        future: DatabaseHelper().getTopTenNearestExpiry(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasData &&
+                snapshot.data != null &&
+                snapshot.data!.isNotEmpty) {
+              final List<DataRow> rows = [];
+              for (final item in snapshot.data!) {
+                rows.add(DataRow(cells: [
+                  DataCell(Text('${item['stock_exp_date']}',
+                      style: const TextStyle(fontSize: 10))),
+                  DataCell(Text('${item['item_name']}',
+                      style: const TextStyle(fontSize: 10))),
+                  DataCell(Text('${item['item_type']}',
+                      style: const TextStyle(fontSize: 10))),
+                  DataCell(Text('${item['stock_amount']}',
+                      style: const TextStyle(fontSize: 10))),
+                  DataCell(IconButton(
+                      onPressed: () async {
+                        var result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => BatchInventory(
+                                      itemName: '${item['item_name']}',
+                                      itemType: '${item['item_type']}',
+                                      itemId: item['stock_item_id'],
+                                      batchAmount: item['stock_amount'],
+                                      batchNumber: '${item['stock_batch']}',
+                                      donor: '${item['donor']}',
+                                      expDate: '${item['stock_exp_date']}',
+                                      donorId: item['stock_donor_id'],
+                                      packageForm: '${item['package_form']}',
+                                      packageFormId:
+                                          item['stock_package_form_id'],
+                                      sourcePlace: '${item['source_place']}',
+                                      sourcePlaceId:
+                                          item['stock_source_place_id'],
+                                    )));
+                        if (result == 'success') {
+                          setState(() {});
+                        }
+                      },
+                      icon: const Icon(Icons.play_arrow, color: Colors.red))),
+                ]));
+              }
+              return DataTable(
+                  columnSpacing: 9,
+                  columns: const [
+                    DataColumn(
+                        label: Text(
+                      'Exp\ny-m-d',
+                      style:
+                          TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                    )),
+                    DataColumn(
+                        label: Text(
+                      'Item',
+                      style:
+                          TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                    )),
+                    DataColumn(
+                        label: Text(
+                      'Type',
+                      style:
+                          TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                    )),
+                    DataColumn(label: Icon(Icons.tag, size: 16), numeric: true),
+                    DataColumn(
+                        label: Text(
+                      '',
+                    )),
+                  ],
+                  headingRowColor: MaterialStateProperty.all(
+                    const Color.fromARGB(255, 255, 227, 160),
+                  ),
+                  rows: rows);
+            } else if (snapshot.hasError) {
+              return Text('${snapshot.error}');
+            } else {
+              return const Text(
+                  'There is no data with the nearest expiry. \nသက်တမ်းလွန်ရက်အနီးဆုံးပစ္စည်းများအတွက် အချက်အလက်များမရှိသေးပါ။');
+            }
+          } else {
+            return const CircularProgressIndicator();
+          }
+        });
   }
 }

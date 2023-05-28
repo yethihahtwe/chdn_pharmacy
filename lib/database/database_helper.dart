@@ -316,4 +316,30 @@ class DatabaseHelper {
         where: "stock_item_id=?",
         whereArgs: [itemId]);
   }
+
+  // get top ten nearest expiry for info screen
+  Future<List<Map<String, dynamic>>> getTopTenNearestExpiry() async {
+    _db = await _loadDatabase();
+    return await _db.query(tblStock,
+        columns: [
+          'stock_exp_date',
+          // "SUBSTR(stock_exp_date, LENGTH(stock_exp_date)-3)||'-'||SUBSTR(stock_exp_date, INSTR(stock_exp_date, '-')+1,INSTR(stock_exp_date,'-')-1)||'-'||SUBSTR(stock_exp_date,1,INSTR(stock_exp_date,'-')-1)AS background_sort",
+          'stock_item_id',
+          '(SELECT item_name FROM $tblItem WHERE item_id=stock_item_id) AS item_name',
+          '(SELECT item_type FROM $tblItem WHERE item_id=stock_item_id) AS item_type',
+          'SUM(stock_amount) AS stock_amount',
+          'stock_batch',
+          '(SELECT source_place_name FROM $tblSourcePlace WHERE source_place_id=stock_source_place_id) AS source_place',
+          'stock_source_place_id',
+          '(SELECT donor_name FROM $tblDonor WHERE donor_id=stock_donor_id) AS donor',
+          'stock_donor_id',
+          '(SELECT package_form_name FROM $tblPackageForm WHERE package_form_id=stock_package_form_id) AS package_form',
+          'stock_package_form_id'
+        ],
+        groupBy:
+            'stock_exp_date, stock_item_id, stock_batch, stock_donor_id, stock_source_place_id, stock_package_form_id',
+        having: "SUM(stock_amount)>0 AND stock_exp_date!=''",
+        orderBy: 'stock_exp_date ASC',
+        limit: 10);
+  }
 }

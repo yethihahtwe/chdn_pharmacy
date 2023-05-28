@@ -21,14 +21,26 @@ class ItemInventory extends StatefulWidget {
 }
 
 class _ItemInventoryState extends State<ItemInventory> {
+  // to display total balance
   int? totalBalance;
 
-  int sortColumnIndex = 0;
-  bool sortAscending = true;
-  void sortColumn(int columnIndex, bool ascending) {
+  // to sort balance table
+  int sortColumnIndexBalanceTable = 0;
+  bool sortAscendingBalanceTable = true;
+  void sortColumnBalanceTable(int columnIndex, bool ascending) {
     setState(() {
-      sortColumnIndex = columnIndex;
-      sortAscending = ascending;
+      sortColumnIndexBalanceTable = columnIndex;
+      sortAscendingBalanceTable = ascending;
+    });
+  }
+
+  // to sort stock table
+  int sortColumnIndexStockTable = 0;
+  bool sortAscendingStockTable = false;
+  void sortColumnStockTable(int columnIndex, bool ascending) {
+    setState(() {
+      sortColumnIndexStockTable = columnIndex;
+      sortAscendingStockTable = ascending;
     });
   }
 
@@ -173,42 +185,44 @@ class _ItemInventoryState extends State<ItemInventory> {
                 ]));
               } // sort the rows based on selected column
               rows.sort((a, b) {
-                final aValue = a.cells[sortColumnIndex].child.toString();
-                final bValue = b.cells[sortColumnIndex].child.toString();
-                return sortAscending
+                final aValue =
+                    a.cells[sortColumnIndexBalanceTable].child.toString();
+                final bValue =
+                    b.cells[sortColumnIndexBalanceTable].child.toString();
+                return sortAscendingBalanceTable
                     ? aValue.compareTo(bValue)
                     : bValue.compareTo(aValue);
               });
               return DataTable(
-                  columnSpacing: 0.1,
+                  columnSpacing: 0,
                   columns: [
                     DataColumn(
-                        label: const Text('Exp',
+                        label: const Text('Exp\ny-m-d',
                             style: TextStyle(
                                 fontSize: 10, fontWeight: FontWeight.bold)),
                         onSort: (columnIndex, ascending) {
-                          sortColumn(columnIndex, ascending);
+                          sortColumnBalanceTable(columnIndex, ascending);
                         }),
                     DataColumn(
                         label: const Text('Batch',
                             style: TextStyle(
                                 fontSize: 10, fontWeight: FontWeight.bold)),
                         onSort: (columnIndex, ascending) {
-                          sortColumn(columnIndex, ascending);
+                          sortColumnBalanceTable(columnIndex, ascending);
                         }),
                     DataColumn(
                         label: const Text('Source',
                             style: TextStyle(
                                 fontSize: 10, fontWeight: FontWeight.bold)),
                         onSort: (columnIndex, ascending) {
-                          sortColumn(columnIndex, ascending);
+                          sortColumnBalanceTable(columnIndex, ascending);
                         }),
                     DataColumn(
                         label: const Text('Donor',
                             style: TextStyle(
                                 fontSize: 10, fontWeight: FontWeight.bold)),
                         onSort: (columnIndex, ascending) {
-                          sortColumn(columnIndex, ascending);
+                          sortColumnBalanceTable(columnIndex, ascending);
                         }),
                     DataColumn(
                         numeric: true,
@@ -217,22 +231,22 @@ class _ItemInventoryState extends State<ItemInventory> {
                           size: 12,
                         ),
                         onSort: (columnIndex, ascending) {
-                          sortColumn(columnIndex, ascending);
+                          sortColumnBalanceTable(columnIndex, ascending);
                         }),
                     DataColumn(
                         label: const Text('Pkg',
                             style: TextStyle(
                                 fontSize: 10, fontWeight: FontWeight.bold)),
                         onSort: (columnIndex, ascending) {
-                          sortColumn(columnIndex, ascending);
+                          sortColumnBalanceTable(columnIndex, ascending);
                         }),
                     const DataColumn(
                         label: Text('ထုတ်',
                             style: TextStyle(
                                 fontSize: 10, fontWeight: FontWeight.bold)))
                   ],
-                  sortAscending: sortAscending,
-                  sortColumnIndex: sortColumnIndex,
+                  sortAscending: sortAscendingBalanceTable,
+                  sortColumnIndex: sortColumnIndexBalanceTable,
                   headingRowColor: MaterialStateProperty.all(
                       const Color.fromARGB(255, 255, 227, 160)),
                   rows: rows);
@@ -301,7 +315,7 @@ class _ItemInventoryState extends State<ItemInventory> {
                 )),
                 DataCell(IconButton(
                     onPressed: () async {
-                      var result = await Navigator.push(
+                      await Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => StockDetail(
@@ -310,60 +324,97 @@ class _ItemInventoryState extends State<ItemInventory> {
                                     itemType: widget.itemType,
                                     packageForm: item['package_form'],
                                   )));
-                      if (result == 'success') {
-                        setState(() {});
-                      } else {
-                        setState(() {});
-                      }
+
+                      DatabaseHelper()
+                          .getTotalBalance(widget.itemId)
+                          .then((value) {
+                        setState(() {
+                          totalBalance = value!['total_balance'];
+                        });
+                      });
                     },
                     icon: const Icon(Icons.play_circle_filled,
                         color: Color.fromARGB(255, 218, 0, 76), size: 16)))
               ]));
-            }
+            } // sort the rows based on selected column
+            rows.sort((a, b) {
+              final aValue =
+                  a.cells[sortColumnIndexStockTable].child.toString();
+              final bValue =
+                  b.cells[sortColumnIndexStockTable].child.toString();
+              return sortAscendingStockTable
+                  ? aValue.compareTo(bValue)
+                  : bValue.compareTo(aValue);
+            });
             return DataTable(
-                columnSpacing: 1,
-                columns: const [
+                columnSpacing: 0,
+                columns: [
                   DataColumn(
-                      label: Text(
-                    'Date',
-                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
-                  )),
-                  DataColumn(
+                      label: const Text(
+                        'Date\ny-m-d',
+                        style: TextStyle(
+                            fontSize: 10, fontWeight: FontWeight.bold),
+                      ),
+                      onSort: (columnIndex, ascending) {
+                        sortColumnStockTable(columnIndex, ascending);
+                      }),
+                  const DataColumn(
                       label: Icon(
                     Icons.sync_alt_outlined,
                     size: 16,
                   )),
                   DataColumn(
-                      label: Text(
-                    'Source',
-                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
-                  )),
+                      label: const Text(
+                        'Source',
+                        style: TextStyle(
+                            fontSize: 10, fontWeight: FontWeight.bold),
+                      ),
+                      onSort: (columnIndex, ascending) {
+                        sortColumnStockTable(columnIndex, ascending);
+                      }),
                   DataColumn(
-                      label: Text(
-                    'Donor',
-                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
-                  )),
+                      label: const Text(
+                        'Donor',
+                        style: TextStyle(
+                            fontSize: 10, fontWeight: FontWeight.bold),
+                      ),
+                      onSort: (columnIndex, ascending) {
+                        sortColumnStockTable(columnIndex, ascending);
+                      }),
                   DataColumn(
-                      label: Text(
-                    'Exp',
-                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
-                  )),
+                      label: const Text(
+                        'Exp\ny-m-d',
+                        style: TextStyle(
+                            fontSize: 10, fontWeight: FontWeight.bold),
+                      ),
+                      onSort: (columnIndex, ascending) {
+                        sortColumnStockTable(columnIndex, ascending);
+                      }),
                   DataColumn(
                       numeric: true,
-                      label: Icon(
+                      label: const Icon(
                         Icons.tag,
                         size: 16,
-                      )),
+                      ),
+                      onSort: (columnIndex, ascending) {
+                        sortColumnStockTable(columnIndex, ascending);
+                      }),
                   DataColumn(
-                      label: Text(
-                    'Pkg',
-                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
-                  )),
-                  DataColumn(
+                      label: const Text(
+                        'Pkg',
+                        style: TextStyle(
+                            fontSize: 10, fontWeight: FontWeight.bold),
+                      ),
+                      onSort: (columnIndex, ascending) {
+                        sortColumnStockTable(columnIndex, ascending);
+                      }),
+                  const DataColumn(
                       label: Text(
                     '',
                   )),
                 ],
+                sortAscending: sortAscendingStockTable,
+                sortColumnIndex: sortColumnIndexStockTable,
                 headingRowColor: MaterialStateProperty.all(
                     const Color.fromARGB(255, 255, 227, 160)),
                 rows: rows);

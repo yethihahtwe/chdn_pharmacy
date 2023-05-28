@@ -31,7 +31,10 @@ class _EditStockDateState extends State<EditStockDate> {
     if (pickedDate == null) {
       return widget.dateValue;
     } else {
-      return '${pickedDate!.day}-${pickedDate!.month}-${pickedDate!.year}';
+      String day = pickedDate!.day.toString().padLeft(2, '0');
+      String month = pickedDate!.month.toString().padLeft(2, '0');
+      String year = pickedDate!.year.toString();
+      return '$year-$month-$day';
     }
   }
 
@@ -65,7 +68,8 @@ class _EditStockDateState extends State<EditStockDate> {
                         // start of date Row
                         Row(
                           children: [
-                            Text('${widget.dateType}: '),
+                            Text('${widget.dateType}\n(နှစ်-လ-ရက်): '),
+                            const SizedBox(width: 5),
                             Text(_getDateText(),
                                 style: const TextStyle(
                                     fontWeight: FontWeight.bold)),

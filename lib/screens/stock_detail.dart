@@ -23,6 +23,10 @@ class _StockDetailState extends State<StockDetail> {
   // empty string map to load stock detail
   Map<String, dynamic> _stockDetail = {};
 
+  // to show or hide destination row
+  bool _isStockOut = false;
+  bool _isStockDamage = false;
+
   @override
   void initState() {
     super.initState();
@@ -31,6 +35,17 @@ class _StockDetailState extends State<StockDetail> {
       setState(() {
         _stockDetail = value ?? {};
       });
+      if (_stockDetail['stock_type'] == 'OUT') {
+        setState(() {
+          _isStockOut = true;
+          _isStockDamage = false;
+        });
+      } else if (_stockDetail['stock_type'] == 'DMG') {
+        setState(() {
+          _isStockOut = false;
+          _isStockDamage = true;
+        });
+      }
     });
   }
 
@@ -438,47 +453,93 @@ class _StockDetailState extends State<StockDetail> {
               ],
             ), // end of donor row
             const Divider(),
+            // start of destination row
+
+            Visibility(
+              visible: _isStockOut,
+              child: Row(children: [
+                const Expanded(flex: 1, child: Text('Destination:')),
+                Expanded(
+                    flex: 1,
+                    child: Text(_stockDetail['destination'] ?? '',
+                        style: const TextStyle(fontWeight: FontWeight.bold))),
+                SizedBox(
+                  width: 30,
+                  height: 30,
+                  child: IconButton(
+                    iconSize: 16,
+                    onPressed: () async {
+                      await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => EditStockDropdown(
+                                    dropdownTableName: 'tbl_destination',
+                                    dropdownIdColumn: 'destination_id',
+                                    dropdownNameColumn: 'destination_name',
+                                    fieldNameToEdit: 'Destination',
+                                    queryValue: _stockDetail['stock_to'],
+                                    iconName: Icons.airport_shuttle_outlined,
+                                    stockId: widget.stockId,
+                                    columnName: 'stock_to',
+                                    onStockUpdated: () {
+                                      DatabaseHelper()
+                                          .getStockById(widget.stockId)
+                                          .then((value) {
+                                        setState(() {
+                                          _stockDetail = value!;
+                                        });
+                                      });
+                                    },
+                                  )));
+                    },
+                    icon: const Icon(Icons.edit),
+                  ),
+                )
+              ]),
+            ), // end of destination row
+            Visibility(visible: _isStockOut, child: const Divider()),
             // start of remark row
             Row(
               children: [
-                const Expanded(flex: 1, child: Text('Remark:')),
+                Expanded(
+                    flex: 1,
+                    child:
+                        Text(_isStockDamage ? 'Cause of damage' : 'Remark:')),
                 Expanded(
                   flex: 1,
                   child: Text(_stockDetail['stock_remark'] ?? '',
                       style: const TextStyle(fontWeight: FontWeight.bold)),
                 ),
                 SizedBox(
-                  width: 30,
-                  height: 30,
-                  child: _stockDetail['stock_type'] == 'IN'
-                      ? IconButton(
-                          iconSize: 16,
-                          onPressed: () async {
-                            var result = await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => EditStockNonDate(
-                                        fieldNameToEdit: 'Remark',
-                                        iconName: Icons.drafts,
-                                        queryValue:
-                                            _stockDetail['stock_remark'],
-                                        columnName: 'stock_remark',
-                                        id: widget.stockId,
-                                        isNumberKeyboard: false)));
-                            if (result == 'success') {
-                              DatabaseHelper()
-                                  .getStockById(widget.stockId)
-                                  .then((value) {
-                                setState(() {
-                                  _stockDetail = value!;
-                                });
-                              });
-                            }
-                          },
-                          icon: const Icon(Icons.edit),
-                        )
-                      : null,
-                )
+                    width: 30,
+                    height: 30,
+                    child: IconButton(
+                      iconSize: 16,
+                      onPressed: () async {
+                        var result = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => EditStockNonDate(
+                                    fieldNameToEdit: _isStockDamage
+                                        ? 'Cause of damage'
+                                        : 'Remark',
+                                    iconName: Icons.drafts,
+                                    queryValue: _stockDetail['stock_remark'],
+                                    columnName: 'stock_remark',
+                                    id: widget.stockId,
+                                    isNumberKeyboard: false)));
+                        if (result == 'success') {
+                          DatabaseHelper()
+                              .getStockById(widget.stockId)
+                              .then((value) {
+                            setState(() {
+                              _stockDetail = value!;
+                            });
+                          });
+                        }
+                      },
+                      icon: const Icon(Icons.edit),
+                    ))
               ],
             ), // end of remark row
             const Divider(),

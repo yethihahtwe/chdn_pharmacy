@@ -30,7 +30,10 @@ class _AddStockState extends State<AddStock> {
       return 'Select Date';
     } else {
       _isDatePicked = true;
-      return '${date!.day}-${date!.month}-${date!.year}';
+      String day = date!.day.toString().padLeft(2, '0');
+      String month = date!.month.toString().padLeft(2, '0');
+      String year = date!.year.toString();
+      return '$year-$month-$day';
     }
   }
 
@@ -39,7 +42,10 @@ class _AddStockState extends State<AddStock> {
     if (date == null) {
       return '';
     } else {
-      return '${date!.day}-${date!.month}-${date!.year}';
+      String day = date!.day.toString().padLeft(2, '0');
+      String month = date!.month.toString().padLeft(2, '0');
+      String year = date!.year.toString();
+      return '$year-$month-$day';
     }
   }
 
@@ -88,7 +94,10 @@ class _AddStockState extends State<AddStock> {
       return 'Select Expiry Date';
     } else {
       _isExpDatePicked = true;
-      return '${_expDate!.day}-${_expDate!.month}-${_expDate!.year}';
+      String day = _expDate!.day.toString().padLeft(2, '0');
+      String month = _expDate!.month.toString().padLeft(2, '0');
+      String year = _expDate!.year.toString();
+      return '$year-$month-$day';
     }
   }
 
@@ -97,7 +106,10 @@ class _AddStockState extends State<AddStock> {
     if (_expDate == null) {
       return '';
     } else {
-      return '${_expDate!.day}-${_expDate!.month}-${_expDate!.year}';
+      String day = _expDate!.day.toString().padLeft(2, '0');
+      String month = _expDate!.month.toString().padLeft(2, '0');
+      String year = _expDate!.year.toString();
+      return '$year-$month-$day';
     }
   }
 
@@ -142,7 +154,7 @@ class _AddStockState extends State<AddStock> {
     SharedPrefHelper.getLastDate().then((value) {
       if (value != null) {
         setState(() {
-          date = DateFormat('dd-MM-yyyy').parse(value);
+          date = DateFormat('yyyy-MM-dd').parse(value);
         });
       }
     });
@@ -234,7 +246,7 @@ class _AddStockState extends State<AddStock> {
                 height: 20,
               ),
               // start of date picker
-              const Text('Stock-in Date | ပစ္စည်းအဝင်ရက်စွဲ'),
+              const Text('Stock-in Date | ပစ္စည်းအဝင်ရက်စွဲ (နှစ်-လ-ရက်)'),
               SizedBox(
                 width: 200,
                 height: 45,

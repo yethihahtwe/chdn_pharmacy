@@ -25,7 +25,7 @@ class _HistoryState extends State<History> {
 
   // sort column
   int sortColumnIndex = 0;
-  bool sortAscending = true;
+  bool sortAscending = false;
   void _sortColumn(int columnIndex, bool ascending) {
     setState(() {
       sortColumnIndex = columnIndex;

@@ -174,10 +174,14 @@ class _ReduceStockState extends State<ReduceStock> {
               sizedBoxH10(),
               if (widget.stockType == 'OUT')
                 ReusableDropdown(
-                    reusableList: reusableList,
-                    label: 'Destination/ ပေးပို့ရာနေရာ',
-                    iconName: Icons.airport_shuttle_outlined,
-                    queryValue: null),
+                  reusableList: reusableList,
+                  label: 'Destination/ ပေးပို့ရာနေရာ',
+                  iconName: Icons.airport_shuttle_outlined,
+                  queryValue: null,
+                  onChanged: (value) {
+                    selectedReusableValue = value;
+                  },
+                ),
               sizedBoxH10(),
               ReusableTextFormField(
                 label: widget.stockType == 'OUT'
