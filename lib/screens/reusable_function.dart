@@ -23,7 +23,8 @@ class EditStock {
       String? stockRemark,
       int? stockTo,
       String? stockSync,
-      String stockCre) async {
+      String stockCre,
+      String stockDraft) async {
     await DatabaseHelper().insertStock(Stock.insertStock(
         stockDate: stockDate,
         stockType: stockType,
@@ -37,7 +38,8 @@ class EditStock {
         stockRemark: stockRemark ?? '',
         stockTo: stockTo ?? 0,
         stockSync: stockSync ?? '',
-        stockCre: stockCre));
+        stockCre: stockCre,
+        stockDraft: stockDraft));
   }
 }
 

@@ -1,3 +1,5 @@
+import 'package:chdn_pharmacy/screens/group_dispense.dart';
+import 'package:chdn_pharmacy/screens/reusable_widget.dart';
 import 'package:flutter/material.dart';
 import '../database/database_helper.dart';
 import '../database/shared_pref_helper.dart';
@@ -80,25 +82,56 @@ class _HomeState extends State<Home> {
                 })
           ])),
       // start of add stock fab
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () async {
-          var result = await Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const AddStock()));
-          if (result == 'success') {
-            setState(() {});
-          }
-        },
-        label: const Text(
-          'Add Stock',
-          style: TextStyle(
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          // start of dipsense fab
+          FloatingActionButton.extended(
+            heroTag: 'btnDispense',
+            onPressed: () async {
+              var result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const GroupDispense()));
+              if (result == 'success') {
+                setState(() {});
+              }
+            },
+            label: const Text(
+              'Dispense',
+              style: TextStyle(
+                  color: Color.fromARGB(255, 49, 49, 49),
+                  fontWeight: FontWeight.bold),
+            ),
+            icon: const Icon(
+              Icons.outbond_outlined,
               color: Color.fromARGB(255, 49, 49, 49),
-              fontWeight: FontWeight.bold),
-        ),
-        icon: const Icon(
-          Icons.add,
-          color: Color.fromARGB(255, 49, 49, 49),
-        ),
-        backgroundColor: const Color.fromARGB(255, 255, 197, 63),
+            ),
+            backgroundColor: const Color.fromARGB(255, 255, 197, 63),
+          ), // end of dispense fab
+          sizedBoxW10(),
+          FloatingActionButton.extended(
+            heroTag: 'btnAddStock',
+            onPressed: () async {
+              var result = await Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const AddStock()));
+              if (result == 'success') {
+                setState(() {});
+              }
+            },
+            label: const Text(
+              'Add Stock',
+              style: TextStyle(
+                  color: Color.fromARGB(255, 49, 49, 49),
+                  fontWeight: FontWeight.bold),
+            ),
+            icon: const Icon(
+              Icons.add_circle_outline_outlined,
+              color: Color.fromARGB(255, 49, 49, 49),
+            ),
+            backgroundColor: const Color.fromARGB(255, 255, 197, 63),
+          ),
+        ],
       ), // end of add stock fab
       bottomNavigationBar: BottomNavigation(
           selectedIndex: _selectedIndex, onItemTapped: _onItemTapped),

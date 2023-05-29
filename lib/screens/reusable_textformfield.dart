@@ -8,6 +8,7 @@ class ReusableTextFormField extends StatefulWidget {
   final String hintText;
   final IconData iconName;
   final String? Function(String?)? validator;
+  final ValueChanged<String?>? onChanged;
   const ReusableTextFormField({
     super.key,
     required this.label,
@@ -16,6 +17,7 @@ class ReusableTextFormField extends StatefulWidget {
     required this.hintText,
     required this.iconName,
     this.validator,
+    this.onChanged,
   });
 
   @override
@@ -40,6 +42,11 @@ class _ReusableTextFormFieldState extends State<ReusableTextFormField> {
                 validator: widget.validator,
                 onSaved: (value) {
                   widget.controller.text = value!;
+                },
+                onChanged: (value) {
+                  if (widget.onChanged != null) {
+                    widget.onChanged!(value);
+                  }
                 },
                 decoration: InputDecoration(
                     contentPadding: const EdgeInsets.all(10),

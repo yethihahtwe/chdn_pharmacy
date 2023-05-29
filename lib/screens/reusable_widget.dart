@@ -244,6 +244,10 @@ Widget sizedBoxH10() {
   return const SizedBox(height: 10);
 }
 
+Widget sizedBoxW10() {
+  return const SizedBox(width: 10);
+}
+
 Widget reusableTextFormField(String label, TextEditingController controller,
     IconData iconName, bool isNumberKeyboard) {
   return Column(

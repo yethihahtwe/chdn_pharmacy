@@ -162,7 +162,8 @@ class Stock {
       required String stockRemark,
       required int stockTo,
       required String stockSync,
-      required String stockCre}) {
+      required String stockCre,
+      required String stockDraft}) {
     return {
       'stock_date': stockDate,
       'stock_type': stockType,
@@ -176,7 +177,8 @@ class Stock {
       'stock_remark': stockRemark,
       'stock_to': stockTo,
       'stock_sync': stockSync,
-      'stock_cre': stockCre
+      'stock_cre': stockCre,
+      'stock_draft': stockDraft
     };
   }
 }

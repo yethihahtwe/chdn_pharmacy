@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -341,5 +342,35 @@ class DatabaseHelper {
         having: "SUM(stock_amount)>0 AND stock_exp_date!=''",
         orderBy: 'stock_exp_date ASC',
         limit: 10);
+  }
+
+  // count of draft stock for notification icon
+  Future<int> getCountDraftStock() async {
+    _db = await _loadDatabase();
+    final result = await _db.query(tblStock,
+        columns: ['COUNT(*)'], where: "stock_draft=?", whereArgs: ['true']);
+    return Sqflite.firstIntValue(result) ?? 0;
+  }
+
+  // get available batch for group dispense screen
+  Future<List<Map<String, dynamic>>> getAvailableItem() async {
+    _db = await _loadDatabase();
+    return await _db.query(tblStock,
+        columns: [
+          '(SELECT item_name FROM $tblItem WHERE item_id=stock_item_id) AS item_name',
+          '(SELECT item_type FROM $tblItem WHERE item_id=stock_item_id) AS item_type',
+          'SUM(stock_amount) AS stock_amount',
+          '(SELECT package_form_name FROM $tblPackageForm WHERE package_form_id=stock_package_form_id) AS package_form',
+          '(SELECT source_place_name FROM $tblSourcePlace WHERE source_place_id=stock_source_place_id) AS source_place',
+          '(SELECT donor_name FROM $tblDonor WHERE donor_id=stock_donor_id) AS donor',
+          'stock_package_form_id',
+          'stock_exp_date',
+          'stock_batch',
+          'stock_source_place_id',
+          'stock_donor_id'
+        ],
+        groupBy:
+            'stock_item_id, stock_package_form_id, stock_batch, stock_exp_date, stock_source_place_id, stock_donor_id',
+        orderBy: 'stock_exp_date ASC');
   }
 }

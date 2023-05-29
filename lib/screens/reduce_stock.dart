@@ -242,7 +242,8 @@ class _ReduceStockState extends State<ReduceStock> {
                           remarkController.text,
                           selectedReusableValue,
                           '',
-                          userId!);
+                          userId!,
+                          'settled');
                       EasyLoading.showSuccess(widget.stockType == 'OUT'
                           ? 'ပစ္စည်းထုတ်ယူမှတ်တမ်း သိမ်းဆည်းပြီးပါပြီ။'
                           : widget.stockType == 'DMG'

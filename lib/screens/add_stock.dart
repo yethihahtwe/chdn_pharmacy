@@ -475,7 +475,7 @@ class _AddStockState extends State<AddStock> {
               const SizedBox(height: 10),
               // start of exp date
               if (_showExpDatePicker)
-                const Text('Expiry Date | သက်တမ်းလွန်ရက်စွဲ'),
+                const Text('Expiry Date | သက်တမ်းလွန်ရက်စွဲ (နှစ်-လ-ရက်)'),
               if (_showExpDatePicker)
                 SizedBox(
                   width: 200,
@@ -820,7 +820,8 @@ class _AddStockState extends State<AddStock> {
         stockRemark: _remarkController.text,
         stockTo: 0,
         stockSync: '',
-        stockCre: _userId!));
+        stockCre: _userId!,
+        stockDraft: 'settled'));
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('lastDate', saveDateText());
     await prefs.setInt('lastSourcePlace', _selectedSourcePlace!);
