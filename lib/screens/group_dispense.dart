@@ -1,8 +1,11 @@
-import 'package:chdn_pharmacy/database/database_helper.dart';
-import 'package:chdn_pharmacy/model/data_model.dart';
-import 'package:chdn_pharmacy/screens/reusable_dropdown.dart';
+import 'package:chdn_pharmacy/screens/draft_dispense.dart';
+import 'package:chdn_pharmacy/screens/reusable_function.dart';
 import 'package:chdn_pharmacy/screens/reusable_widget.dart';
 import 'package:flutter/material.dart';
+
+import '../database/database_helper.dart';
+import '../model/data_model.dart';
+import 'reusable_dropdown.dart';
 
 class GroupDispense extends StatefulWidget {
   const GroupDispense({super.key});
@@ -74,20 +77,18 @@ class _GroupDispenseState extends State<GroupDispense> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).primaryColor,
-        title: const Text('Dispense Items'),
-        centerTitle: true,
-        actions: [buildNotificationIcon()],
-      ), // end of app bar
-      body: SingleChildScrollView(
-          padding: EdgeInsets.only(
-            left: MediaQuery.of(context).size.width * 0.05,
-            right: MediaQuery.of(context).size.width * 0.05,
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-          ),
-          child: Column(
-              mainAxisSize: MainAxisSize.max,
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).primaryColor,
+          title: const Text('Dispense Items'),
+          centerTitle: true,
+          actions: [buildNotificationIcon()],
+        ), // end of app bar
+        body: SingleChildScrollView(
+            padding: EdgeInsets.only(
+                left: MediaQuery.of(context).size.width * 0.05,
+                right: MediaQuery.of(context).size.width * 0.05,
+                bottom: MediaQuery.of(context).viewInsets.bottom),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 sizedBoxH20(),
@@ -112,17 +113,24 @@ class _GroupDispenseState extends State<GroupDispense> {
                     });
                   },
                 ),
-                sizedBoxH10(),
-                buildAvailableItems()
-              ])),
-    );
+                sizedBoxH20(),
+                buildAvailableItems(),
+              ],
+            )));
   }
 
   // notification icon widget
   Widget buildNotificationIcon() {
     return Stack(alignment: AlignmentDirectional.bottomEnd, children: [
       IconButton(
-          onPressed: () {}, icon: const Icon(Icons.local_shipping_outlined)),
+          onPressed: () async {
+            if (date == null) {
+              FormControl.alertDialog(context, 'Date of dispense');
+            } else if (selectedDestination == null) {
+              FormControl.alertDialog(context, 'Destinaion');
+            }
+          },
+          icon: const Icon(Icons.local_shipping_outlined)),
       Positioned(
           top: 10,
           left: 1,
@@ -165,128 +173,142 @@ class _GroupDispenseState extends State<GroupDispense> {
   }
 
   Widget buildAvailableItems() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Column(
-        children: [
-          if (showSearchAndTable) buildSearchTextField(),
-          if (showSearchAndTable) sizedBoxH10(),
-          if (showSearchAndTable)
-            FutureBuilder<List<Map<String, dynamic>>>(
-              future: DatabaseHelper().getAvailableItem(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  if (snapshot.hasData &&
-                      snapshot.data != null &&
-                      snapshot.data!.isNotEmpty) {
-                    final List<DataRow> rows = [];
-                    for (final item in snapshot.data!) {
-                      rows.add(DataRow(cells: [
-                        DataCell(Text('${item['item_name']}',
-                            style: const TextStyle(fontSize: 10))),
-                        DataCell(Text('${item['item_type']}',
-                            style: const TextStyle(fontSize: 10))),
-                        DataCell(Text('${item['stock_amount']}',
-                            style: const TextStyle(
-                                fontSize: 10, fontWeight: FontWeight.bold))),
-                        DataCell(Text('${item['package_form']}(s)',
-                            style: const TextStyle(fontSize: 10))),
-                        DataCell(Text('${item['stock_exp_date']}',
-                            style: const TextStyle(
-                                fontSize: 10, fontWeight: FontWeight.bold))),
-                        DataCell(Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('${item['source_place']}',
-                                style: const TextStyle(fontSize: 10)),
-                            Text('${item['donor']}',
-                                style: const TextStyle(fontSize: 10))
-                          ],
-                        )),
-                        DataCell(IconButton(
-                            onPressed: () async {},
-                            icon: const Icon(
-                              Icons.outbond_outlined,
-                              color: Colors.red,
-                              size: 16,
-                            ))),
-                      ]));
-                    } // filter rows based in search input
-                    final List<DataRow> filteredRows = rows.where(
-                      (row) {
-                        final itemName = row.cells[0].child.toString();
-                        final itemType = row.cells[1].child.toString();
-                        final searchQuery = searchController.text.toLowerCase();
-                        return itemName.toLowerCase().contains(searchQuery) ||
-                            itemType.toLowerCase().contains(searchQuery);
-                      },
-                    ).toList();
-                    return Visibility(
-                      visible: showSearchAndTable,
-                      child: DataTable(
-                          columnSpacing: 3,
-                          columns: const [
-                            DataColumn(
-                                label: Text(
-                              'Item',
-                              style: TextStyle(
-                                  fontSize: 10, fontWeight: FontWeight.bold),
-                            )),
-                            DataColumn(
-                                label: Text(
-                              'Type',
-                              style: TextStyle(
-                                  fontSize: 10, fontWeight: FontWeight.bold),
-                            )),
-                            DataColumn(
-                                numeric: true,
-                                label: Icon(
-                                  Icons.tag,
-                                  size: 16,
-                                )),
-                            DataColumn(
-                                label: Text(
-                              'Pkg',
-                              style: TextStyle(
-                                  fontSize: 10, fontWeight: FontWeight.bold),
-                            )),
-                            DataColumn(
-                                label: Text(
-                              'Exp\nနှစ်-လ-ရက်',
-                              style: TextStyle(
-                                  fontSize: 8, fontWeight: FontWeight.bold),
-                            )),
-                            DataColumn(
-                                label: Text(
-                              'Source',
-                              style: TextStyle(
-                                  fontSize: 10, fontWeight: FontWeight.bold),
-                            )),
-                            DataColumn(
-                                label: Text(
-                              '',
-                            )),
-                          ],
-                          headingRowColor: MaterialStateProperty.all(
-                            const Color.fromARGB(255, 255, 227, 160),
-                          ),
-                          rows: filteredRows),
-                    );
-                  } else if (snapshot.hasError) {
-                    return Text('${snapshot.error}');
-                  } else {
-                    return const Text(
-                        'There is no data with available items.\nထုတ်ယူနိုင်သည့်ပစ္စည်းအချက်အလက်များမရှိသေးပါ။');
-                  }
-                } else {
-                  return const CircularProgressIndicator();
-                }
+    return FutureBuilder<List<Map<String, dynamic>>>(
+        future: DatabaseHelper().getAvailableItem(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData &&
+              snapshot.data != null &&
+              snapshot.data!.isNotEmpty) {
+            final List<DataRow> rows = [];
+            for (final item in snapshot.data!) {
+              rows.add(DataRow(cells: [
+                DataCell(Text('${item['item_name']}',
+                    style: const TextStyle(fontSize: 10))),
+                DataCell(Text('${item['item_type']}',
+                    style: const TextStyle(fontSize: 10))),
+                DataCell(Text('${item['stock_amount']}',
+                    style: const TextStyle(
+                        fontSize: 10, fontWeight: FontWeight.bold))),
+                DataCell(Text('${item['package_form']}(s)',
+                    style: const TextStyle(fontSize: 10))),
+                DataCell(Text('${item['stock_exp_date']}',
+                    style: const TextStyle(
+                        fontSize: 10, fontWeight: FontWeight.bold))),
+                DataCell(Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('${item['source_place']}',
+                        style: const TextStyle(fontSize: 10)),
+                    Text('${item['donor']}',
+                        style: const TextStyle(fontSize: 10))
+                  ],
+                )),
+                DataCell(IconButton(
+                    onPressed: () async {
+                      var result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => DraftDispense(
+                                    itemName: item['item_name'],
+                                    itemType: item['item_type'],
+                                    itemId: item['stock_item_id'],
+                                    packageFormId:
+                                        item['stock_package_form_id'],
+                                    expDate: item['stock_exp_date'],
+                                    batch: item['stock_batch'],
+                                    sourcePlaceId:
+                                        item['stock_source_place_id'],
+                                    donorId: item['stock_donor_id'],
+                                    existingAmount: item['stock_amount'],
+                                    packageForm: item['package_form'],
+                                  )));
+                      if (result == 'success') {
+                        DatabaseHelper().getCountDraftStock().then((value) {
+                          setState(() {
+                            draftCount = value;
+                          });
+                        });
+                      }
+                    },
+                    icon: const Icon(
+                      Icons.outbond_outlined,
+                      color: Colors.red,
+                      size: 16,
+                    ))),
+              ]));
+            } // filter rows based in search input
+            final List<DataRow> filteredRows = rows.where(
+              (row) {
+                final itemName = row.cells[0].child.toString();
+                final itemType = row.cells[1].child.toString();
+                final searchQuery = searchController.text.toLowerCase();
+                return itemName.toLowerCase().contains(searchQuery) ||
+                    itemType.toLowerCase().contains(searchQuery);
               },
-            ),
-        ],
-      ),
-    );
+            ).toList();
+            return Visibility(
+              visible: showSearchAndTable,
+              child: Column(children: [
+                buildSearchTextField(),
+                sizedBoxH10(),
+                DataTable(
+                    columnSpacing: 3,
+                    columns: const [
+                      DataColumn(
+                          label: Text(
+                        'Item',
+                        style: TextStyle(
+                            fontSize: 10, fontWeight: FontWeight.bold),
+                      )),
+                      DataColumn(
+                          label: Text(
+                        'Type',
+                        style: TextStyle(
+                            fontSize: 10, fontWeight: FontWeight.bold),
+                      )),
+                      DataColumn(
+                          numeric: true,
+                          label: Icon(
+                            Icons.tag,
+                            size: 16,
+                          )),
+                      DataColumn(
+                          label: Text(
+                        'Pkg',
+                        style: TextStyle(
+                            fontSize: 10, fontWeight: FontWeight.bold),
+                      )),
+                      DataColumn(
+                          label: Text(
+                        'Exp\nနှစ်-လ-ရက်',
+                        style:
+                            TextStyle(fontSize: 8, fontWeight: FontWeight.bold),
+                      )),
+                      DataColumn(
+                          label: Text(
+                        'Source',
+                        style: TextStyle(
+                            fontSize: 10, fontWeight: FontWeight.bold),
+                      )),
+                      DataColumn(
+                          label: Text(
+                        '',
+                      )),
+                    ],
+                    headingRowColor: MaterialStateProperty.all(
+                      const Color.fromARGB(255, 255, 227, 160),
+                    ),
+                    rows: filteredRows),
+              ]),
+            );
+          } else if (snapshot.hasError) {
+            return Text('${snapshot.error}');
+          } else {
+            return const Text(
+                'There is no data with available items.\nထုတ်ယူနိုင်သည့်ပစ္စည်းအချက်အလက်များမရှိသေးပါ။');
+          }
+        });
   }
 
   // search text field
@@ -307,7 +329,7 @@ class _GroupDispenseState extends State<GroupDispense> {
                     Icons.cancel,
                     color: Colors.grey,
                   )),
-          hintText: 'Search Item',
+          hintText: 'Search Available Item',
           border: const OutlineInputBorder(),
           focusedBorder: OutlineInputBorder(
               borderSide: BorderSide(

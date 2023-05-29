@@ -115,7 +115,9 @@ class _HistoryState extends State<History> {
             for (final item in snapshot.data!) {
               rows.add(DataRow(cells: [
                 DataCell(Text(
-                  '${item['stock_date']}',
+                  item['stock_date'] == ''
+                      ? 'Pending'
+                      : '${item['stock_date']}',
                   style: const TextStyle(fontSize: 10),
                 )),
                 DataCell(item['stock_type'] == 'IN'

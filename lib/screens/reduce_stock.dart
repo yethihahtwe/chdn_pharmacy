@@ -2,7 +2,6 @@ import 'package:chdn_pharmacy/database/database_helper.dart';
 import 'package:chdn_pharmacy/database/shared_pref_helper.dart';
 import 'package:chdn_pharmacy/screens/reusable_dropdown.dart';
 import 'package:chdn_pharmacy/screens/reusable_function.dart';
-import 'package:chdn_pharmacy/screens/reusable_textformfield.dart';
 import 'package:chdn_pharmacy/screens/reusable_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -100,20 +99,7 @@ class _ReduceStockState extends State<ReduceStock> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColor,
-        title: Row(
-          children: [
-            Icon(widget.stockType == 'OUT'
-                ? Icons.outbond_outlined
-                : widget.stockType == 'DMG'
-                    ? Icons.bolt_outlined
-                    : null),
-            Text(widget.stockType == 'OUT'
-                ? 'Dispense Item/ ပစ္စည်းထုတ်ရန်'
-                : widget.stockType == 'DMG'
-                    ? 'Damaged Item/ ပျက်စီးစာရင်းသွင်းရန်'
-                    : ''),
-          ],
-        ),
+        title: buildAppBarTitle(),
         centerTitle: true,
       ), // end of app bar
       body: Form(
@@ -125,87 +111,23 @@ class _ReduceStockState extends State<ReduceStock> {
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               sizedBoxH20(),
-              Row(
-                children: [
-                  const Icon(Icons.info_outline, size: 16),
-                  Expanded(
-                      child: Text(
-                    'ယခု batch အတွက် အများဆုံး$_stockDescribeအရေအတွက်မှာ ${widget.batchAmount.toString()} ${widget.packageForm}(s) ဖြစ်ပါသည်။',
-                    style: const TextStyle(fontSize: 10),
-                  ))
-                ],
-              ),
+              buildAlertInfoRow(),
               sizedBoxH20(),
-              Text(
-                  widget.stockType == 'OUT'
-                      ? 'Date of dispense/ ထုတ်ယူသည့်ရက်စွဲ'
-                      : widget.stockType == 'DMG'
-                          ? 'Date of damage/ ပျက်စီးသည့်ရက်စွဲ'
-                          : '',
-                  style: const TextStyle(fontWeight: FontWeight.bold)),
+              buildDateLabel(),
               reusableHotButton(Icons.calendar_month_outlined, getDateText(),
                   () {
                 pickDate(context);
               }),
               sizedBoxH10(),
-              ReusableTextFormField(
-                label: widget.stockType == 'OUT'
-                    ? 'Amount of dispense/ ထုတ်ယူသည့်အရေအတွက်'
-                    : widget.stockType == 'DMG'
-                        ? 'Amount of damage/ ပျက်စီးသည့်အရေအတွက်'
-                        : '',
-                hintText: widget.stockType == 'OUT'
-                    ? 'Please enter dispensed amount'
-                    : widget.stockType == 'DMG'
-                        ? 'Please enter damaged amount'
-                        : '',
-                iconName: Icons.tag,
-                isNumberKeyboard: true,
-                controller: controller,
-              ),
+              buildAmountLabel(),
+              buildAmountTextFormField(),
               sizedBoxH10(),
-              Row(
-                children: [
-                  const Text('Package Form: ',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  Text('${widget.packageForm}(s)'),
-                ],
-              ),
+              buildPackageFormLabel(),
               sizedBoxH10(),
-              if (widget.stockType == 'OUT')
-                ReusableDropdown(
-                  reusableList: reusableList,
-                  label: 'Destination/ ပေးပို့ရာနေရာ',
-                  iconName: Icons.airport_shuttle_outlined,
-                  queryValue: null,
-                  onChanged: (value) {
-                    selectedReusableValue = value;
-                  },
-                ),
+              if (widget.stockType == 'OUT') buildDestinationDropdown(),
               sizedBoxH10(),
-              ReusableTextFormField(
-                label: widget.stockType == 'OUT'
-                    ? 'Remark/ မှတ်ချက်'
-                    : widget.stockType == 'DMG'
-                        ? 'Cause of the damage/ ပျက်စီးရသည့်အကြောင်းရင်း'
-                        : '',
-                isNumberKeyboard: false,
-                hintText: widget.stockType == 'OUT'
-                    ? 'Remark if any'
-                    : widget.stockType == 'DMG'
-                        ? 'Please enter cause of the damage'
-                        : '',
-                iconName: Icons.note,
-                validator: widget.stockType == 'DMG'
-                    ? (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter cause of damage';
-                        }
-                        return null;
-                      }
-                    : null,
-                controller: remarkController,
-              ),
+              buildRemarkLabel(),
+              buildRemarkTextFormField(),
               sizedBoxH20(),
               reusableTwoButtonRow(
                   reusableHotButton(
@@ -221,8 +143,8 @@ class _ReduceStockState extends State<ReduceStock> {
                               : '', () async {
                     if (!_isDatePicked) {
                       await FormControl.alertDialog(context, 'Date');
-                    } else if (int.tryParse(controller.text)! >
-                        widget.batchAmount) {
+                    } else if (controller.text.isNotEmpty &&
+                        int.tryParse(controller.text)! > widget.batchAmount) {
                       await FormControl.alertDialog(
                           context, 'Amount not to exceed remaining');
                     } else if (_key.currentState != null &&
@@ -282,5 +204,156 @@ class _ReduceStockState extends State<ReduceStock> {
     setState(() {
       date = newDate;
     });
+  }
+
+  Widget buildAppBarTitle() {
+    return Row(
+      children: [
+        Icon(widget.stockType == 'OUT'
+            ? Icons.outbond_outlined
+            : widget.stockType == 'DMG'
+                ? Icons.bolt_outlined
+                : null),
+        Text(widget.stockType == 'OUT'
+            ? 'Dispense Item/ ပစ္စည်းထုတ်ရန်'
+            : widget.stockType == 'DMG'
+                ? 'Damaged Item/ ပျက်စီးစာရင်းသွင်းရန်'
+                : ''),
+      ],
+    );
+  }
+
+  Widget buildAlertInfoRow() {
+    return Row(
+      children: [
+        const Icon(Icons.info_outline, size: 16),
+        Expanded(
+            child: Text(
+          'ယခု batch အတွက် အများဆုံး$_stockDescribeအရေအတွက်မှာ ${widget.batchAmount.toString()} ${widget.packageForm}(s) ဖြစ်ပါသည်။',
+          style: const TextStyle(fontSize: 10),
+        ))
+      ],
+    );
+  }
+
+  Widget buildDateLabel() {
+    return Text(
+        widget.stockType == 'OUT'
+            ? 'Date of dispense/ ထုတ်ယူသည့်ရက်စွဲ'
+            : widget.stockType == 'DMG'
+                ? 'Date of damage/ ပျက်စီးသည့်ရက်စွဲ'
+                : '',
+        style: const TextStyle(fontWeight: FontWeight.bold));
+  }
+
+  Widget buildPackageFormLabel() {
+    return Row(
+      children: [
+        const Text('Package Form: ',
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        Text('${widget.packageForm}(s)'),
+      ],
+    );
+  }
+
+  Widget buildRemarkLabel() {
+    return Text(
+        widget.stockType == 'OUT'
+            ? 'Remark/ မှတ်ချက်'
+            : widget.stockType == 'DMG'
+                ? 'Cause of the damage/ ပျက်စီးရသည့်အကြောင်းရင်း'
+                : '',
+        style: const TextStyle(fontWeight: FontWeight.bold));
+  }
+
+  Widget buildAmountLabel() {
+    return Text(
+        widget.stockType == 'OUT'
+            ? 'Amount of dispense/ ထုတ်ယူသည့်အရေအတွက်'
+            : widget.stockType == 'DMG'
+                ? 'Amount of damage/ ပျက်စီးသည့်အရေအတွက်'
+                : '',
+        style: const TextStyle(fontWeight: FontWeight.bold));
+  }
+
+  Widget buildAmountTextFormField() {
+    return SizedBox(
+      height: 50,
+      child: TextFormField(
+        keyboardType: TextInputType.number,
+        controller: controller,
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter dispensed amount';
+          }
+          return null;
+        },
+        onSaved: (value) {
+          controller.text = value!;
+        },
+        decoration: InputDecoration(
+            contentPadding: const EdgeInsets.all(10),
+            prefixIcon: const Icon(
+              Icons.tag,
+              color: Colors.grey,
+            ),
+            hintText: 'Please enter dispensed amount',
+            border: const OutlineInputBorder(),
+            focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                    color: Theme.of(context).colorScheme.background,
+                    width: 2))),
+        maxLines: 1,
+      ),
+    );
+  }
+
+  Widget buildDestinationDropdown() {
+    return ReusableDropdown(
+      reusableList: reusableList,
+      label: 'Destination/ ပေးပို့ရာနေရာ',
+      iconName: Icons.airport_shuttle_outlined,
+      queryValue: null,
+      onChanged: (value) {
+        selectedReusableValue = value;
+      },
+    );
+  }
+
+  Widget buildRemarkTextFormField() {
+    return SizedBox(
+      height: 50,
+      child: TextFormField(
+        controller: remarkController,
+        validator: widget.stockType == 'DMG'
+            ? (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter cause of damage';
+                }
+                return null;
+              }
+            : null,
+        onSaved: (value) {
+          remarkController.text = value!;
+        },
+        decoration: InputDecoration(
+            contentPadding: const EdgeInsets.all(10),
+            prefixIcon: const Icon(
+              Icons.note,
+              color: Colors.grey,
+            ),
+            hintText: widget.stockType == 'OUT'
+                ? 'Remark if any'
+                : widget.stockType == 'DMG'
+                    ? 'Please enter cause of the damage'
+                    : '',
+            border: const OutlineInputBorder(),
+            focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+                    color: Theme.of(context).colorScheme.background,
+                    width: 2))),
+        maxLines: 1,
+      ),
+    );
   }
 }

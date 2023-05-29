@@ -1,6 +1,4 @@
 import 'dart:io';
-
-import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -359,6 +357,7 @@ class DatabaseHelper {
         columns: [
           '(SELECT item_name FROM $tblItem WHERE item_id=stock_item_id) AS item_name',
           '(SELECT item_type FROM $tblItem WHERE item_id=stock_item_id) AS item_type',
+          'stock_item_id',
           'SUM(stock_amount) AS stock_amount',
           '(SELECT package_form_name FROM $tblPackageForm WHERE package_form_id=stock_package_form_id) AS package_form',
           '(SELECT source_place_name FROM $tblSourcePlace WHERE source_place_id=stock_source_place_id) AS source_place',
@@ -371,6 +370,17 @@ class DatabaseHelper {
         ],
         groupBy:
             'stock_item_id, stock_package_form_id, stock_batch, stock_exp_date, stock_source_place_id, stock_donor_id',
-        orderBy: 'stock_exp_date ASC');
+        orderBy: 'stock_exp_date ASC',
+        having: 'SUM(stock_amount)>0');
+  }
+
+  // prevent duplicate for draft dispense screen
+  Future<int> getSameItemDraftStock(itemId) async {
+    _db = await _loadDatabase();
+    final result = await _db.query(tblStock,
+        columns: ['COUNT(*)'],
+        where: 'stock_draft=? AND stock_item_id=?',
+        whereArgs: ['true', itemId]);
+    return Sqflite.firstIntValue(result) ?? 0;
   }
 }
