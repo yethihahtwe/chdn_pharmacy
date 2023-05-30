@@ -417,4 +417,12 @@ class DatabaseHelper {
         whereArgs: [filterValue]);
     return result.isNotEmpty ? result.first : null;
   }
+
+  // confirm checkout dispense
+  Future<void> confirmCheckout(String stockDate, int destinationId) async {
+    _db = await _loadDatabase();
+    await _db.rawUpdate(
+        'UPDATE $tblStock SET stock_date=?, stock_type=?, stock_to=?, stock_draft=? WHERE stock_draft=?',
+        [stockDate, 'OUT', destinationId, 'settled', 'true']);
+  }
 }

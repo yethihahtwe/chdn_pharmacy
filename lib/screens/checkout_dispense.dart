@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 import '../database/database_helper.dart';
 import 'reusable_widget.dart';
 
 class CheckoutDispense extends StatefulWidget {
-  final String date;
+  final String stockDate;
   final int destinationId;
   const CheckoutDispense(
-      {super.key, required this.date, required this.destinationId});
+      {super.key, required this.stockDate, required this.destinationId});
 
   @override
   State<CheckoutDispense> createState() => _CheckoutDispenseState();
@@ -16,6 +17,9 @@ class CheckoutDispense extends StatefulWidget {
 class _CheckoutDispenseState extends State<CheckoutDispense> {
   // to display destination name
   String? destinationName;
+
+  // to display stock date
+  String? dateText;
 
   @override
   void initState() {
@@ -27,6 +31,9 @@ class _CheckoutDispenseState extends State<CheckoutDispense> {
       setState(() {
         destinationName = value?['destination_name'];
       });
+    });
+    setState(() {
+      dateText = widget.stockDate;
     });
   }
 
@@ -48,12 +55,16 @@ class _CheckoutDispenseState extends State<CheckoutDispense> {
             buildDestinationNameText(),
             buildDraftDispenseTable(),
           ])),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [buildConfirmButton(), sizedBoxW10(), buildCancelButton()],
+      ),
     );
   }
 
   Widget buildDestinationNameText() {
     return Text(
-      '${widget.date} တွင် $destinationName သို့ထုတ်ပေးမည့်ပစ္စည်းများ',
+      '${widget.stockDate} တွင် $destinationName သို့ထုတ်ပေးမည့်ပစ္စည်းများ',
       style: const TextStyle(fontWeight: FontWeight.bold),
     );
   }
@@ -93,66 +104,55 @@ class _CheckoutDispenseState extends State<CheckoutDispense> {
                   Text('${item['donor']}', style: const TextStyle(fontSize: 10))
                 ],
               )),
-              DataCell(Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(
-                      Icons.edit,
-                      size: 16,
-                      color: Color.fromARGB(255, 218, 0, 76),
-                    ),
-                    onPressed: () {},
-                  ),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.delete,
-                      size: 16,
-                      color: Color.fromARGB(255, 218, 0, 76),
-                    ),
-                    onPressed: () async {
-                      await showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                                title: const Text('Delete Draft?'),
-                                content: const Text(
-                                  'Are sure you want to delete the draft dispense?\nထုတ်ပေးမည့်စာရင်းမှဖယ်ရှားရန်သေချာပါသလား',
-                                  style: TextStyle(fontSize: 12),
-                                ),
-                                actions: <Widget>[
-                                  TextButton(
-                                      onPressed: () async {
-                                        await DatabaseHelper()
-                                            .deleteStock(item['stock_id']);
-                                        Navigator.pop(context, 'success');
-                                      },
-                                      child: const Text(
-                                        'Delete',
-                                        style: TextStyle(
-                                          color: Colors.red,
-                                        ),
-                                      )),
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: const Text(
-                                      'Cancel',
-                                      style: TextStyle(
+              DataCell(IconButton(
+                icon: const Icon(
+                  Icons.delete,
+                  size: 16,
+                  color: Color.fromARGB(255, 218, 0, 76),
+                ),
+                onPressed: () async {
+                  await showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                            title: const Text('Delete Draft?'),
+                            content: const Text(
+                              'Are sure you want to delete the draft dispense?\nထုတ်ပေးမည့်စာရင်းမှဖယ်ရှားရန်သေချာပါသလား',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                            actions: <Widget>[
+                              TextButton(
+                                  onPressed: () async {
+                                    await DatabaseHelper()
+                                        .deleteStock(item['stock_id']);
+                                    Navigator.pop(context);
+                                    Navigator.pop(context, 'success');
+                                  },
+                                  child: const Text(
+                                    'Delete',
+                                    style: TextStyle(
                                         color: Colors.red,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  )
-                                ]);
-                          });
-                      setState(() {});
-                    },
-                  )
-                ],
+                                        fontWeight: FontWeight.bold),
+                                  )),
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              )
+                            ]);
+                      });
+                  setState(() {});
+                },
               )),
             ]));
           }
           return DataTable(
-              columnSpacing: 5,
+              columnSpacing: 0.1,
               columns: const [
                 DataColumn(
                     label: Text('Item',
@@ -192,6 +192,77 @@ class _CheckoutDispenseState extends State<CheckoutDispense> {
           return const CircularProgressIndicator();
         }
       },
+    );
+  }
+
+  Widget buildConfirmButton() {
+    return FloatingActionButton.extended(
+      heroTag: 'btnConfirm',
+      onPressed: () async {
+        await showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                  title: const Text('Confirm?'),
+                  content: const Text(
+                    'Are sure you want to confirm the dispense?\nထုတ်ယူမည့်ပစ္စည်းစာရင်းအတည်ပြုရန်သေချာပါသလား',
+                    style: TextStyle(fontSize: 12),
+                  ),
+                  actions: <Widget>[
+                    TextButton(
+                        onPressed: () async {
+                          await DatabaseHelper()
+                              .confirmCheckout(dateText!, widget.destinationId);
+                          EasyLoading.showSuccess(
+                              'ပစ္စည်းထုတ်ယူစာရင်းထည့်သွင်းပြီးပါပြီ။');
+                          Navigator.pop(context);
+                          Navigator.pop(context, 'success');
+                        },
+                        child: const Text(
+                          'OK',
+                          style: TextStyle(
+                              color: Colors.red, fontWeight: FontWeight.bold),
+                        )),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text(
+                        'Cancel',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    )
+                  ]);
+            });
+        setState(() {});
+      },
+      label: const Text(
+        'Confirm',
+        style: TextStyle(
+            color: Color.fromARGB(255, 49, 49, 49),
+            fontWeight: FontWeight.bold),
+      ),
+      icon: const Icon(
+        Icons.launch_outlined,
+        color: Color.fromARGB(255, 49, 49, 49),
+      ),
+      backgroundColor: const Color.fromARGB(255, 255, 197, 63),
+    );
+  }
+
+  Widget buildCancelButton() {
+    return FloatingActionButton.extended(
+      heroTag: 'btnBack',
+      onPressed: () {
+        Navigator.pop(context);
+      },
+      label: const Text(
+        'Go Back',
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      icon: const Icon(Icons.keyboard_backspace_outlined, color: Colors.white),
+      backgroundColor: const Color.fromARGB(255, 218, 0, 76),
     );
   }
 }

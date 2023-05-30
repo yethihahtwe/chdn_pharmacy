@@ -3,6 +3,7 @@ import 'package:chdn_pharmacy/screens/draft_dispense.dart';
 import 'package:chdn_pharmacy/screens/reusable_function.dart';
 import 'package:chdn_pharmacy/screens/reusable_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 import '../database/database_helper.dart';
 import '../model/data_model.dart';
@@ -50,9 +51,6 @@ class _GroupDispenseState extends State<GroupDispense> {
     searchController.clear();
     setState(() {});
   }
-
-  // hide search field and table if destination is not yet selected
-  bool showSearchAndTable = false;
 
   @override
   void initState() {
@@ -239,61 +237,59 @@ class _GroupDispenseState extends State<GroupDispense> {
                     itemType.toLowerCase().contains(searchQuery);
               },
             ).toList();
-            return Visibility(
-              visible: showSearchAndTable,
-              child: Column(children: [
-                buildSearchTextField(),
-                sizedBoxH10(),
-                DataTable(
-                    columnSpacing: 3,
-                    columns: const [
-                      DataColumn(
-                          label: Text(
-                        'Item',
-                        style: TextStyle(
-                            fontSize: 10, fontWeight: FontWeight.bold),
-                      )),
-                      DataColumn(
-                          label: Text(
-                        'Type',
-                        style: TextStyle(
-                            fontSize: 10, fontWeight: FontWeight.bold),
-                      )),
-                      DataColumn(
-                          numeric: true,
-                          label: Icon(
-                            Icons.tag,
-                            size: 16,
-                          )),
-                      DataColumn(
-                          label: Text(
-                        'Pkg',
-                        style: TextStyle(
-                            fontSize: 10, fontWeight: FontWeight.bold),
-                      )),
-                      DataColumn(
-                          label: Text(
-                        'Exp\nနှစ်-လ-ရက်',
-                        style:
-                            TextStyle(fontSize: 8, fontWeight: FontWeight.bold),
-                      )),
-                      DataColumn(
-                          label: Text(
-                        'Source',
-                        style: TextStyle(
-                            fontSize: 10, fontWeight: FontWeight.bold),
-                      )),
-                      DataColumn(
-                          label: Text(
-                        '',
-                      )),
-                    ],
-                    headingRowColor: MaterialStateProperty.all(
-                      const Color.fromARGB(255, 255, 227, 160),
-                    ),
-                    rows: filteredRows),
-              ]),
-            );
+            return Column(children: [
+              buildAvailableItemsLabelText(),
+              buildSearchTextField(),
+              sizedBoxH10(),
+              DataTable(
+                  columnSpacing: 3,
+                  columns: const [
+                    DataColumn(
+                        label: Text(
+                      'Item',
+                      style:
+                          TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                    )),
+                    DataColumn(
+                        label: Text(
+                      'Type',
+                      style:
+                          TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                    )),
+                    DataColumn(
+                        numeric: true,
+                        label: Icon(
+                          Icons.tag,
+                          size: 16,
+                        )),
+                    DataColumn(
+                        label: Text(
+                      'Pkg',
+                      style:
+                          TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                    )),
+                    DataColumn(
+                        label: Text(
+                      'Exp\nနှစ်-လ-ရက်',
+                      style:
+                          TextStyle(fontSize: 8, fontWeight: FontWeight.bold),
+                    )),
+                    DataColumn(
+                        label: Text(
+                      'Source',
+                      style:
+                          TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                    )),
+                    DataColumn(
+                        label: Text(
+                      '',
+                    )),
+                  ],
+                  headingRowColor: MaterialStateProperty.all(
+                    const Color.fromARGB(255, 255, 227, 160),
+                  ),
+                  rows: filteredRows),
+            ]);
           } else if (snapshot.hasError) {
             return Text('${snapshot.error}');
           } else {
@@ -301,6 +297,11 @@ class _GroupDispenseState extends State<GroupDispense> {
                 'There is no data with available items.\nထုတ်ယူနိုင်သည့်ပစ္စည်းအချက်အလက်များမရှိသေးပါ။');
           }
         });
+  }
+
+  Widget buildAvailableItemsLabelText() {
+    return const Text('Available Items | ထုတ်ယူနိုင်သည့်ပစ္စည်းများ',
+        style: TextStyle(fontWeight: FontWeight.bold));
   }
 
   // search text field
@@ -340,15 +341,23 @@ class _GroupDispenseState extends State<GroupDispense> {
             FormControl.alertDialog(context, 'Date of dispense');
           } else if (selectedDestination == null) {
             FormControl.alertDialog(context, 'Destination');
+          } else if (draftCount == 0) {
+            EasyLoading.showError('ထုတ်ယူရမည့်ပစ္စည်းများကို ဦးစွာရွေးခြယ်ပါ');
           } else {
-            Navigator.push(
+            var result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) => CheckoutDispense(
-                          date: getDateText(),
+                          stockDate: getDateText(),
                           destinationId: selectedDestination!,
                         )));
-            setState(() {});
+            if (result == 'success') {
+              DatabaseHelper().getCountDraftStock().then((value) {
+                setState(() {
+                  draftCount = value;
+                });
+              });
+            }
           }
         },
         label: const Text(
@@ -393,7 +402,7 @@ class _GroupDispenseState extends State<GroupDispense> {
         ),
       );
   Widget buildDestinationLabelText() {
-    return const Text('Destination',
+    return const Text('Destination | ပေးပို့ရန်နေရာ',
         style: TextStyle(fontWeight: FontWeight.bold));
   }
 
@@ -419,7 +428,6 @@ class _GroupDispenseState extends State<GroupDispense> {
         items: destinationList.map(buildDestinationDropdownMenuItem).toList(),
         onChanged: (value) => setState(() {
               selectedDestination = value;
-              showSearchAndTable = true;
             }));
   }
 }
