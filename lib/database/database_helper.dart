@@ -233,7 +233,7 @@ class DatabaseHelper {
   Future<List<Map<String, dynamic>>> getAllStock() async {
     _db = await _loadDatabase();
     return await _db.rawQuery(
-        'SELECT stock_id, stock_item_id, stock_date, stock_type, (SELECT item_name FROM $tblItem WHERE item_id=stock_item_id) AS item_name, (SELECT item_type FROM $tblItem WHERE item_id=stock_item_id) AS item_type, (SELECT package_form_name from $tblPackageForm WHERE package_form_id=stock_package_form_id) AS stock_package_form, stock_amount, stock_sync FROM tbl_stock');
+        "SELECT stock_id, stock_item_id, stock_date, stock_type, (SELECT item_name FROM $tblItem WHERE item_id=stock_item_id) AS item_name, (SELECT item_type FROM $tblItem WHERE item_id=stock_item_id) AS item_type, (SELECT package_form_name from $tblPackageForm WHERE package_form_id=stock_package_form_id) AS stock_package_form, stock_amount, stock_sync FROM tbl_stock");
   }
 
   // select single stock row for stock detail screen
@@ -312,7 +312,7 @@ class DatabaseHelper {
           'stock_amount',
           'stock_exp_date'
         ],
-        where: "stock_item_id=?",
+        where: 'stock_item_id=?',
         whereArgs: [itemId]);
   }
 
@@ -382,5 +382,39 @@ class DatabaseHelper {
         where: 'stock_draft=? AND stock_item_id=?',
         whereArgs: ['true', itemId]);
     return Sqflite.firstIntValue(result) ?? 0;
+  }
+
+  // list of draft items for dispense
+  Future<List<Map<String, dynamic>>> getDraftDispense() async {
+    _db = await _loadDatabase();
+    return await _db.query(tblStock,
+        columns: [
+          'stock_id',
+          '(SELECT item_name FROM $tblItem WHERE item_id=stock_item_id) AS item_name',
+          'stock_item_id',
+          '(SELECT item_type FROM $tblItem WHERE item_id=stock_item_id) AS item_type',
+          'stock_amount',
+          '(SELECT package_form_name FROM $tblPackageForm WHERE package_form_id=stock_package_form_id) AS package_form',
+          'stock_package_form_id',
+          'stock_exp_date',
+          '(SELECT source_place_name FROM $tblSourcePlace WHERE source_place_id=stock_source_place_id) AS source_place',
+          'stock_source_place_id',
+          '(SELECT donor_name FROM $tblDonor WHERE donor_id=stock_donor_id) AS donor',
+          'stock_donor_id',
+          'stock_batch'
+        ],
+        where: 'stock_draft=?',
+        whereArgs: ['true']);
+  }
+
+  // get single value reusable
+  Future<Map<String, dynamic>?> getSingleValueReusable(String tableName,
+      String singleColumnName, String filterColumnName, int filterValue) async {
+    _db = await _loadDatabase();
+    List<Map<String, dynamic>> result = await _db.query(tableName,
+        columns: [singleColumnName],
+        where: '$filterColumnName=?',
+        whereArgs: [filterValue]);
+    return result.isNotEmpty ? result.first : null;
   }
 }

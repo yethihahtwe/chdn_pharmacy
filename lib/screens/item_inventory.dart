@@ -273,7 +273,9 @@ class _ItemInventoryState extends State<ItemInventory> {
             for (final item in snapshot.data!) {
               rows.add(DataRow(cells: [
                 DataCell(Text(
-                  '${item['stock_date']}',
+                  item['stock_date'] != ''
+                      ? '${item['stock_date']}'
+                      : 'Pending',
                   style: const TextStyle(fontSize: 10),
                 )),
                 DataCell(item['stock_type'] == 'IN'
@@ -313,28 +315,30 @@ class _ItemInventoryState extends State<ItemInventory> {
                   ' ${item['package_form']}' '(s)',
                   style: const TextStyle(fontSize: 10),
                 )),
-                DataCell(IconButton(
-                    onPressed: () async {
-                      await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => StockDetail(
-                                    stockId: item['stock_id'],
-                                    itemName: widget.itemName,
-                                    itemType: widget.itemType,
-                                    packageForm: item['package_form'],
-                                  )));
+                DataCell(item['stock_date'] != ''
+                    ? IconButton(
+                        onPressed: () async {
+                          await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => StockDetail(
+                                        stockId: item['stock_id'],
+                                        itemName: widget.itemName,
+                                        itemType: widget.itemType,
+                                        packageForm: item['package_form'],
+                                      )));
 
-                      DatabaseHelper()
-                          .getTotalBalance(widget.itemId)
-                          .then((value) {
-                        setState(() {
-                          totalBalance = value!['total_balance'];
-                        });
-                      });
-                    },
-                    icon: const Icon(Icons.play_circle_filled,
-                        color: Color.fromARGB(255, 218, 0, 76), size: 16)))
+                          DatabaseHelper()
+                              .getTotalBalance(widget.itemId)
+                              .then((value) {
+                            setState(() {
+                              totalBalance = value!['total_balance'];
+                            });
+                          });
+                        },
+                        icon: const Icon(Icons.play_circle_filled,
+                            color: Color.fromARGB(255, 218, 0, 76), size: 16))
+                    : const Text(''))
               ]));
             } // sort the rows based on selected column
             rows.sort((a, b) {

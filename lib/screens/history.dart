@@ -144,25 +144,27 @@ class _HistoryState extends State<History> {
                     style: const TextStyle(fontSize: 10))),
                 DataCell(Text('${item['stock_package_form']}' '(s)',
                     style: const TextStyle(fontSize: 10))),
-                DataCell(IconButton(
-                    onPressed: () async {
-                      var result = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => StockDetail(
-                                    stockId: item['stock_id'],
-                                    itemName: item['item_name'],
-                                    itemType: item['item_type'],
-                                    packageForm: item['stock_package_form'],
-                                  )));
-                      if (result == 'success') {
-                        setState(() {});
-                      } else {
-                        setState(() {});
-                      }
-                    },
-                    icon: const Icon(Icons.play_circle_filled,
-                        color: Color.fromARGB(255, 218, 0, 76), size: 16)))
+                DataCell(item['stock_date'] != ''
+                    ? IconButton(
+                        onPressed: () async {
+                          var result = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => StockDetail(
+                                        stockId: item['stock_id'],
+                                        itemName: item['item_name'],
+                                        itemType: item['item_type'],
+                                        packageForm: item['stock_package_form'],
+                                      )));
+                          if (result == 'success') {
+                            setState(() {});
+                          } else {
+                            setState(() {});
+                          }
+                        },
+                        icon: const Icon(Icons.play_circle_filled,
+                            color: Color.fromARGB(255, 218, 0, 76), size: 16))
+                    : const Text(''))
               ]));
             } // filter rows based in search input
             final List<DataRow> filteredRows = rows.where((row) {

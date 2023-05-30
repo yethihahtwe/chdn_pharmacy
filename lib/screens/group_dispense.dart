@@ -1,3 +1,4 @@
+import 'package:chdn_pharmacy/screens/checkout_dispense.dart';
 import 'package:chdn_pharmacy/screens/draft_dispense.dart';
 import 'package:chdn_pharmacy/screens/reusable_function.dart';
 import 'package:chdn_pharmacy/screens/reusable_widget.dart';
@@ -5,7 +6,6 @@ import 'package:flutter/material.dart';
 
 import '../database/database_helper.dart';
 import '../model/data_model.dart';
-import 'reusable_dropdown.dart';
 
 class GroupDispense extends StatefulWidget {
   const GroupDispense({super.key});
@@ -77,46 +77,38 @@ class _GroupDispenseState extends State<GroupDispense> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Theme.of(context).primaryColor,
-          title: const Text('Dispense Items'),
-          centerTitle: true,
-          actions: [buildNotificationIcon()],
-        ), // end of app bar
-        body: SingleChildScrollView(
-            padding: EdgeInsets.only(
-                left: MediaQuery.of(context).size.width * 0.05,
-                right: MediaQuery.of(context).size.width * 0.05,
-                bottom: MediaQuery.of(context).viewInsets.bottom),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                sizedBoxH20(),
-                const Text(
-                  'Date of dispense | ထုတ်ပေးမည့်ရက်စွဲ (နှစ်-လ-ရက်)',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                reusableHotButton(Icons.calendar_month_outlined, getDateText(),
-                    () {
-                  pickDate(context);
-                }),
-                sizedBoxH10(),
-                ReusableDropdown(
-                  reusableList: destinationList,
-                  label: 'Destination',
-                  iconName: Icons.local_shipping_outlined,
-                  queryValue: null,
-                  onChanged: (value) {
-                    setState(() {
-                      selectedDestination = value;
-                      showSearchAndTable = true;
-                    });
-                  },
-                ),
-                sizedBoxH20(),
-                buildAvailableItems(),
-              ],
-            )));
+      appBar: AppBar(
+        backgroundColor: Theme.of(context).primaryColor,
+        title: const Text('Dispense Items'),
+        centerTitle: true,
+        actions: [buildNotificationIcon()],
+      ), // end of app bar
+      body: SingleChildScrollView(
+          padding: EdgeInsets.only(
+              left: MediaQuery.of(context).size.width * 0.05,
+              right: MediaQuery.of(context).size.width * 0.05,
+              bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              sizedBoxH20(),
+              const Text(
+                'Date of dispense | ထုတ်ပေးမည့်ရက်စွဲ (နှစ်-လ-ရက်)',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              reusableHotButton(Icons.calendar_month_outlined, getDateText(),
+                  () {
+                pickDate(context);
+              }),
+              sizedBoxH10(),
+              buildDestinationLabelText(),
+              buildDestinationDropdown(),
+              sizedBoxH20(),
+              buildAvailableItems(),
+            ],
+          )),
+      floatingActionButton: buildCheckOutFab(),
+    );
   }
 
   // notification icon widget
@@ -127,7 +119,7 @@ class _GroupDispenseState extends State<GroupDispense> {
             if (date == null) {
               FormControl.alertDialog(context, 'Date of dispense');
             } else if (selectedDestination == null) {
-              FormControl.alertDialog(context, 'Destinaion');
+              FormControl.alertDialog(context, 'Destination');
             }
           },
           icon: const Icon(Icons.local_shipping_outlined)),
@@ -338,5 +330,96 @@ class _GroupDispenseState extends State<GroupDispense> {
         setState(() {});
       },
     );
+  }
+
+  Widget buildCheckOutFab() {
+    return Stack(alignment: AlignmentDirectional.bottomEnd, children: [
+      FloatingActionButton.extended(
+        onPressed: () async {
+          if (date == null) {
+            FormControl.alertDialog(context, 'Date of dispense');
+          } else if (selectedDestination == null) {
+            FormControl.alertDialog(context, 'Destination');
+          } else {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => CheckoutDispense(
+                          date: getDateText(),
+                          destinationId: selectedDestination!,
+                        )));
+            setState(() {});
+          }
+        },
+        label: const Text(
+          'ထုတ်ပေးရန်စာရင်း',
+          style: TextStyle(
+              color: Color.fromARGB(255, 49, 49, 49),
+              fontWeight: FontWeight.bold),
+        ),
+        icon: const Icon(
+          Icons.local_shipping_outlined,
+          color: Color.fromARGB(255, 49, 49, 49),
+        ),
+        backgroundColor: const Color.fromARGB(255, 255, 197, 63),
+      ),
+      Positioned(
+          top: 1,
+          left: 1,
+          child: Container(
+            padding: const EdgeInsets.all(5),
+            decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.red,
+                border: Border.all(color: Colors.white, width: 0.5)),
+            child: Text(
+              draftCount.toString(),
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 10,
+                  color: Colors.white),
+            ),
+          ))
+    ]);
+  }
+
+  DropdownMenuItem<int> buildDestinationDropdownMenuItem(
+          ReusableMenuModel item) =>
+      DropdownMenuItem(
+        value: item.id,
+        child: Text(
+          item.name,
+          style: const TextStyle(fontSize: 16),
+        ),
+      );
+  Widget buildDestinationLabelText() {
+    return const Text('Destination',
+        style: TextStyle(fontWeight: FontWeight.bold));
+  }
+
+  Widget buildDestinationDropdown() {
+    return DropdownButtonFormField<int>(
+        icon: const Icon(
+          Icons.arrow_drop_down_circle_outlined,
+          color: Colors.grey,
+        ),
+        value: selectedDestination,
+        decoration: const InputDecoration(
+          prefixIcon: Icon(
+            Icons.local_shipping_outlined,
+            color: Colors.grey,
+          ),
+          border: OutlineInputBorder(),
+          focusedBorder: OutlineInputBorder(
+              borderSide: BorderSide(
+                  color: Color.fromARGB(255, 255, 197, 63), width: 2)),
+          contentPadding: EdgeInsets.only(top: 5, bottom: 5, right: 10),
+        ),
+        hint: const Text('Select destination'),
+        items: destinationList.map(buildDestinationDropdownMenuItem).toList(),
+        onChanged: (value) => setState(() {
+              selectedDestination = value;
+              showSearchAndTable = true;
+            }));
   }
 }
