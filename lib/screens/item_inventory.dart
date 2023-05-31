@@ -92,12 +92,18 @@ class _ItemInventoryState extends State<ItemInventory> {
               ), // end of total balance card
               const SizedBox(height: 10),
               // start of balance by batch table
-              const Text('Batch အလိုက်အရေအတွက်'),
+              const Text(
+                'Batch အလိုက်အရေအတွက်',
+                style: TextStyle(fontSize: 12),
+              ),
               balanceByBatchTable(),
               // end of balance by batch table
               const Divider(),
               // start of stock by item table
-              const Text('အဝင်အထွက်မှတ်တမ်းများ'),
+              const Text(
+                'အဝင်အထွက်မှတ်တမ်းများ',
+                style: TextStyle(fontSize: 12),
+              ),
               stockByItemTable(),
               // end of stock by item table
               const SizedBox(height: 20),
@@ -241,7 +247,7 @@ class _ItemInventoryState extends State<ItemInventory> {
                           sortColumnBalanceTable(columnIndex, ascending);
                         }),
                     const DataColumn(
-                        label: Text('ထုတ်',
+                        label: Text('ပျက်စီး',
                             style: TextStyle(
                                 fontSize: 10, fontWeight: FontWeight.bold)))
                   ],

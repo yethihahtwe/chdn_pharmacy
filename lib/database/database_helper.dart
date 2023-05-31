@@ -425,4 +425,22 @@ class DatabaseHelper {
         'UPDATE $tblStock SET stock_date=?, stock_type=?, stock_to=?, stock_draft=? WHERE stock_draft=?',
         [stockDate, 'OUT', destinationId, 'settled', 'true']);
   }
+
+  // export to qr
+  Future<List<Map<String, dynamic>>> getDispenseBatch(
+      int destinationId, String stockDate) async {
+    _db = await _loadDatabase();
+    return await _db.query(tblStock,
+        columns: [
+          'stock_item_id',
+          'stock_package_form_id',
+          'stock_exp_date',
+          'stock_batch',
+          'stock_amount',
+          'stock_donor_id',
+          'stock_remark'
+        ],
+        where: 'stock_draft=? AND stock_to=? AND stock_date=?',
+        whereArgs: ['settled', destinationId, stockDate]);
+  }
 }

@@ -1,5 +1,6 @@
 import 'package:chdn_pharmacy/screens/add_donor.dart';
 import 'package:chdn_pharmacy/screens/edit_donor.dart';
+import 'package:chdn_pharmacy/screens/reusable_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../database/database_helper.dart';
@@ -64,6 +65,7 @@ class _ManageDonorState extends State<ManageDonor> {
             const SizedBox(
               height: 20,
             ),
+            reusableForeignKeyConstraintMessage('အလှူရှင်အမည်', context),
             FutureBuilder<List<Map<String, dynamic>>>(
                 future: DatabaseHelper().getAllDonor(),
                 builder: (context, snapshot) {

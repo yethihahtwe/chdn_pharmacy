@@ -1,5 +1,6 @@
 import 'package:chdn_pharmacy/screens/add_destination.dart';
 import 'package:chdn_pharmacy/screens/edit_destination.dart';
+import 'package:chdn_pharmacy/screens/reusable_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../database/database_helper.dart';
@@ -64,6 +65,7 @@ class _ManageDestinationState extends State<ManageDestination> {
             const SizedBox(
               height: 20,
             ),
+            reusableForeignKeyConstraintMessage('ပေးပို့ရာနေရာ', context),
             FutureBuilder<List<Map<String, dynamic>>>(
                 future: DatabaseHelper().getAllDestination(),
                 builder: (context, snapshot) {

@@ -1,4 +1,5 @@
 import 'package:chdn_pharmacy/screens/add_package_form.dart';
+import 'package:chdn_pharmacy/screens/reusable_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../database/database_helper.dart';
@@ -43,6 +44,7 @@ class _ManagePackageFormState extends State<ManagePackageForm> {
             const SizedBox(
               height: 20,
             ),
+            reusableForeignKeyConstraintMessage('ထုပ်ပိုးပုံစံ', context),
             FutureBuilder<List<Map<String, dynamic>>>(
                 future: DatabaseHelper().getAllPackageForm(),
                 builder: (context, snapshot) {

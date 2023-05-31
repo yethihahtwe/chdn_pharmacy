@@ -442,3 +442,27 @@ Widget reusableTwoButtonRow(Widget hotButton, Widget coldButton) {
     ],
   );
 }
+
+Widget reusableForeignKeyConstraintMessage(
+    String fieldToEdit, BuildContext context) {
+  return SizedBox(
+    width: MediaQuery.of(context).size.width,
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Icon(
+          Icons.info_outline,
+          size: 14,
+        ),
+        Expanded(
+          child: Text(
+            '$fieldToEdit ကို ပြင်လျှင်ဖြစ်စေ၊ ဖျက်လျှင်ဖြစ်စေ ၎င်း $fieldToEdit ကိုမှတ်သားထားသည့် အခြားမှတ်တမ်းများ၌ပါ ပြောင်းလဲခြင်း၊ ပျက်ခြင်းဖြစ်နိုင်ပါသည်',
+            style: const TextStyle(fontSize: 10),
+            softWrap: true,
+          ),
+        )
+      ],
+    ),
+  );
+}

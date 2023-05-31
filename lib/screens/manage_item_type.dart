@@ -1,5 +1,6 @@
 import 'package:chdn_pharmacy/database/database_helper.dart';
 import 'package:chdn_pharmacy/screens/edit_item_type.dart';
+import 'package:chdn_pharmacy/screens/reusable_widget.dart';
 import 'package:flutter/material.dart';
 
 import 'add_item_type.dart';
@@ -51,6 +52,7 @@ class _ManageItemTypeState extends State<ManageItemType> {
             const SizedBox(
               height: 20,
             ),
+            reusableForeignKeyConstraintMessage('ပစ္စည်းအမျိုးအစား', context),
             FutureBuilder<List<Map<String, dynamic>>>(
                 future: DatabaseHelper().getAllItemType(),
                 builder: (context, snapshot) {

@@ -1,3 +1,4 @@
+import 'package:chdn_pharmacy/screens/generated_qr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
@@ -215,8 +216,15 @@ class _CheckoutDispenseState extends State<CheckoutDispense> {
                               .confirmCheckout(dateText!, widget.destinationId);
                           EasyLoading.showSuccess(
                               'ပစ္စည်းထုတ်ယူစာရင်းထည့်သွင်းပြီးပါပြီ။');
-                          Navigator.pop(context);
-                          Navigator.pop(context, 'success');
+                          await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => GeneratedQR(
+                                      destinationId: widget.destinationId,
+                                      stockDate: widget.stockDate,
+                                      destinationName: destinationName ?? '')));
+                          // Navigator.pop(context);
+                          // Navigator.pop(context, 'success');
                         },
                         child: const Text(
                           'OK',

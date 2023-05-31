@@ -1,5 +1,6 @@
 import 'package:chdn_pharmacy/screens/add_source_place.dart';
 import 'package:chdn_pharmacy/screens/edit_source_place.dart';
+import 'package:chdn_pharmacy/screens/reusable_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../database/database_helper.dart';
@@ -64,6 +65,7 @@ class _ManageSourcePlaceState extends State<ManageSourcePlace> {
             const SizedBox(
               height: 20,
             ),
+            reusableForeignKeyConstraintMessage('ရရှိရာနေရာ', context),
             FutureBuilder<List<Map<String, dynamic>>>(
                 future: DatabaseHelper().getAllSourcePlace(),
                 builder: (context, snapshot) {

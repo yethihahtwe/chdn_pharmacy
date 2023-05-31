@@ -1,6 +1,8 @@
 import 'package:chdn_pharmacy/database/shared_pref_helper.dart';
 import 'package:chdn_pharmacy/model/data_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -537,11 +539,18 @@ class _AddStockState extends State<AddStock> {
                     },
                     decoration: InputDecoration(
                         contentPadding: const EdgeInsets.all(10),
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.document_scanner_outlined),
+                          onPressed: () {
+                            scanBarCode();
+                          },
+                        ),
+                        suffixIconColor: Colors.red,
                         prefixIcon: const Icon(
                           Icons.more_outlined,
                           color: Colors.grey,
                         ),
-                        hintText: 'Enter Batch Number',
+                        hintText: 'Scan or Enter Batch Number',
                         border: const OutlineInputBorder(),
                         focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -845,5 +854,20 @@ class _AddStockState extends State<AddStock> {
         _itemNotValid = true;
       });
     }
+  }
+
+  // scan barcode
+  Future<void> scanBarCode() async {
+    String scanResponse;
+    try {
+      scanResponse = await FlutterBarcodeScanner.scanBarcode(
+          '#d2d2d2', 'Cancel', true, ScanMode.BARCODE);
+    } on PlatformException {
+      scanResponse = 'Failed to get Platform Version.';
+    }
+    if (!mounted) return;
+    setState(() {
+      _batchNameController.text = scanResponse;
+    });
   }
 }

@@ -76,6 +76,7 @@ class _DraftDispenseState extends State<DraftDispense> {
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               sizedBoxH20(),
               buildAlertInfoRow(),
+              buildItemBatchDetailCard(),
               buildAmountLabel(),
               buildAmountTextFormField(),
               sizedBoxH20(),
@@ -197,6 +198,34 @@ class _DraftDispenseState extends State<DraftDispense> {
                     color: Theme.of(context).colorScheme.background,
                     width: 2))),
         maxLines: 1,
+      ),
+    );
+  }
+
+  Widget buildItemBatchDetailCard() {
+    return Card(
+      clipBehavior: Clip.hardEdge,
+      elevation: 5,
+      child: InkWell(
+        splashColor: Colors.red.withAlpha(30),
+        child: ListTile(
+          isThreeLine: true,
+          leading: const Icon(Icons.vaccines_outlined),
+          title: Text(
+            widget.itemName,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          subtitle: Text('${widget.itemType}\nExp: ${widget.expDate}'),
+          trailing: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(widget.existingAmount.toString(),
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold)),
+              Text('${widget.packageForm}(s)')
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -67,6 +67,7 @@ class _ManageState extends State<Manage> {
                                           const ManageItemType()));
                             },
                             child: const ListTile(
+                              dense: true,
                               leading: Icon(Icons.type_specimen_outlined),
                               title: Text('Manage Item Types'),
                               subtitle:
@@ -89,6 +90,7 @@ class _ManageState extends State<Manage> {
                                           const ManageItem()));
                             },
                             child: const ListTile(
+                              dense: true,
                               leading: Icon(Icons.medication),
                               title: Text('Manage Items'),
                               subtitle: Text('ပစ္စည်းအမည်များ စီမံခန့်ခွဲရန်'),
@@ -112,6 +114,7 @@ class _ManageState extends State<Manage> {
                                           const ManagePackageForm()));
                             },
                             child: const ListTile(
+                              dense: true,
                               leading: Icon(Icons.local_pharmacy_outlined),
                               title: Text('Manage Package Forms'),
                               subtitle:
@@ -136,6 +139,7 @@ class _ManageState extends State<Manage> {
                                           const ManageSourcePlace()));
                             },
                             child: const ListTile(
+                              dense: true,
                               leading: Icon(Icons.system_update_alt),
                               title: Text('Manage Source Places'),
                               subtitle: Text('ရရှိရာနေရာများစီမံခန့်ခွဲရန်'),
@@ -159,6 +163,7 @@ class _ManageState extends State<Manage> {
                                           const ManageDonor()));
                             },
                             child: const ListTile(
+                              dense: true,
                               leading: Icon(Icons.contact_mail),
                               title: Text('Manage Donors'),
                               subtitle: Text('အလှူရှင်အမည်များစီမံခန့်ခွဲရန်'),
@@ -180,6 +185,7 @@ class _ManageState extends State<Manage> {
                                           const ManageDestination()));
                             },
                             child: const ListTile(
+                              dense: true,
                               leading: Icon(Icons.airport_shuttle),
                               title: Text('Manage Destinations'),
                               subtitle: Text('ပေးပို့ရာနေရာများစီမံခန့်ခွဲရန်'),

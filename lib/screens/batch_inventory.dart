@@ -40,7 +40,7 @@ class _BatchInventoryState extends State<BatchInventory> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColor,
-        title: Text('${widget.itemName}, ${widget.itemType}'),
+        title: const Text('Damage Log | ပျက်စီးစာရင်းသွင်းရန်'),
         centerTitle: true,
       ), // end of app bar
       body: SingleChildScrollView(
@@ -80,47 +80,25 @@ class _BatchInventoryState extends State<BatchInventory> {
             detailRow('Donor', widget.donor),
             sizedBox20(),
             reusableTwoButtonRow(
-                reusableHotButton(Icons.outbound_outlined, 'Dispense',
-                    () async {
-                  await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ReduceStock(
-                              stockType: 'OUT',
-                              batchAmount: widget.batchAmount,
-                              packageForm: widget.packageForm,
-                              itemId: widget.itemId,
-                              stockPackageFormId: widget.packageFormId,
-                              stockExpDate: widget.expDate,
-                              stockBatch: widget.batchNumber,
-                              stockSourcePlaceId: widget.sourcePlaceId,
-                              stockDonorId: widget.donorId)));
-                }),
-                reusableHotButton(Icons.bolt_outlined, 'Damage', () async {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ReduceStock(
-                              stockType: 'DMG',
-                              batchAmount: widget.batchAmount,
-                              packageForm: widget.packageForm,
-                              itemId: widget.itemId,
-                              stockPackageFormId: widget.packageFormId,
-                              stockExpDate: widget.expDate,
-                              stockBatch: widget.batchNumber,
-                              stockSourcePlaceId: widget.sourcePlaceId,
-                              stockDonorId: widget.donorId)));
-                })),
-            sizedBox20(),
-            Row(
-              children: [
-                Expanded(
-                  child: reusableColdButton('Go Back', () {
-                    Navigator.pop(context);
-                  }),
-                ),
-              ],
-            )
+              reusableHotButton(Icons.bolt_outlined, 'Damage', () async {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ReduceStock(
+                            stockType: 'DMG',
+                            batchAmount: widget.batchAmount,
+                            packageForm: widget.packageForm,
+                            itemId: widget.itemId,
+                            stockPackageFormId: widget.packageFormId,
+                            stockExpDate: widget.expDate,
+                            stockBatch: widget.batchNumber,
+                            stockSourcePlaceId: widget.sourcePlaceId,
+                            stockDonorId: widget.donorId)));
+              }),
+              reusableColdButton('Go Back', () {
+                Navigator.pop(context);
+              }),
+            ),
           ])),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:chdn_pharmacy/database/database_helper.dart';
 import 'package:chdn_pharmacy/screens/add_item.dart';
 import 'package:chdn_pharmacy/screens/edit_item.dart';
+import 'package:chdn_pharmacy/screens/reusable_widget.dart';
 import 'package:flutter/material.dart';
 
 class ManageItem extends StatefulWidget {
@@ -55,6 +56,7 @@ class _ManageItemState extends State<ManageItem> {
             const SizedBox(
               height: 20,
             ),
+            reusableForeignKeyConstraintMessage('ပစ္စည်းအမည်', context),
             // check presence of data
             FutureBuilder<List<Map<String, dynamic>>>(
                 future: DatabaseHelper().getAllItem(),

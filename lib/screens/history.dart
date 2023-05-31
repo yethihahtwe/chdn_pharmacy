@@ -152,8 +152,8 @@ class _HistoryState extends State<History> {
                               MaterialPageRoute(
                                   builder: (context) => StockDetail(
                                         stockId: item['stock_id'],
-                                        itemName: item['item_name'],
-                                        itemType: item['item_type'],
+                                        itemName: item['item_name'] ?? '',
+                                        itemType: item['item_type'] ?? '',
                                         packageForm: item['stock_package_form'],
                                       )));
                           if (result == 'success') {

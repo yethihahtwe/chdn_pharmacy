@@ -605,7 +605,8 @@ class _StockDetailState extends State<StockDetail> {
                           ))),
                 )
               ],
-            )
+            ),
+            sizedBoxH20()
           ])),
     );
   }
