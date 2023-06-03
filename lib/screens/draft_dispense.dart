@@ -39,6 +39,14 @@ class _DraftDispenseState extends State<DraftDispense> {
   // controllers
   TextEditingController amountController = TextEditingController();
   TextEditingController remarkController = TextEditingController();
+
+  @override
+  void dispose() {
+    super.dispose();
+    amountController.dispose();
+    remarkController.dispose();
+  }
+
   // user id
   String? userId;
   // prevent duplicates
@@ -203,28 +211,26 @@ class _DraftDispenseState extends State<DraftDispense> {
   }
 
   Widget buildItemBatchDetailCard() {
-    return Card(
-      clipBehavior: Clip.hardEdge,
-      elevation: 5,
-      child: InkWell(
-        splashColor: Colors.red.withAlpha(30),
-        child: ListTile(
-          isThreeLine: true,
-          leading: const Icon(Icons.vaccines_outlined),
-          title: Text(
-            widget.itemName,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          subtitle: Text('${widget.itemType}\nExp: ${widget.expDate}'),
-          trailing: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(widget.existingAmount.toString(),
-                  style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold)),
-              Text('${widget.packageForm}(s)')
-            ],
-          ),
+    return Container(
+      decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey, width: 1),
+          borderRadius: BorderRadius.circular(10)),
+      child: ListTile(
+        isThreeLine: true,
+        leading: const Icon(Icons.vaccines_outlined),
+        title: Text(
+          widget.itemName,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        subtitle: Text('${widget.itemType}\nExp: ${widget.expDate}'),
+        trailing: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(widget.existingAmount.toString(),
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            Text('${widget.packageForm}(s)')
+          ],
         ),
       ),
     );

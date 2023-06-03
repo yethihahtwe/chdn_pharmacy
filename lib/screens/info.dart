@@ -1,5 +1,6 @@
 import 'package:chdn_pharmacy/database/database_helper.dart';
 import 'package:chdn_pharmacy/screens/batch_inventory.dart';
+import 'package:chdn_pharmacy/screens/item_inventory.dart';
 import 'package:chdn_pharmacy/screens/reusable_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -169,21 +170,10 @@ class _InfoState extends State<Info> {
                         var result = await Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => BatchInventory(
+                                builder: (context) => ItemInventory(
                                       itemName: '${item['item_name']}',
                                       itemType: '${item['item_type']}',
                                       itemId: item['stock_item_id'],
-                                      batchAmount: item['stock_amount'],
-                                      batchNumber: '${item['stock_batch']}',
-                                      donor: '${item['donor']}',
-                                      expDate: '${item['stock_exp_date']}',
-                                      donorId: item['stock_donor_id'],
-                                      packageForm: '${item['package_form']}',
-                                      packageFormId:
-                                          item['stock_package_form_id'],
-                                      sourcePlace: '${item['source_place']}',
-                                      sourcePlaceId:
-                                          item['stock_source_place_id'],
                                     )));
                         if (result == 'success') {
                           setState(() {});

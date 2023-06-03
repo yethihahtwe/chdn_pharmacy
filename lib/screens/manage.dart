@@ -2,6 +2,7 @@ import 'package:chdn_pharmacy/database/shared_pref_helper.dart';
 import 'package:chdn_pharmacy/screens/manage_item.dart';
 import 'package:chdn_pharmacy/screens/manage_item_type.dart';
 import 'package:chdn_pharmacy/screens/manage_source_place.dart';
+import 'package:chdn_pharmacy/screens/reusable_widget.dart';
 import 'package:chdn_pharmacy/screens/update_profile.dart';
 import 'package:flutter/material.dart';
 
@@ -9,6 +10,7 @@ import '../widgets/nav_bar.dart';
 import 'manage_destination.dart';
 import 'manage_donor.dart';
 import 'manage_package_form.dart';
+import 'manage_qr.dart';
 
 class Manage extends StatefulWidget {
   const Manage({super.key});
@@ -192,6 +194,27 @@ class _ManageState extends State<Manage> {
                             ),
                           ),
                         ), // end of destination card
+                        // start of generate QR card
+                        sizedBoxH10(),
+                        Card(
+                          clipBehavior: Clip.hardEdge,
+                          elevation: 5,
+                          child: InkWell(
+                            splashColor: Colors.red.withAlpha(30),
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const ManageQr()));
+                            },
+                            child: const ListTile(
+                              dense: true,
+                              leading: Icon(Icons.qr_code_2_outlined),
+                              title: Text('Generate QR'),
+                              subtitle: Text('QR ထုတ်ရန်'),
+                            ),
+                          ),
+                        ), // end of package form card
                         const SizedBox(height: 20)
                       ]));
             } else {

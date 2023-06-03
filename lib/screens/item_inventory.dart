@@ -357,7 +357,7 @@ class _ItemInventoryState extends State<ItemInventory> {
                   : bValue.compareTo(aValue);
             });
             return DataTable(
-                columnSpacing: 0,
+                columnSpacing: 0.1,
                 columns: [
                   DataColumn(
                       label: const Text(
