@@ -171,7 +171,9 @@ class _ReduceStockState extends State<ReduceStock> {
                           : widget.stockType == 'DMG'
                               ? 'ပစ္စည်းပျက်စီးမှတ်တမ်း သိမ်းဆည်းပြီးပါပြီ။'
                               : '');
+                      // ignore: use_build_context_synchronously
                       Navigator.pop(context);
+                      // ignore: use_build_context_synchronously
                       Navigator.pop(context, 'success');
                     }
                   }),

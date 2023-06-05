@@ -1,11 +1,19 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:chdn_pharmacy/screens/group_dispense.dart';
 import 'package:chdn_pharmacy/screens/reusable_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import '../database/database_helper.dart';
 import '../database/shared_pref_helper.dart';
+import '../database/synchronize.dart';
 import '../widgets/nav_bar.dart';
 import 'add_stock.dart';
 import 'item_inventory.dart';
+import 'scan_preview.dart';
 import 'update_profile.dart';
 
 class Home extends StatefulWidget {
@@ -48,6 +56,14 @@ class _HomeState extends State<Home> {
     setState(() {});
   }
 
+  // to store QR scanned data
+  String? jsonString;
+  List<Map<String, dynamic>> scannedList = [];
+
+  // to sync
+  List<Map<String, dynamic>> data = [];
+  final SynchronizationData synchronizationData = SynchronizationData();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,30 +73,35 @@ class _HomeState extends State<Home> {
         centerTitle: true,
         automaticallyImplyLeading: false,
       ), // end of app bar
-      body: SingleChildScrollView(
-          padding: EdgeInsets.only(
-            left: MediaQuery.of(context).size.width * 0.05,
-            right: MediaQuery.of(context).size.width * 0.05,
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-          ),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const SizedBox(
-              height: 20,
+      body: WillPopScope(
+        onWillPop: () async {
+          return false;
+        },
+        child: SingleChildScrollView(
+            padding: EdgeInsets.only(
+              left: MediaQuery.of(context).size.width * 0.05,
+              right: MediaQuery.of(context).size.width * 0.05,
+              bottom: MediaQuery.of(context).viewInsets.bottom,
             ),
-            FutureBuilder<String?>(
-                // check profile set up
-                future: SharedPrefHelper.getUserId(), //check user id
-                builder: (context, snapshot) {
-                  if (snapshot.hasData && snapshot.data != null) {
-                    // return check inventory if user id present
-                    return buildInventoryContent();
-                  } else {
-                    // return this if user id absent
-                    return buildProfileSetup();
-                  }
-                })
-          ])),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              const SizedBox(
+                height: 20,
+              ),
+              FutureBuilder<String?>(
+                  // check profile set up
+                  future: SharedPrefHelper.getUserId(), //check user id
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData && snapshot.data != null) {
+                      // return check inventory if user id present
+                      return buildInventoryContent();
+                    } else {
+                      // return this if user id absent
+                      return buildProfileSetup();
+                    }
+                  })
+            ])),
+      ),
       // start of add stock fab
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -110,27 +131,73 @@ class _HomeState extends State<Home> {
             backgroundColor: const Color.fromARGB(255, 255, 197, 63),
           ), // end of dispense fab
           sizedBoxW10(),
-          FloatingActionButton.extended(
-            heroTag: 'btnAddStock',
-            onPressed: () async {
-              var result = await Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const AddStock()));
-              if (result == 'success') {
-                setState(() {});
-              }
-            },
+          SpeedDial(
+            buttonSize: const Size(48, 48),
             label: const Text(
               'Add Stock',
               style: TextStyle(
                   color: Color.fromARGB(255, 49, 49, 49),
                   fontWeight: FontWeight.bold),
             ),
-            icon: const Icon(
-              Icons.add_circle_outline_outlined,
-              color: Color.fromARGB(255, 49, 49, 49),
-            ),
+            animatedIcon: AnimatedIcons.list_view,
+            animatedIconTheme:
+                const IconThemeData(color: Color.fromARGB(255, 49, 49, 49)),
             backgroundColor: const Color.fromARGB(255, 255, 197, 63),
-          ),
+            spacing: 20,
+            spaceBetweenChildren: 10,
+            children: [
+              SpeedDialChild(
+                child: const Icon(Icons.keyboard_outlined),
+                label: 'တစ်ခုချင်း',
+                backgroundColor: const Color.fromARGB(255, 255, 227, 160),
+                onTap: () async {
+                  var result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const AddStock()));
+                  if (result == 'success') {
+                    setState(() {});
+                  }
+                },
+              ),
+              SpeedDialChild(
+                child: const Icon(Icons.qr_code_2_outlined),
+                label: 'QR ဖြင့်',
+                backgroundColor: const Color.fromARGB(255, 255, 227, 160),
+                onTap: () async {
+                  await scanQrCode();
+                },
+              ),
+            ],
+          ), // start of sync button
+          sizedBoxW10(),
+          FloatingActionButton(
+            heroTag: 'btnSync',
+            backgroundColor: Colors.green,
+            onPressed: () async {
+              if (await SynchronizationData.isInternet()) {
+                DatabaseHelper().getAllStockForSync().then((value) {
+                  setState(() {
+                    data = value;
+                  });
+                });
+                EasyLoading.showProgress(0.1,
+                    status: 'အချက်အလက်များပေးပို့နေပါသည်');
+                String dataJson = SynchronizationData().prepareDataForApi(data);
+                try {
+                  http.Response response =
+                      await SynchronizationData().uploadDataToApi(dataJson);
+                  SynchronizationData().handleResponse(response);
+                  EasyLoading.showSuccess('အချက်အလက်များ ပေးပို့ပြီးပါပြီ။');
+                } catch (e) {
+                  EasyLoading.showError('$e');
+                }
+              } else {
+                EasyLoading.showError('No internet connection');
+              }
+            },
+            child: const Icon(Icons.cloud_upload_outlined),
+          ), // end of sync button
         ],
       ), // end of add stock fab
       bottomNavigationBar: BottomNavigation(
@@ -337,5 +404,30 @@ class _HomeState extends State<Home> {
         ],
       ),
     );
+  }
+
+  Future<void> scanQrCode() async {
+    String scanResponse;
+    try {
+      scanResponse = await FlutterBarcodeScanner.scanBarcode(
+          '#d2d2d2', 'Cancel', true, ScanMode.QR);
+    } on PlatformException {
+      scanResponse = 'Failed to get Platform Version.';
+    }
+    if (!mounted) return;
+    setState(() {
+      jsonString = scanResponse;
+      scannedList =
+          List<Map<String, dynamic>>.from(jsonDecode(jsonString ?? ''));
+    });
+    var result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ScanPreview(
+                  previewList: scannedList,
+                )));
+    if (result == 'success') {
+      setState(() {});
+    }
   }
 }

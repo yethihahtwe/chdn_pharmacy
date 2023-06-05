@@ -1,7 +1,10 @@
 import 'dart:io';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
+
+import '../model/data_model.dart';
 
 class DatabaseHelper {
   late Database _db;
@@ -236,6 +239,12 @@ class DatabaseHelper {
         "SELECT stock_id, stock_item_id, stock_date, stock_type, (SELECT item_name FROM $tblItem WHERE item_id=stock_item_id) AS item_name, (SELECT item_type FROM $tblItem WHERE item_id=stock_item_id) AS item_type, (SELECT package_form_name from $tblPackageForm WHERE package_form_id=stock_package_form_id) AS stock_package_form, stock_amount, stock_sync FROM tbl_stock");
   }
 
+  // select for sync
+  Future<List<Map<String, dynamic>>> getAllStockForSync() async {
+    _db = await _loadDatabase();
+    return await _db.query(tblStock);
+  }
+
   // select single stock row for stock detail screen
   Future<Map<String, dynamic>?> getStockById(int id) async {
     _db = await _loadDatabase();
@@ -442,5 +451,50 @@ class DatabaseHelper {
         ],
         where: 'stock_draft=? AND stock_to=? AND stock_date=?',
         whereArgs: ['settled', destinationId, stockDate]);
+  }
+
+  // for generate qr page
+  Future<List<Map<String, dynamic>>> getAllDispensed() async {
+    _db = await _loadDatabase();
+    return await _db.query(tblStock,
+        columns: [
+          '(SELECT destination_name FROM $tblDestination WHERE destination_id=stock_to) AS destination',
+          'stock_date',
+          'stock_to'
+        ],
+        where: 'stock_type=?',
+        whereArgs: ['OUT'],
+        groupBy: 'stock_date, stock_to',
+        orderBy: 'stock_date DESC');
+  }
+
+  // for qr import
+  Future<void> importQrToStock(List<Map<String, dynamic>> scannedList,
+      String stockDate, int stockSourcePlaceId, String userId) async {
+    _db = await _loadDatabase();
+    for (var data in scannedList) {
+      final stock = Stock.insertStock(
+          stockDate: stockDate,
+          stockType: 'IN',
+          stockItemId: data['stock_item_id'],
+          stockPackageFormId: data['stock_package_form_id'],
+          stockExpDate: data['stock_exp_date'],
+          stockBatch: data['stock_batch'],
+          stockAmount: data['stock_amount'] * -1,
+          stockSourcePlaceId: stockSourcePlaceId,
+          stockDonorId: data['stock_donor_id'],
+          stockRemark: data['stock_remark'],
+          stockTo: 0,
+          stockSync: '',
+          stockCre: userId,
+          stockDraft: '');
+      try {
+        await _db.insert(tblStock, stock);
+        EasyLoading.showSuccess(
+            'Successfully imported from QR\nQR မှရရှိသည့်အချက်အလက်များ ထည့်သွင်းပြီးပါပြီ');
+      } catch (e) {
+        EasyLoading.showError('$e');
+      }
+    }
   }
 }

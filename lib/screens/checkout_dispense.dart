@@ -126,7 +126,9 @@ class _CheckoutDispenseState extends State<CheckoutDispense> {
                                   onPressed: () async {
                                     await DatabaseHelper()
                                         .deleteStock(item['stock_id']);
+                                    // ignore: use_build_context_synchronously
                                     Navigator.pop(context);
+                                    // ignore: use_build_context_synchronously
                                     Navigator.pop(context, 'success');
                                   },
                                   child: const Text(
@@ -216,15 +218,16 @@ class _CheckoutDispenseState extends State<CheckoutDispense> {
                               .confirmCheckout(dateText!, widget.destinationId);
                           EasyLoading.showSuccess(
                               'ပစ္စည်းထုတ်ယူစာရင်းထည့်သွင်းပြီးပါပြီ။');
+                          // ignore: use_build_context_synchronously
                           await Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => GeneratedQR(
-                                      destinationId: widget.destinationId,
-                                      stockDate: widget.stockDate,
-                                      destinationName: destinationName ?? '')));
-                          // Navigator.pop(context);
-                          // Navigator.pop(context, 'success');
+                                        destinationId: widget.destinationId,
+                                        stockDate: widget.stockDate,
+                                        destinationName: destinationName ?? '',
+                                        enableGoBack: false,
+                                      )));
                         },
                         child: const Text(
                           'OK',

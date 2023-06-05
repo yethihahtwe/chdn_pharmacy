@@ -51,6 +51,10 @@ dependencies:
   image_gallery_saver: ^2.0.1
   screenshot: ^2.1.0
   permission_handler: ^10.2.0
+  flutter_speed_dial: ^7.0.0
+  http: ^1.0.0
+  connectivity_plus: ^4.0.1
+  internet_connection_checker: ^1.0.0+1
 
 dev_dependencies:
   flutter_test:

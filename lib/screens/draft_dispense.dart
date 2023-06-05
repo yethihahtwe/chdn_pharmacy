@@ -119,6 +119,7 @@ class _DraftDispenseState extends State<DraftDispense> {
                           null,
                           userId!,
                           'true');
+                      // ignore: use_build_context_synchronously
                       Navigator.pop(context, 'success');
                     }
                   }),

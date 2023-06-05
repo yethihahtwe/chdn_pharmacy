@@ -14,11 +14,14 @@ class GeneratedQR extends StatefulWidget {
   final int destinationId;
   final String stockDate;
   final String destinationName;
-  const GeneratedQR(
-      {super.key,
-      required this.destinationId,
-      required this.stockDate,
-      required this.destinationName});
+  final bool enableGoBack;
+  const GeneratedQR({
+    super.key,
+    required this.destinationId,
+    required this.stockDate,
+    required this.destinationName,
+    required this.enableGoBack,
+  });
 
   @override
   State<GeneratedQR> createState() => _GeneratedQRState();
@@ -53,12 +56,12 @@ class _GeneratedQRState extends State<GeneratedQR> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColor,
         title: const Text('Generate QR'),
-        automaticallyImplyLeading: false,
+        automaticallyImplyLeading: widget.enableGoBack,
         centerTitle: true,
       ),
       body: WillPopScope(
         onWillPop: () async {
-          return false;
+          return widget.enableGoBack;
         },
         child: SingleChildScrollView(
             padding: EdgeInsets.only(
@@ -77,6 +80,7 @@ class _GeneratedQRState extends State<GeneratedQR> {
                     final image = await screenshotController.capture();
                     await saveImage(image!);
                     await EasyLoading.showSuccess('QR code သိမ်းဆည်းပြီးပါပြီ');
+                    // ignore: use_build_context_synchronously
                     await Navigator.push(context,
                         MaterialPageRoute(builder: (context) => const Home()));
                   }),
@@ -132,6 +136,7 @@ class _GeneratedQRState extends State<GeneratedQR> {
   }
 
   Future<String> saveImage(Uint8List bytes) async {
+    // ignore: await_only_futures
     await [Permission.photos.request()];
     final name = '${widget.stockDate}_${widget.destinationName}_QR';
     final result = await ImageGallerySaver.saveImage(bytes, name: name);

@@ -137,10 +137,10 @@ class _EditStockDateState extends State<EditStockDate> {
 
   //pick date function
   Future _pickDate(BuildContext context) async {
-    final _initialDate = DateTime.now();
-    final _newDate = await showDatePicker(
+    final initialDate = DateTime.now();
+    final newDate = await showDatePicker(
         context: context,
-        initialDate: _initialDate,
+        initialDate: initialDate,
         firstDate: DateTime(DateTime.now().year - 5),
         lastDate: DateTime(DateTime.now().year + 5),
         builder: (context, child) {
@@ -151,15 +151,16 @@ class _EditStockDateState extends State<EditStockDate> {
               )),
               child: child!);
         });
-    if (_newDate == null) return;
+    if (newDate == null) return;
     setState(() {
-      pickedDate = _newDate;
+      pickedDate = newDate;
     });
   }
 }
 
 class EditStockNonDate extends StatefulWidget {
   final String fieldNameToEdit;
+  // ignore: prefer_typing_uninitialized_variables
   final queryValue;
   final IconData iconName;
   final String columnName;

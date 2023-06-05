@@ -56,28 +56,33 @@ class _HistoryState extends State<History> {
         centerTitle: true,
         automaticallyImplyLeading: false,
       ), // end of app bar
-      body: SingleChildScrollView(
-          padding: EdgeInsets.only(
-              left: MediaQuery.of(context).size.width * 0.05,
-              right: MediaQuery.of(context).size.width * 0.05),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const SizedBox(
-              height: 20,
-            ),
-            FutureBuilder<String?>(
-                // check profile set up
-                future: SharedPrefHelper.getUserId(), //check user id
-                builder: (context, snapshot) {
-                  if (snapshot.hasData && snapshot.data != null) {
-                    // return check inventory if user id present
-                    return buildInventoryContent();
-                  } else {
-                    // return this if user id absent
-                    return buildProfileSetup();
-                  }
-                })
-          ])),
+      body: WillPopScope(
+        onWillPop: () async {
+          return false;
+        },
+        child: SingleChildScrollView(
+            padding: EdgeInsets.only(
+                left: MediaQuery.of(context).size.width * 0.05,
+                right: MediaQuery.of(context).size.width * 0.05),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              const SizedBox(
+                height: 20,
+              ),
+              FutureBuilder<String?>(
+                  // check profile set up
+                  future: SharedPrefHelper.getUserId(), //check user id
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData && snapshot.data != null) {
+                      // return check inventory if user id present
+                      return buildInventoryContent();
+                    } else {
+                      // return this if user id absent
+                      return buildProfileSetup();
+                    }
+                  })
+            ])),
+      ),
       // start of add stock fab
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
