@@ -63,6 +63,7 @@ class _HomeState extends State<Home> {
 
   // to sync
   List<Map<String, dynamic>> data = [];
+  List<Map<String, dynamic>> itemTypeData = [];
   final SynchronizationData synchronizationData = SynchronizationData();
 
   // to show or hide sync button
@@ -73,6 +74,8 @@ class _HomeState extends State<Home> {
   String userVillage = '';
   String userWarehouse = '';
   String userId = '';
+  bool isOtherVillage = false;
+  bool isOtherWarehouse = false;
 
   @override
   void initState() {
@@ -111,6 +114,16 @@ class _HomeState extends State<Home> {
     SharedPrefHelper.getUserId().then((value) {
       setState(() {
         userId = value ?? '';
+      });
+    });
+    SharedPrefHelper.getIsOtherVillage().then((value) {
+      setState(() {
+        isOtherVillage = value ?? false;
+      });
+    });
+    SharedPrefHelper.getIsOtherWarehouse().then((value) {
+      setState(() {
+        isOtherWarehouse = value ?? false;
       });
     });
   }
@@ -158,69 +171,71 @@ class _HomeState extends State<Home> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           // start of dipsense fab
-          FloatingActionButton.extended(
-            heroTag: 'btnDispense',
-            onPressed: () async {
-              var result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const GroupDispense()));
-              if (result == 'success') {
-                setState(() {});
-              }
-            },
-            label: const Text(
-              'Dispense',
-              style: TextStyle(
-                  color: Color.fromARGB(255, 49, 49, 49),
-                  fontWeight: FontWeight.bold),
-            ),
-            icon: const Icon(
-              Icons.outbond_outlined,
-              color: Color.fromARGB(255, 49, 49, 49),
-            ),
-            backgroundColor: const Color.fromARGB(255, 255, 197, 63),
-          ), // end of dispense fab
+          if (showBtnSync)
+            FloatingActionButton.extended(
+              heroTag: 'btnDispense',
+              onPressed: () async {
+                var result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const GroupDispense()));
+                if (result == 'success') {
+                  setState(() {});
+                }
+              },
+              label: const Text(
+                'Dispense',
+                style: TextStyle(
+                    color: Color.fromARGB(255, 49, 49, 49),
+                    fontWeight: FontWeight.bold),
+              ),
+              icon: const Icon(
+                Icons.outbond_outlined,
+                color: Color.fromARGB(255, 49, 49, 49),
+              ),
+              backgroundColor: const Color.fromARGB(255, 255, 197, 63),
+            ), // end of dispense fab
           sizedBoxW10(),
-          SpeedDial(
-            buttonSize: const Size(48, 48),
-            label: const Text(
-              'Add Stock',
-              style: TextStyle(
-                  color: Color.fromARGB(255, 49, 49, 49),
-                  fontWeight: FontWeight.bold),
-            ),
-            animatedIcon: AnimatedIcons.list_view,
-            animatedIconTheme:
-                const IconThemeData(color: Color.fromARGB(255, 49, 49, 49)),
-            backgroundColor: const Color.fromARGB(255, 255, 197, 63),
-            spacing: 20,
-            spaceBetweenChildren: 10,
-            children: [
-              SpeedDialChild(
-                child: const Icon(Icons.keyboard_outlined),
-                label: 'တစ်ခုချင်း',
-                backgroundColor: const Color.fromARGB(255, 255, 227, 160),
-                onTap: () async {
-                  var result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const AddStock()));
-                  if (result == 'success') {
-                    setState(() {});
-                  }
-                },
+          if (showBtnSync)
+            SpeedDial(
+              buttonSize: const Size(48, 48),
+              label: const Text(
+                'Add Stock',
+                style: TextStyle(
+                    color: Color.fromARGB(255, 49, 49, 49),
+                    fontWeight: FontWeight.bold),
               ),
-              SpeedDialChild(
-                child: const Icon(Icons.qr_code_2_outlined),
-                label: 'QR ဖြင့်',
-                backgroundColor: const Color.fromARGB(255, 255, 227, 160),
-                onTap: () async {
-                  await scanQrCode();
-                },
-              ),
-            ],
-          ), // start of sync button
+              animatedIcon: AnimatedIcons.list_view,
+              animatedIconTheme:
+                  const IconThemeData(color: Color.fromARGB(255, 49, 49, 49)),
+              backgroundColor: const Color.fromARGB(255, 255, 197, 63),
+              spacing: 20,
+              spaceBetweenChildren: 10,
+              children: [
+                SpeedDialChild(
+                  child: const Icon(Icons.keyboard_outlined),
+                  label: 'တစ်ခုချင်း',
+                  backgroundColor: const Color.fromARGB(255, 255, 227, 160),
+                  onTap: () async {
+                    var result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const AddStock()));
+                    if (result == 'success') {
+                      setState(() {});
+                    }
+                  },
+                ),
+                SpeedDialChild(
+                  child: const Icon(Icons.qr_code_2_outlined),
+                  label: 'QR ဖြင့်',
+                  backgroundColor: const Color.fromARGB(255, 255, 227, 160),
+                  onTap: () async {
+                    await scanQrCode();
+                  },
+                ),
+              ],
+            ), // start of sync button
           if (showBtnSync) sizedBoxW10(),
           if (showBtnSync)
             FloatingActionButton(
@@ -233,6 +248,11 @@ class _HomeState extends State<Home> {
                       data = value;
                     });
                   });
+                  DatabaseHelper().getAllItemTypeForSync().then((value) {
+                    setState(() {
+                      itemTypeData = value;
+                    });
+                  });
 
                   EasyLoading.showProgress(0.1,
                       status: 'အချက်အလက်များပေးပို့နေပါသည်');
@@ -242,11 +262,20 @@ class _HomeState extends State<Home> {
                     http.Response response =
                         await SynchronizationData().uploadDataToApi(dataJson);
                     SynchronizationData().handleResponse(response);
-                    EasyLoading.showSuccess('အချက်အလက်များ ပေးပို့ပြီးပါပြီ။');
+                  } catch (e) {
+                    EasyLoading.showError('$e');
+                  }
+                  String itemTypeDataJson =
+                      SynchronizationData().prepareDataForApi(itemTypeData);
+                  try {
+                    http.Response response = await SynchronizationData()
+                        .uploadItemTypeDataToApi(itemTypeDataJson);
+                    SynchronizationData().handleResponse(response);
                   } catch (e) {
                     EasyLoading.showError('$e');
                   }
                   sendUserData();
+                  EasyLoading.showSuccess('အချက်အလက်များ ပေးပို့ပြီးပါပြီ။');
                 } else {
                   EasyLoading.showError('No internet connection');
                 }
@@ -404,7 +433,7 @@ class _HomeState extends State<Home> {
   Widget buildProfileSetup() {
     return Container(
       width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height * 0.6,
+      // height: MediaQuery.of(context).size.height * 0.6,
       margin: EdgeInsets.only(
           top: 20,
           left: MediaQuery.of(context).size.width * 0.05,
@@ -433,45 +462,39 @@ class _HomeState extends State<Home> {
           ),
           const Text(
               'You have not set your Warehouse/Clinic profile.\nPlease click `Update Profile` button.\nဆေးဂိုဒေါင်/ဆေးခန်းဆိုင်ရာ အချက်အလက်များ မဖြည့်သွင်းရသေးပါ။\nအသစ်စတင်အသုံးပြုသူဖြစ်လျှင် `Update Profile` ခလုတ်ကိုနှိပ်၍ဖြည့်သွင်းပါ\nယခင်အသုံးပြုဖူးသူဖြစ်လျှင် အချက်အလက်များပြန်လည်ရယူရန် `Restore with User ID` ကိုနှိပ်ပါ'),
-          Row(
-            children: [
-              SizedBox(
-                // Start of update profile button
-                width: 200,
-                height: 45,
-                child: ElevatedButton.icon(
-                  onPressed: () async {
-                    var result = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const UpdateProfile()));
-                    if (result == 'success') {
-                      setState(() {});
-                    }
-                  },
-                  icon: const Icon(Icons.person),
-                  label: const Text('Update Profile'),
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
-                          Theme.of(context).colorScheme.background),
-                      foregroundColor: MaterialStateProperty.all(
-                          Theme.of(context).colorScheme.secondary)),
-                ),
-              ), // end of update profile button
-              sizedBoxW10(),
-              reusableHotButton(
-                  Icons.restore_page_outlined, 'Restore with User ID',
-                  () async {
+          SizedBox(
+            // Start of update profile button
+            width: 200,
+            height: 45,
+            child: ElevatedButton.icon(
+              onPressed: () async {
                 var result = await Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const RestoreUserId()));
+                        builder: (context) => const UpdateProfile()));
                 if (result == 'success') {
                   setState(() {});
                 }
-              })
-            ],
+              },
+              icon: const Icon(Icons.person),
+              label: const Text('Update Profile',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(
+                      Theme.of(context).colorScheme.background),
+                  foregroundColor: MaterialStateProperty.all(
+                      Theme.of(context).colorScheme.secondary)),
+            ),
           ),
+          sizedBoxH10(),
+          reusableHotButton(Icons.restore_page_outlined, 'Restore with User ID',
+              () async {
+            var result = await Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const RestoreUserId()));
+            if (result == 'success') {
+              setState(() {});
+            }
+          })
         ],
       ),
     );
@@ -508,7 +531,9 @@ class _HomeState extends State<Home> {
       'device_user_township': userTownship,
       'device_user_village': userVillage,
       'device_user_warehouse': userWarehouse,
-      'device_user_id': userId
+      'device_user_id': userId,
+      'device_is_other_village': isOtherVillage.toString(),
+      'device_is_other_warehouse': isOtherWarehouse.toString()
     };
     String userDataJson = SynchronizationData().prepareUserDataForApi(userData);
     http.Response response =

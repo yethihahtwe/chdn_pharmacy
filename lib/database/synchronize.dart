@@ -41,6 +41,16 @@ class SynchronizationData {
     return response;
   }
 
+  Future<http.Response> uploadItemTypeDataToApi(String value) async {
+    http.Client client = http.Client();
+    http.Response response = await client.post(
+        Uri.parse('https://chdn-karenni.org/pharmacy/item_type_sync.php'),
+        headers: {'Content-Type': 'application/json'},
+        body: value);
+    client.close();
+    return response;
+  }
+
   Future<http.Response> uploadUserDataToApi(String value) async {
     http.Client client = http.Client();
     http.Response response = await client.post(

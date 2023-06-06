@@ -239,12 +239,6 @@ class DatabaseHelper {
         "SELECT stock_id, stock_item_id, stock_date, stock_type, (SELECT item_name FROM $tblItem WHERE item_id=stock_item_id) AS item_name, (SELECT item_type FROM $tblItem WHERE item_id=stock_item_id) AS item_type, (SELECT package_form_name from $tblPackageForm WHERE package_form_id=stock_package_form_id) AS stock_package_form, stock_amount, stock_sync FROM tbl_stock");
   }
 
-  // select for sync
-  Future<List<Map<String, dynamic>>> getAllStockForSync() async {
-    _db = await _loadDatabase();
-    return await _db.query(tblStock);
-  }
-
   // select single stock row for stock detail screen
   Future<Map<String, dynamic>?> getStockById(int id) async {
     _db = await _loadDatabase();
@@ -494,6 +488,48 @@ class DatabaseHelper {
             'Successfully imported from QR\nQR မှရရှိသည့်အချက်အလက်များ ထည့်သွင်းပြီးပါပြီ');
       } catch (e) {
         EasyLoading.showError('$e');
+      }
+    }
+  }
+
+  // select for sync
+  // stock
+  Future<List<Map<String, dynamic>>> getAllStockForSync() async {
+    _db = await _loadDatabase();
+    return await _db.query(tblStock);
+  }
+
+  // item type
+  Future<List<Map<String, dynamic>>> getAllItemTypeForSync() async {
+    _db = await _loadDatabase();
+    return await _db
+        .query(tblItemType, where: 'item_type_editable=?', whereArgs: ['true']);
+  }
+
+  // for restore stock
+  Future<void> restoreStockTable(
+      List<Map<String, dynamic>> retrievedList) async {
+    _db = await _loadDatabase();
+    for (var data in retrievedList) {
+      final stock = Stock.insertStock(
+          stockDate: data['stock_date'],
+          stockType: data['stock_type'],
+          stockItemId: int.tryParse(data['stock_item_id'])!,
+          stockPackageFormId: int.tryParse(data['stock_package_form_id'])!,
+          stockExpDate: data['stock_exp_date'],
+          stockBatch: data['stock_batch'],
+          stockAmount: int.tryParse(data['stock_amount'])!,
+          stockSourcePlaceId: int.tryParse(data['stock_source_place_id'])!,
+          stockDonorId: int.tryParse(data['stock_donor_id'])!,
+          stockRemark: data['stock_remark'],
+          stockTo: int.tryParse(data['stock_to'])!,
+          stockSync: '',
+          stockCre: data['stock_cre'],
+          stockDraft: '');
+      try {
+        await _db.insert(tblStock, stock);
+      } catch (e) {
+        print('$e');
       }
     }
   }
