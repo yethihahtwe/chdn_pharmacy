@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:chdn_pharmacy/screens/restore_user_id.dart';
 import 'package:http/http.dart' as http;
 import 'package:chdn_pharmacy/screens/group_dispense.dart';
 import 'package:chdn_pharmacy/screens/reusable_widget.dart';
@@ -63,6 +64,56 @@ class _HomeState extends State<Home> {
   // to sync
   List<Map<String, dynamic>> data = [];
   final SynchronizationData synchronizationData = SynchronizationData();
+
+  // to show or hide sync button
+  bool showBtnSync = false;
+  // to save user data to server
+  String userName = '';
+  String userTownship = '';
+  String userVillage = '';
+  String userWarehouse = '';
+  String userId = '';
+
+  @override
+  void initState() {
+    super.initState();
+    SharedPrefHelper.getUserId().then((value) {
+      if (value == null || value.isEmpty || value == '') {
+        setState(() {
+          showBtnSync = false;
+        });
+      } else {
+        setState(() {
+          showBtnSync = true;
+        });
+      }
+    });
+    SharedPrefHelper.getUserName().then((value) {
+      setState(() {
+        userName = value ?? '';
+      });
+    });
+    SharedPrefHelper.getUserTownship().then((value) {
+      setState(() {
+        userTownship = value ?? '';
+      });
+    });
+    SharedPrefHelper.getUserVillage().then((value) {
+      setState(() {
+        userVillage = value ?? '';
+      });
+    });
+    SharedPrefHelper.getUserWarehouse().then((value) {
+      setState(() {
+        userWarehouse = value ?? '';
+      });
+    });
+    SharedPrefHelper.getUserId().then((value) {
+      setState(() {
+        userId = value ?? '';
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -170,34 +221,38 @@ class _HomeState extends State<Home> {
               ),
             ],
           ), // start of sync button
-          sizedBoxW10(),
-          FloatingActionButton(
-            heroTag: 'btnSync',
-            backgroundColor: Colors.green,
-            onPressed: () async {
-              if (await SynchronizationData.isInternet()) {
-                DatabaseHelper().getAllStockForSync().then((value) {
-                  setState(() {
-                    data = value;
+          if (showBtnSync) sizedBoxW10(),
+          if (showBtnSync)
+            FloatingActionButton(
+              heroTag: 'btnSync',
+              backgroundColor: Colors.green,
+              onPressed: () async {
+                if (await SynchronizationData.isInternet()) {
+                  DatabaseHelper().getAllStockForSync().then((value) {
+                    setState(() {
+                      data = value;
+                    });
                   });
-                });
-                EasyLoading.showProgress(0.1,
-                    status: 'အချက်အလက်များပေးပို့နေပါသည်');
-                String dataJson = SynchronizationData().prepareDataForApi(data);
-                try {
-                  http.Response response =
-                      await SynchronizationData().uploadDataToApi(dataJson);
-                  SynchronizationData().handleResponse(response);
-                  EasyLoading.showSuccess('အချက်အလက်များ ပေးပို့ပြီးပါပြီ။');
-                } catch (e) {
-                  EasyLoading.showError('$e');
+
+                  EasyLoading.showProgress(0.1,
+                      status: 'အချက်အလက်များပေးပို့နေပါသည်');
+                  String dataJson =
+                      SynchronizationData().prepareDataForApi(data);
+                  try {
+                    http.Response response =
+                        await SynchronizationData().uploadDataToApi(dataJson);
+                    SynchronizationData().handleResponse(response);
+                    EasyLoading.showSuccess('အချက်အလက်များ ပေးပို့ပြီးပါပြီ။');
+                  } catch (e) {
+                    EasyLoading.showError('$e');
+                  }
+                  sendUserData();
+                } else {
+                  EasyLoading.showError('No internet connection');
                 }
-              } else {
-                EasyLoading.showError('No internet connection');
-              }
-            },
-            child: const Icon(Icons.cloud_upload_outlined),
-          ), // end of sync button
+              },
+              child: const Icon(Icons.cloud_upload_outlined),
+            ), // end of sync button
         ],
       ), // end of add stock fab
       bottomNavigationBar: BottomNavigation(
@@ -377,29 +432,45 @@ class _HomeState extends State<Home> {
             ),
           ),
           const Text(
-              'You have not set your Warehouse/Clinic profile.\nPlease click `Update Profile` button.\nဆေးဂိုဒေါင်/ဆေးခန်းဆိုင်ရာ အချက်အလက်များ မဖြည့်သွင်းရသေးပါ။ `Update Profile` ခလုတ်ကိုနှိပ်၍ဖြည့်သွင်းပါ'),
-          // Start of update profile button
-          SizedBox(
-            width: 200,
-            height: 45,
-            child: ElevatedButton.icon(
-              onPressed: () async {
+              'You have not set your Warehouse/Clinic profile.\nPlease click `Update Profile` button.\nဆေးဂိုဒေါင်/ဆေးခန်းဆိုင်ရာ အချက်အလက်များ မဖြည့်သွင်းရသေးပါ။\nအသစ်စတင်အသုံးပြုသူဖြစ်လျှင် `Update Profile` ခလုတ်ကိုနှိပ်၍ဖြည့်သွင်းပါ\nယခင်အသုံးပြုဖူးသူဖြစ်လျှင် အချက်အလက်များပြန်လည်ရယူရန် `Restore with User ID` ကိုနှိပ်ပါ'),
+          Row(
+            children: [
+              SizedBox(
+                // Start of update profile button
+                width: 200,
+                height: 45,
+                child: ElevatedButton.icon(
+                  onPressed: () async {
+                    var result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const UpdateProfile()));
+                    if (result == 'success') {
+                      setState(() {});
+                    }
+                  },
+                  icon: const Icon(Icons.person),
+                  label: const Text('Update Profile'),
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                          Theme.of(context).colorScheme.background),
+                      foregroundColor: MaterialStateProperty.all(
+                          Theme.of(context).colorScheme.secondary)),
+                ),
+              ), // end of update profile button
+              sizedBoxW10(),
+              reusableHotButton(
+                  Icons.restore_page_outlined, 'Restore with User ID',
+                  () async {
                 var result = await Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => const UpdateProfile()));
+                        builder: (context) => const RestoreUserId()));
                 if (result == 'success') {
                   setState(() {});
                 }
-              },
-              icon: const Icon(Icons.person),
-              label: const Text('Update Profile'),
-              style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(
-                      Theme.of(context).colorScheme.background),
-                  foregroundColor: MaterialStateProperty.all(
-                      Theme.of(context).colorScheme.secondary)),
-            ),
+              })
+            ],
           ),
         ],
       ),
@@ -429,5 +500,20 @@ class _HomeState extends State<Home> {
     if (result == 'success') {
       setState(() {});
     }
+  }
+
+  Future<void> sendUserData() async {
+    Map<String, dynamic> userData = {
+      'device_user_name': userName,
+      'device_user_township': userTownship,
+      'device_user_village': userVillage,
+      'device_user_warehouse': userWarehouse,
+      'device_user_id': userId
+    };
+    String userDataJson = SynchronizationData().prepareUserDataForApi(userData);
+    http.Response response =
+        await SynchronizationData().uploadUserDataToApi(userDataJson);
+    print(userDataJson);
+    SynchronizationData().handleResponse(response);
   }
 }

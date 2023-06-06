@@ -2,6 +2,7 @@
 
 import 'package:chdn_pharmacy/database/shared_pref_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
@@ -417,6 +418,8 @@ class _UpdateProfileState extends State<UpdateProfile> {
                       });
                       await saveProfile();
                       Navigator.pop(context, 'success');
+                      EasyLoading.showSuccess(
+                          'အသုံးပြုသူအချက်အလက်များ သိမ်းဆည်းပြီးပါပြီ');
                     } else {
                       showDialog(
                           context: context,

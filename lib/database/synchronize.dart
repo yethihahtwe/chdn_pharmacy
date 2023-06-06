@@ -27,10 +27,24 @@ class SynchronizationData {
     return jsonEncode({'value': value});
   }
 
+  String prepareUserDataForApi(Map<String, dynamic> value) {
+    return jsonEncode({'userData': value});
+  }
+
   Future<http.Response> uploadDataToApi(String value) async {
     http.Client client = http.Client();
     http.Response response = await client.post(
         Uri.parse('https://chdn-karenni.org/pharmacy/sqflite-sync.php'),
+        headers: {'Content-Type': 'application/json'},
+        body: value);
+    client.close();
+    return response;
+  }
+
+  Future<http.Response> uploadUserDataToApi(String value) async {
+    http.Client client = http.Client();
+    http.Response response = await client.post(
+        Uri.parse('https://chdn-karenni.org/pharmacy/user_data_sync.php'),
         headers: {'Content-Type': 'application/json'},
         body: value);
     client.close();
