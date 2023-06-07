@@ -26,7 +26,7 @@ class _HistoryState extends State<History> {
   // sort column
   int sortColumnIndex = 0;
   bool sortAscending = false;
-  void _sortColumn(int columnIndex, bool ascending) {
+  void sortColumn(int columnIndex, bool ascending) {
     setState(() {
       sortColumnIndex = columnIndex;
       sortAscending = ascending;
@@ -230,33 +230,33 @@ class _HistoryState extends State<History> {
                           size: 16,
                         ),
                         onSort: (columnIndex, ascending) {
-                          _sortColumn(columnIndex, ascending);
+                          sortColumn(columnIndex, ascending);
                         }),
                     DataColumn(
                         label: const Icon(Icons.sync_alt, size: 16),
                         onSort: (columnIndex, ascending) {
-                          _sortColumn(columnIndex, ascending);
+                          sortColumn(columnIndex, ascending);
                         }),
                     DataColumn(
                         label: const Icon(Icons.vaccines, size: 16),
                         onSort: (columnIndex, ascending) {
-                          _sortColumn(columnIndex, ascending);
+                          sortColumn(columnIndex, ascending);
                         }),
                     DataColumn(
                         label: const Icon(Icons.category, size: 16),
                         onSort: (columnIndex, ascending) {
-                          _sortColumn(columnIndex, ascending);
+                          sortColumn(columnIndex, ascending);
                         }),
                     DataColumn(
                         numeric: true,
                         label: const Icon(Icons.tag, size: 16),
                         onSort: (columnIndex, ascending) {
-                          _sortColumn(columnIndex, ascending);
+                          sortColumn(columnIndex, ascending);
                         }),
                     DataColumn(
                         label: const Icon(Icons.inventory_2, size: 14),
                         onSort: (columnIndex, ascending) {
-                          _sortColumn(columnIndex, ascending);
+                          sortColumn(columnIndex, ascending);
                         }),
                     const DataColumn(
                         label: Text(
