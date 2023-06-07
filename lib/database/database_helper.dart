@@ -506,6 +506,41 @@ class DatabaseHelper {
         .query(tblItemType, where: 'item_type_editable=?', whereArgs: ['true']);
   }
 
+  // item
+  Future<List<Map<String, dynamic>>> getAllItemForSync() async {
+    _db = await _loadDatabase();
+    return await _db
+        .query(tblItem, where: 'item_editable=?', whereArgs: ['true']);
+  }
+
+  // package form
+  Future<List<Map<String, dynamic>>> getAllPackageFormForSync() async {
+    _db = await _loadDatabase();
+    return await _db.query(tblPackageForm,
+        where: 'package_form_editable=?', whereArgs: ['true']);
+  }
+
+  // source place
+  Future<List<Map<String, dynamic>>> getAllSourcePlaceForSync() async {
+    _db = await _loadDatabase();
+    return await _db.query(tblSourcePlace,
+        where: 'source_place_editable=?', whereArgs: ['true']);
+  }
+
+  // donor
+  Future<List<Map<String, dynamic>>> getAllDonorForSync() async {
+    _db = await _loadDatabase();
+    return await _db
+        .query(tblDonor, where: 'donor_editable=?', whereArgs: ['true']);
+  }
+
+  // destination
+  Future<List<Map<String, dynamic>>> getAllDestinationForSync() async {
+    _db = await _loadDatabase();
+    return await _db.query(tblDestination,
+        where: 'destination_editable=?', whereArgs: ['true']);
+  }
+
   // for restore stock
   Future<void> restoreStockTable(
       List<Map<String, dynamic>> retrievedList) async {
@@ -528,6 +563,109 @@ class DatabaseHelper {
           stockDraft: '');
       try {
         await _db.insert(tblStock, stock);
+      } catch (e) {
+        print('$e');
+      }
+    }
+  }
+
+  // for restore item type
+  Future<void> restoreItemTypeTable(
+      List<Map<String, dynamic>> retrievedList) async {
+    _db = await _loadDatabase();
+    for (var data in retrievedList) {
+      final itemType = ItemType.insertItemType(
+          itemTypeName: data['item_type_name'],
+          itemTypeEditable: data['item_type_editable'],
+          itemTypeCre: data['item_type_cre']);
+      try {
+        await _db.insert(tblItemType, itemType);
+      } catch (e) {
+        print('$e');
+      }
+    }
+  }
+
+  // for restore item
+  Future<void> restoreItemTable(
+      List<Map<String, dynamic>> retrievedList) async {
+    _db = await _loadDatabase();
+    for (var data in retrievedList) {
+      final item = Item.insertItem(
+          itemName: data['item_name'],
+          itemType: data['item_type'],
+          itemEditable: data['item_editable'],
+          itemCre: data['item_cre']);
+      try {
+        await _db.insert(tblItem, item);
+      } catch (e) {
+        print('$e');
+      }
+    }
+  }
+
+  // for restore package form
+  Future<void> restorePackageFormTable(
+      List<Map<String, dynamic>> retrievedList) async {
+    _db = await _loadDatabase();
+    for (var data in retrievedList) {
+      final packageForm = PackageForm.insertPackageForm(
+          packageFormName: data['package_form_name'],
+          packageFormEditable: data['package_form_editable'],
+          packageFormCre: data['package_form_cre']);
+      try {
+        await _db.insert(tblPackageForm, packageForm);
+      } catch (e) {
+        print('$e');
+      }
+    }
+  }
+
+  // for restore source place
+  Future<void> restoreSourcePlaceTable(
+      List<Map<String, dynamic>> retrievedList) async {
+    _db = await _loadDatabase();
+    for (var data in retrievedList) {
+      final sourcePlace = SourcePlace.insertSourcePlace(
+          sourcePlaceName: data['source_place_name'],
+          sourcePlaceEditable: data['source_place_editable'],
+          sourcePlaceCre: data['source_place_cre']);
+      try {
+        await _db.insert(tblSourcePlace, sourcePlace);
+      } catch (e) {
+        print('$e');
+      }
+    }
+  }
+
+  // for restore donor
+  Future<void> restoreDonorTable(
+      List<Map<String, dynamic>> retrievedList) async {
+    _db = await _loadDatabase();
+    for (var data in retrievedList) {
+      final donor = Donor.insertDonor(
+          donorName: data['donor_name'],
+          donorEditable: data['donor_editable'],
+          donorCre: data['donor_cre']);
+      try {
+        await _db.insert(tblDonor, donor);
+      } catch (e) {
+        print('$e');
+      }
+    }
+  }
+
+  // for restore destination
+  Future<void> restoreDestinationTable(
+      List<Map<String, dynamic>> retrievedList) async {
+    _db = await _loadDatabase();
+    for (var data in retrievedList) {
+      final destination = Destination.insertDestination(
+          destinationName: data['destination_name'],
+          destinationEditable: data['destination_editable'],
+          destinationCre: data['destination_cre']);
+      try {
+        await _db.insert(tblDestination, destination);
       } catch (e) {
         print('$e');
       }

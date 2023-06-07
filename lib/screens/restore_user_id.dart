@@ -58,6 +58,13 @@ class _RestoreUserIdState extends State<RestoreUserId> {
                   try {
                     await restoreUserData();
                     await restoreStockData();
+                    await restoreItemTypeData();
+                    await restoreItemData();
+                    await restorePackageFormData();
+                    await restoreSourcePlaceData();
+                    await restoreDonorData();
+                    await restoreDestinationData();
+                    Navigator.pop(context, 'success');
                   } catch (e) {
                     EasyLoading.showError('$e');
                   }
@@ -171,16 +178,188 @@ class _RestoreUserIdState extends State<RestoreUserId> {
     }
   }
 
+  Future<List<Map<String, dynamic>>> retrieveItemTypeDataFromServer(
+      String userId) async {
+    final response = await http.get(Uri.parse(
+        'https://chdn-karenni.org/pharmacy/retrieve_item_type_data.php?device_user_id=$userId'));
+    print(response.body);
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      if (responseData is List<dynamic>) {
+        return responseData.cast<Map<String, dynamic>>();
+      } else {
+        throw Exception('Invalid item type data format');
+      }
+    } else {
+      throw Exception('Failed to retrieve item type data');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> retrieveItemDataFromServer(
+      String userId) async {
+    final response = await http.get(Uri.parse(
+        'https://chdn-karenni.org/pharmacy/retrieve_item_data.php?device_user_id=$userId'));
+    print(response.body);
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      if (responseData is List<dynamic>) {
+        return responseData.cast<Map<String, dynamic>>();
+      } else {
+        throw Exception('Invalid item data format');
+      }
+    } else {
+      throw Exception('Failed to retrieve item data');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> retrievePackageFormDataFromServer(
+      String userId) async {
+    final response = await http.get(Uri.parse(
+        'https://chdn-karenni.org/pharmacy/retrieve_package_form_data.php?device_user_id=$userId'));
+    print(response.body);
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      if (responseData is List<dynamic>) {
+        return responseData.cast<Map<String, dynamic>>();
+      } else {
+        throw Exception('Invalid package form data format');
+      }
+    } else {
+      throw Exception('Failed to retrieve package form data');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> retrieveSourcePlaceDataFromServer(
+      String userId) async {
+    final response = await http.get(Uri.parse(
+        'https://chdn-karenni.org/pharmacy/retrieve_source_place_data.php?device_user_id=$userId'));
+    print(response.body);
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      if (responseData is List<dynamic>) {
+        return responseData.cast<Map<String, dynamic>>();
+      } else {
+        throw Exception('Invalid source place data format');
+      }
+    } else {
+      throw Exception('Failed to retrieve source place data');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> retrieveDonorDataFromServer(
+      String userId) async {
+    final response = await http.get(Uri.parse(
+        'https://chdn-karenni.org/pharmacy/retrieve_donor_data.php?device_user_id=$userId'));
+    print(response.body);
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      if (responseData is List<dynamic>) {
+        return responseData.cast<Map<String, dynamic>>();
+      } else {
+        throw Exception('Invalid donor data format');
+      }
+    } else {
+      throw Exception('Failed to retrieve donor data');
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> retrieveDestinationDataFromServer(
+      String userId) async {
+    final response = await http.get(Uri.parse(
+        'https://chdn-karenni.org/pharmacy/retrieve_destination_data.php?device_user_id=$userId'));
+    print(response.body);
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      if (responseData is List<dynamic>) {
+        return responseData.cast<Map<String, dynamic>>();
+      } else {
+        throw Exception('Invalid destination data format');
+      }
+    } else {
+      throw Exception('Failed to retrieve destination data');
+    }
+  }
+
   Future<void> restoreStockData() async {
     try {
       final stockData =
           await retrieveStockDataFromServer(userIdController.text);
       await DatabaseHelper().restoreStockTable(stockData);
       EasyLoading.showSuccess('ပစ္စည်းအဝင်အထွက်မှတ်တမ်းများရယူပြီးပါပြီ။');
-      Navigator.pop(context, 'success');
     } catch (e) {
       print('$e');
       EasyLoading.showError('ပစ္စည်းအဝင်အထွက်မှတ်တမ်းများ ရှာမတွေ့ပါ။');
+    }
+  }
+
+  Future<void> restoreItemTypeData() async {
+    try {
+      final itemTypeData =
+          await retrieveItemTypeDataFromServer(userIdController.text);
+      await DatabaseHelper().restoreItemTypeTable(itemTypeData);
+      EasyLoading.showSuccess('ပစ္စည်းအမျိုးအစားမှတ်တမ်းများရယူပြီးပါပြီ။');
+    } catch (e) {
+      print('$e');
+      EasyLoading.showError('ပစ္စည်းအမျိုးအစားမှတ်တမ်းများ ရှာမတွေ့ပါ။');
+    }
+  }
+
+  Future<void> restoreItemData() async {
+    try {
+      final itemData = await retrieveItemDataFromServer(userIdController.text);
+      await DatabaseHelper().restoreItemTable(itemData);
+      EasyLoading.showSuccess('ပစ္စည်းအမည်မှတ်တမ်းများရယူပြီးပါပြီ။');
+    } catch (e) {
+      print('$e');
+      EasyLoading.showError('ပစ္စည်းအမည်မှတ်တမ်းများ ရှာမတွေ့ပါ။');
+    }
+  }
+
+  Future<void> restorePackageFormData() async {
+    try {
+      final packageFormData =
+          await retrievePackageFormDataFromServer(userIdController.text);
+      await DatabaseHelper().restorePackageFormTable(packageFormData);
+      EasyLoading.showSuccess('ထုပ်ပိုးပုံစံမှတ်တမ်းများရယူပြီးပါပြီ။');
+    } catch (e) {
+      print('$e');
+      EasyLoading.showError('ထုတ်ပိုးပုံစံမှတ်တမ်းများ ရှာမတွေ့ပါ။');
+    }
+  }
+
+  Future<void> restoreSourcePlaceData() async {
+    try {
+      final sourcePlaceData =
+          await retrieveSourcePlaceDataFromServer(userIdController.text);
+      await DatabaseHelper().restoreSourcePlaceTable(sourcePlaceData);
+      EasyLoading.showSuccess('ရရှိရာနေရာမှတ်တမ်းများရယူပြီးပါပြီ။');
+    } catch (e) {
+      print('$e');
+      EasyLoading.showError('ရရှိရာနေရာမှတ်တမ်းများ ရှာမတွေ့ပါ။');
+    }
+  }
+
+  Future<void> restoreDonorData() async {
+    try {
+      final donorData =
+          await retrieveDonorDataFromServer(userIdController.text);
+      await DatabaseHelper().restoreDonorTable(donorData);
+      EasyLoading.showSuccess('အလှူရှင်မှတ်တမ်းများရယူပြီးပါပြီ။');
+    } catch (e) {
+      print('$e');
+      EasyLoading.showError('အလှူရှင်မှတ်တမ်းများ ရှာမတွေ့ပါ။');
+    }
+  }
+
+  Future<void> restoreDestinationData() async {
+    try {
+      final destinationData =
+          await retrieveDestinationDataFromServer(userIdController.text);
+      await DatabaseHelper().restoreDestinationTable(destinationData);
+      EasyLoading.showSuccess('ပေးပို့ရာနေရာမှတ်တမ်းများရယူပြီးပါပြီ။');
+    } catch (e) {
+      print('$e');
+      EasyLoading.showError('ပေးပို့ရာနေရာမှတ်တမ်းများ ရှာမတွေ့ပါ။');
     }
   }
 }

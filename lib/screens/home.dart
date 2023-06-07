@@ -64,6 +64,11 @@ class _HomeState extends State<Home> {
   // to sync
   List<Map<String, dynamic>> data = [];
   List<Map<String, dynamic>> itemTypeData = [];
+  List<Map<String, dynamic>> itemData = [];
+  List<Map<String, dynamic>> packageFormData = [];
+  List<Map<String, dynamic>> sourcePlaceData = [];
+  List<Map<String, dynamic>> donorData = [];
+  List<Map<String, dynamic>> destinationData = [];
   final SynchronizationData synchronizationData = SynchronizationData();
 
   // to show or hide sync button
@@ -149,9 +154,7 @@ class _HomeState extends State<Home> {
             ),
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const SizedBox(
-                height: 20,
-              ),
+              sizedBoxH20(),
               FutureBuilder<String?>(
                   // check profile set up
                   future: SharedPrefHelper.getUserId(), //check user id
@@ -171,119 +174,16 @@ class _HomeState extends State<Home> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           // start of dipsense fab
-          if (showBtnSync)
-            FloatingActionButton.extended(
-              heroTag: 'btnDispense',
-              onPressed: () async {
-                var result = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const GroupDispense()));
-                if (result == 'success') {
-                  setState(() {});
-                }
-              },
-              label: const Text(
-                'Dispense',
-                style: TextStyle(
-                    color: Color.fromARGB(255, 49, 49, 49),
-                    fontWeight: FontWeight.bold),
-              ),
-              icon: const Icon(
-                Icons.outbond_outlined,
-                color: Color.fromARGB(255, 49, 49, 49),
-              ),
-              backgroundColor: const Color.fromARGB(255, 255, 197, 63),
-            ), // end of dispense fab
+          if (showBtnSync) buildDispenseButton(),
+          // end of dispense fab
           sizedBoxW10(),
-          if (showBtnSync)
-            SpeedDial(
-              buttonSize: const Size(48, 48),
-              label: const Text(
-                'Add Stock',
-                style: TextStyle(
-                    color: Color.fromARGB(255, 49, 49, 49),
-                    fontWeight: FontWeight.bold),
-              ),
-              animatedIcon: AnimatedIcons.list_view,
-              animatedIconTheme:
-                  const IconThemeData(color: Color.fromARGB(255, 49, 49, 49)),
-              backgroundColor: const Color.fromARGB(255, 255, 197, 63),
-              spacing: 20,
-              spaceBetweenChildren: 10,
-              children: [
-                SpeedDialChild(
-                  child: const Icon(Icons.keyboard_outlined),
-                  label: 'တစ်ခုချင်း',
-                  backgroundColor: const Color.fromARGB(255, 255, 227, 160),
-                  onTap: () async {
-                    var result = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const AddStock()));
-                    if (result == 'success') {
-                      setState(() {});
-                    }
-                  },
-                ),
-                SpeedDialChild(
-                  child: const Icon(Icons.qr_code_2_outlined),
-                  label: 'QR ဖြင့်',
-                  backgroundColor: const Color.fromARGB(255, 255, 227, 160),
-                  onTap: () async {
-                    await scanQrCode();
-                  },
-                ),
-              ],
-            ), // start of sync button
+          if (showBtnSync) buildAddStockButton(),
+          // start of sync button
           if (showBtnSync) sizedBoxW10(),
-          if (showBtnSync)
-            FloatingActionButton(
-              heroTag: 'btnSync',
-              backgroundColor: Colors.green,
-              onPressed: () async {
-                if (await SynchronizationData.isInternet()) {
-                  DatabaseHelper().getAllStockForSync().then((value) {
-                    setState(() {
-                      data = value;
-                    });
-                  });
-                  DatabaseHelper().getAllItemTypeForSync().then((value) {
-                    setState(() {
-                      itemTypeData = value;
-                    });
-                  });
-
-                  EasyLoading.showProgress(0.1,
-                      status: 'အချက်အလက်များပေးပို့နေပါသည်');
-                  String dataJson =
-                      SynchronizationData().prepareDataForApi(data);
-                  try {
-                    http.Response response =
-                        await SynchronizationData().uploadDataToApi(dataJson);
-                    SynchronizationData().handleResponse(response);
-                  } catch (e) {
-                    EasyLoading.showError('$e');
-                  }
-                  String itemTypeDataJson =
-                      SynchronizationData().prepareDataForApi(itemTypeData);
-                  try {
-                    http.Response response = await SynchronizationData()
-                        .uploadItemTypeDataToApi(itemTypeDataJson);
-                    SynchronizationData().handleResponse(response);
-                  } catch (e) {
-                    EasyLoading.showError('$e');
-                  }
-                  sendUserData();
-                  EasyLoading.showSuccess('အချက်အလက်များ ပေးပို့ပြီးပါပြီ။');
-                } else {
-                  EasyLoading.showError('No internet connection');
-                }
-              },
-              child: const Icon(Icons.cloud_upload_outlined),
-            ), // end of sync button
+          if (showBtnSync) buildSyncButton(),
+          // end of sync button
         ],
-      ), // end of add stock fab
+      ),
       bottomNavigationBar: BottomNavigation(
           selectedIndex: _selectedIndex, onItemTapped: _onItemTapped),
     );
@@ -540,5 +440,192 @@ class _HomeState extends State<Home> {
         await SynchronizationData().uploadUserDataToApi(userDataJson);
     print(userDataJson);
     SynchronizationData().handleResponse(response);
+  }
+
+  Widget buildDispenseButton() {
+    return FloatingActionButton.extended(
+      heroTag: 'btnDispense',
+      onPressed: () async {
+        var result = await Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const GroupDispense()));
+        if (result == 'success') {
+          setState(() {});
+        }
+      },
+      label: const Text(
+        'Dispense',
+        style: TextStyle(
+            color: Color.fromARGB(255, 49, 49, 49),
+            fontWeight: FontWeight.bold),
+      ),
+      icon: const Icon(
+        Icons.outbond_outlined,
+        color: Color.fromARGB(255, 49, 49, 49),
+      ),
+      backgroundColor: const Color.fromARGB(255, 255, 197, 63),
+    );
+  }
+
+  Widget buildAddStockButton() {
+    return SpeedDial(
+      buttonSize: const Size(48, 48),
+      label: const Text(
+        'Add Stock',
+        style: TextStyle(
+            color: Color.fromARGB(255, 49, 49, 49),
+            fontWeight: FontWeight.bold),
+      ),
+      animatedIcon: AnimatedIcons.list_view,
+      animatedIconTheme:
+          const IconThemeData(color: Color.fromARGB(255, 49, 49, 49)),
+      backgroundColor: const Color.fromARGB(255, 255, 197, 63),
+      spacing: 20,
+      spaceBetweenChildren: 10,
+      children: [
+        SpeedDialChild(
+          child: const Icon(Icons.keyboard_outlined),
+          label: 'တစ်ခုချင်း',
+          backgroundColor: const Color.fromARGB(255, 255, 227, 160),
+          onTap: () async {
+            var result = await Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const AddStock()));
+            if (result == 'success') {
+              setState(() {});
+            }
+          },
+        ),
+        SpeedDialChild(
+          child: const Icon(Icons.qr_code_2_outlined),
+          label: 'QR ဖြင့်',
+          backgroundColor: const Color.fromARGB(255, 255, 227, 160),
+          onTap: () async {
+            await scanQrCode();
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget buildSyncButton() {
+    return FloatingActionButton(
+      heroTag: 'btnSync',
+      backgroundColor: Colors.green,
+      onPressed: () async {
+        if (await SynchronizationData.isInternet()) {
+          DatabaseHelper().getAllStockForSync().then((value) {
+            setState(() {
+              data = value;
+            });
+          });
+          DatabaseHelper().getAllItemTypeForSync().then((value) {
+            setState(() {
+              itemTypeData = value;
+            });
+          });
+          DatabaseHelper().getAllItemForSync().then((value) {
+            setState(() {
+              itemData = value;
+            });
+          });
+          DatabaseHelper().getAllPackageFormForSync().then((value) {
+            setState(() {
+              packageFormData = value;
+            });
+          });
+          DatabaseHelper().getAllSourcePlaceForSync().then((value) {
+            setState(() {
+              sourcePlaceData = value;
+            });
+          });
+          DatabaseHelper().getAllDonorForSync().then((value) {
+            setState(() {
+              donorData = value;
+            });
+          });
+          DatabaseHelper().getAllDestinationForSync().then((value) {
+            setState(() {
+              destinationData = value;
+            });
+          });
+
+          EasyLoading.showProgress(0.1, status: 'အချက်အလက်များပေးပို့နေပါသည်');
+          // send stock data
+          String dataJson = SynchronizationData().prepareDataForApi(data);
+          try {
+            http.Response response =
+                await SynchronizationData().uploadDataToApi(dataJson);
+            SynchronizationData().handleResponse(response);
+          } catch (e) {
+            EasyLoading.showError('$e');
+          }
+          // send item type data
+          String itemTypeDataJson =
+              SynchronizationData().prepareDataForApi(itemTypeData);
+          try {
+            http.Response response = await SynchronizationData()
+                .uploadItemTypeDataToApi(itemTypeDataJson);
+            SynchronizationData().handleResponse(response);
+          } catch (e) {
+            EasyLoading.showError('$e');
+          }
+          // send item data
+          String itemDataJson =
+              SynchronizationData().prepareDataForApi(itemData);
+          try {
+            http.Response response =
+                await SynchronizationData().uploadItemDataToApi(itemDataJson);
+            SynchronizationData().handleResponse(response);
+          } catch (e) {
+            EasyLoading.showError('$e');
+          }
+          // send package form data
+          String packageFormDataJson =
+              SynchronizationData().prepareDataForApi(packageFormData);
+          try {
+            http.Response response = await SynchronizationData()
+                .uploadPackageFormDataToApi(packageFormDataJson);
+            SynchronizationData().handleResponse(response);
+          } catch (e) {
+            EasyLoading.showError('$e');
+          }
+          // send source place data
+          String sourcePlaceDataJson =
+              SynchronizationData().prepareDataForApi(sourcePlaceData);
+          try {
+            http.Response response = await SynchronizationData()
+                .uploadSourcePlaceDataToApi(sourcePlaceDataJson);
+            SynchronizationData().handleResponse(response);
+          } catch (e) {
+            EasyLoading.showError('$e');
+          }
+          // send donor data
+          String donorDataJson =
+              SynchronizationData().prepareDataForApi(donorData);
+          try {
+            http.Response response =
+                await SynchronizationData().uploadDonorDataToApi(donorDataJson);
+            SynchronizationData().handleResponse(response);
+          } catch (e) {
+            EasyLoading.showError('$e');
+          }
+          // send destination data
+          String destinationDataJson =
+              SynchronizationData().prepareDataForApi(destinationData);
+          try {
+            http.Response response = await SynchronizationData()
+                .uploadDestinationDataToApi(destinationDataJson);
+            SynchronizationData().handleResponse(response);
+          } catch (e) {
+            EasyLoading.showError('$e');
+          }
+          // send user data
+          sendUserData();
+          EasyLoading.showSuccess('အချက်အလက်များ ပေးပို့ပြီးပါပြီ။');
+        } else {
+          EasyLoading.showError('No internet connection');
+        }
+      },
+      child: const Icon(Icons.cloud_upload_outlined),
+    );
   }
 }
