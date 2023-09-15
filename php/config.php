@@ -1,5 +1,5 @@
 <?php
-	$db = mysqli_connect("localhost","ehssgorg_chdn_pharmacy","L8wnYuphePbjWUV","ehssgorg_chdn_pharmacy");
+	$db = mysqli_connect("localhost","theUserName","password","databaseName");
 	if (!$db) {
 		echo "Database Connect Error ".mysqli_error($db);
 	}
